@@ -34,7 +34,7 @@ public class RegisterAndLoginController {
         this.userService = userService;
     }
 
-    // ✅ Register User
+    // ✅ REGISTER USER (FIXED)
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody User user) {
 
@@ -44,31 +44,35 @@ public class RegisterAndLoginController {
         if (userRepository.existsByEmail(user.getEmail()))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
-        User saved = userRepository.save(user);
+        // ✅ Use service (password is encoded here)
+        User saved = userService.registerUser(user);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
-    // ✅ Login User
+    // ✅ LOGIN USER (CORRECT)
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> loginUser(@RequestBody LoginRequest loginRequest) {
 
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.getUsername(),
-                            loginRequest.getPassword()
-                    )
+                new UsernamePasswordAuthenticationToken(
+                    loginRequest.getUsername(),
+                    loginRequest.getPassword()
+                )
             );
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        User user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow();
+        User user = userRepository
+                .findByUsername(loginRequest.getUsername())
+                .orElseThrow();
 
         UserDetails userDetails = org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
-                .password(user.getPassword())
-                .authorities(user.getRole())
+                .password(user.getPassword()) // BCrypt encoded
+                .authorities("ROLE_" + user.getRole())
                 .build();
 
         String token = jwtUtil.generateToken(userDetails, user.getRole());

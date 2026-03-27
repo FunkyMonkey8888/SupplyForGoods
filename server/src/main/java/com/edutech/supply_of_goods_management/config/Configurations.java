@@ -13,10 +13,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class Configurations {
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    // @Bean
+    // public PasswordEncoder passwordEncoder() {
+    //     return new BCryptPasswordEncoder();
+    // }
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
