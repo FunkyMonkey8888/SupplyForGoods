@@ -4,8 +4,13 @@ package com.edutech.supply_of_goods_management.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
  
 import javax.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
- 
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
  @Entity
 @Table(name = "orders") // do not change the table name ( do not change this line)
 public class Order {
@@ -16,18 +21,21 @@ public class Order {
  
     private int quantity;
  
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderStatus status;
  
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
  
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
  
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<Feedback> feedbacks;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Feedback> feedbacks = new ArrayList<>();
  
     public Order() {}
  
@@ -38,8 +46,8 @@ public class Order {
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
  
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public OrderStatus getStatus() { return status; }
+    public void setStatus(OrderStatus status) { this.status = status; }
  
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
@@ -50,3 +58,7 @@ public class Order {
     public List<Feedback> getFeedbacks() { return feedbacks; }
     public void setFeedbacks(List<Feedback> feedbacks) { this.feedbacks = feedbacks; }
 }
+
+
+
+

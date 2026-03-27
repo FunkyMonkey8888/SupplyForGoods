@@ -4,6 +4,8 @@ package com.edutech.supply_of_goods_management.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
  
 import javax.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
  @Entity
 @Table(name = "products") // do not change table name ( do not change this line)
@@ -26,10 +28,12 @@ public class Product {
     private int stockQuantity;
  
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<Order> orders;
+    @JsonIgnore
+    private List<Order> orders= new ArrayList<>();
  
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<Inventory> inventories;
+    @JsonIgnore
+    private List<Inventory> inventories = new ArrayList<>();
  
     public Product() {}
  

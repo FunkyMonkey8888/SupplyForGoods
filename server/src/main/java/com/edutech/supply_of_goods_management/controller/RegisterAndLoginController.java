@@ -1,7 +1,5 @@
-// RegisterAndLoginController.java
 package com.edutech.supply_of_goods_management.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,48 +19,51 @@ import com.edutech.supply_of_goods_management.service.UserService;
 @RequestMapping("/api/user")
 public class RegisterAndLoginController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
+    private final UserService userService;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private UserService userService;
-
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
-
-        if (userRepository.existsByUsername(user.getUsername())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username exists");
-        }
-
-        if (userRepository.existsByEmail(user.getEmail())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email exists");
-        }
-
-        userRepository.save(user);
-        return ResponseEntity.ok("Registered");
+    public RegisterAndLoginController(UserRepository userRepository,
+                                      AuthenticationManager authenticationManager,
+                                      JwtUtil jwtUtil,
+                                      UserService userService) {
+        this.userRepository = userRepository;
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
+        this.userService = userService;
     }
 
+    // ✅ Register User
+    @PostMapping("/register")
+    public ResponseEntity<User> registerUser(@RequestBody User user) {
+
+        if (userRepository.existsByUsername(user.getUsername()))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+
+        if (userRepository.existsByEmail(user.getEmail()))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+
+        User saved = userRepository.save(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
+
+    // ✅ Login User
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> loginUser(@RequestBody LoginRequest loginRequest) {
 
         try {
             authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
-                )
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getUsername(),
+                            loginRequest.getPassword()
+                    )
             );
-        } catch (AuthenticationException ex) {
-            return ResponseEntity.status(401).body("Invalid username or password");
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        User user = userRepository.findByUsername(request.getUsername()).orElseThrow();
+        User user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow();
 
         UserDetails userDetails = org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())

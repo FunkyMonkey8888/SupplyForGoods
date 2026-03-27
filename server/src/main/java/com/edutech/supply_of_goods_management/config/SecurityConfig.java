@@ -55,7 +55,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/consumers/products").hasAuthority("CONSUMER")
                 .antMatchers(HttpMethod.POST, "/api/consumers/order").hasAuthority("CONSUMER")
                 .antMatchers(HttpMethod.GET, "/api/consumers/orders").hasAuthority("CONSUMER")
-                .antMatchers(HttpMethod.POST, "/api/consumers/order/*/feedback").hasAuthority("CONSUMER")
+                .antMatchers(HttpMethod.POST, "/api/consumers/order/{orderId}/feedback").hasAuthority("CONSUMER")
 
                 .anyRequest().authenticated()
 

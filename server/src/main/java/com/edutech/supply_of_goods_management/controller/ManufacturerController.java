@@ -1,6 +1,5 @@
 package com.edutech.supply_of_goods_management.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,18 +18,22 @@ public class ManufacturerController {
         this.productService = productService;
     }
 
+    // ✅ Create Product
     @PostMapping("/product")
-    public Product createProduct(@RequestBody Product product) {
-        return productService.createProduct(product);
+    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
+        return ResponseEntity.ok(productService.createProduct(product));
     }
 
+    // ✅ Update Product
     @PutMapping("/product/{id}")
-    public Product updateProduct(@PathVariable Long id, @RequestBody Product updatedProduct) {
-        return productService.updateProduct(id, updatedProduct);
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id,
+                                                 @RequestBody Product productDetails) {
+        return ResponseEntity.ok(productService.updateProduct(id, productDetails));
     }
 
+    // ✅ Get All Products by Manufacturer
     @GetMapping("/products")
-    public List<Product> getProducts(@RequestParam Long manufacturerId) {
-        return productService.getProductsByManufacturer(manufacturerId);
+    public ResponseEntity<List<Product>> getAllProductsOfManufacturer(@RequestParam Long manufacturerId) {
+        return ResponseEntity.ok(productService.getProductsByManufacturer(manufacturerId));
     }
 }

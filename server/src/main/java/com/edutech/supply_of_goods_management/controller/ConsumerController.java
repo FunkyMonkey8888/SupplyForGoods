@@ -1,7 +1,5 @@
 package com.edutech.supply_of_goods_management.controller;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +11,7 @@ import com.edutech.supply_of_goods_management.service.OrderService;
 import com.edutech.supply_of_goods_management.service.ProductService;
 
 import java.util.List;
+
 @RestController
 @RequestMapping("/api/consumers")
 public class ConsumerController {
@@ -27,27 +26,31 @@ public class ConsumerController {
         this.feedbackService = feedbackService;
     }
 
+    // ✅ Browse Products
     @GetMapping("/products")
-    public List<Product> browseProducts() {
-        return productService.getAllProducts();
+    public ResponseEntity<List<Product>> browseProducts() {
+        return ResponseEntity.ok(productService.getAllProducts());
     }
 
+    // ✅ Place Order
     @PostMapping("/order")
-    public Order placeOrder(@RequestParam Long productId,
-                            @RequestParam Long userId,
-                            @RequestBody Order order) {
-        return orderService.placeOrder(productId, userId, order);
+    public ResponseEntity<Order> placeOrder(@RequestParam Long productId,
+                                            @RequestParam Long userId,
+                                            @RequestBody Order order) {
+        return ResponseEntity.ok(orderService.placeOrder(productId, userId, order));
     }
 
+    // ✅ Get All Orders
     @GetMapping("/orders")
-    public List<Order> getOrders(@RequestParam Long userId) {
-        return orderService.getOrdersByUser(userId);
+    public ResponseEntity<List<Order>> getAllOrders(@RequestParam Long userId) {
+        return ResponseEntity.ok(orderService.getOrdersByUser(userId));
     }
 
+    // ✅ Provide Feedback
     @PostMapping("/order/{orderId}/feedback")
-    public Feedback giveFeedback(@PathVariable Long orderId,
-                                 @RequestParam Long userId,
-                                 @RequestBody Feedback feedback) {
-        return feedbackService.giveFeedback(orderId, userId, feedback);
+    public ResponseEntity<Feedback> provideFeedback(@PathVariable Long orderId,
+                                                    @RequestParam Long userId,
+                                                    @RequestBody Feedback feedback) {
+        return ResponseEntity.ok(feedbackService.giveFeedback(orderId, userId, feedback));
     }
 }
