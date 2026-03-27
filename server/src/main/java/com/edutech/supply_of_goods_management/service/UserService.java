@@ -13,7 +13,13 @@ import com.edutech.supply_of_goods_management.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class UserService {
+
+    public UserDetails loadUserByUsername(String username) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'loadUserByUsername'");
+    }
 
     // implement the user service here
 
