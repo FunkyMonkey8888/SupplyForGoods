@@ -8,6 +8,9 @@ import com.edutech.supply_of_goods_management.entity.Feedback;
 
 import java.util.List;
 
+import org.springframework.stereotype.Repository;
+
+@Repository
 public interface FeedbackRepository {
     // implement the repository here
 }

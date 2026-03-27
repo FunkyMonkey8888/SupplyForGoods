@@ -8,6 +8,9 @@ import com.edutech.supply_of_goods_management.entity.Order;
 
 import java.util.List;
 
+import org.springframework.stereotype.Repository;
+
+@Repository
 public interface OrderRepository  {
     // implement the repository here
 }
