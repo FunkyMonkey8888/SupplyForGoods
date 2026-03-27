@@ -35,7 +35,7 @@ public class OrderService {
         User u = userRepo.findById(userId).orElseThrow();
         order.setProduct(p);
         order.setUser(u);
-        order.setStatus(OrderStatus.PLACED);
+        order.setOrderStatus(OrderStatus.PLACED);
         return orderRepo.save(order);
     }
 
@@ -45,9 +45,10 @@ public Order updateOrderStatus(Long orderId, OrderStatus status) {
     Order order = orderRepo.findById(orderId)
             .orElseThrow(() -> new RuntimeException("Order not found"));
 
-    OrderStatus currentStatus = order.getStatus();
+    String currentStatus = order.getStatus();
+    OrderStatus os = order.getOrderStatus();
 
-    if (!OrderStateMachine.isValidTransition(currentStatus, status)) {
+    if (!OrderStateMachine.isValidTransition(os, status)) {
         throw new IllegalStateException(
                 "Invalid order status transition from "
                 + currentStatus + " to " + status
@@ -63,7 +64,7 @@ public Order updateOrderStatus(Long orderId, OrderStatus status) {
         inventoryService.releaseInventory(order);
     }
 
-    order.setStatus(status);
+    order.setOrderStatus(os);
     return orderRepo.save(order);
 }
 

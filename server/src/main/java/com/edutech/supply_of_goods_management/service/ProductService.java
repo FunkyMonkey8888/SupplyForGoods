@@ -23,7 +23,7 @@ public class ProductService {
         p.setName(updated.getName());
         p.setDescription(updated.getDescription());
         p.setPrice(updated.getPrice());
-        // p.setStockQuantity(updated.getStockQuantity());
+        p.setStockQuantity(updated.getStockQuantity());
         p.setManufacturerId(updated.getManufacturerId());
         return repo.save(p);
     }
