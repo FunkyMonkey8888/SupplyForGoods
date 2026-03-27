@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<properties>
+
+    <!-- =============================== -->
+    <!-- AddInventoryComponent Tests -->
+    <!-- =============================== -->
+
+    <property name="addInventoryCreate"
+        value="AddInventoryComponent should create the component"/>
+
+    <property name="addInventoryInvalid"
+        value="AddInventoryComponent Form validation should not submit the form with invalid inputs"/>
+
+    <property name="addInventoryValid"
+        value="AddInventoryComponent Form validation should submit the form with valid inputs"/>
+
+
+    <!-- =============================== -->
+    <!-- CreateProductsComponent Tests -->
+    <!-- =============================== -->
+
+    <property name="createProductCreate"
+        value="CreateProductsComponent should create the component"/>
+
+    <property name="createProductInvalid"
+        value="CreateProductsComponent Form validation should not submit the form with invalid inputs"/>
+
+    <property name="createProductValid"
+        value="CreateProductsComponent Form validation should submit the form with valid inputs"/>
+
+
+    <!-- =============================== -->
+    <!-- PlaceOrderComponent Tests -->
+    <!-- =============================== -->
+
+    <property name="placeOrderCreate"
+        value="PlaceOrderComponent should create the component"/>
+
+    <property name="placeOrderInvalid"
+        value="PlaceOrderComponent Form validation should not submit the form with invalid inputs"/>
+
+    <property name="placeOrderValid"
+        value="PlaceOrderComponent Form validation should submit the form with valid inputs"/>
+
+
+    <!-- =============================== -->
+    <!-- LoginComponent Tests -->
+    <!-- =============================== -->
+
+    <property name="loginInvalidAll"
+        value="LoginComponent Form validation should have invalid form if username and password are empty"/>
+
+    <property name="loginInvalidPartial"
+        value="LoginComponent Form validation should have invalid form if username or password is empty"/>
+
+    <property name="loginValid"
+        value="LoginComponent Form validation should have valid form if username and password are provided"/>
+
+
+    <!-- =============================== -->
+    <!-- RegistrationComponent Tests -->
+    <!-- =============================== -->
+
+    <property name="registrationInvalidEmpty"
+        value="RegistrationComponent Form validation should have invalid form if any field is empty"/>
+
+    <property name="registrationInvalidEmail"
+        value="RegistrationComponent Form validation should have invalid form if email is invalid"/>
+
+    <property name="registrationValid"
+        value="RegistrationComponent Form validation should have valid form if all fields are filled correctly"/>
+
+
+    <!-- =============================== -->
+    <!-- HttpService Tests -->
+    <!-- =============================== -->
+
+    <property name="httpGetProductsWholesaler"
+        value="HttpService #getProductsByWholesaler should retrieve products for wholesaler via GET with headers"/>
+
+    <property name="httpGetProductsConsumer"
+        value="HttpService #getProductsByConsumers should retrieve products for consumers via GET with headers"/>
+
+    <property name="httpGetOrdersWholesaler"
+        value="HttpService #getOrderByWholesalers should retrieve orders for wholesalers via GET with headers"/>
+
+    <property name="httpGetOrdersConsumer"
+        value="HttpService #getOrderConsumer should retrieve orders for consumers via GET with headers"/>
+
+    <property name="httpGetInventory"
+        value="HttpService #getInventoryByWholesalers should retrieve inventory via GET with headers"/>
+
+    <property name="httpGetProductsManufacturer"
+        value="HttpService #getProductsByManufacturer should retrieve products via GET with headers"/>
+
+    <property name="httpPlaceOrder"
+        value="HttpService #placeOrder should place order via POST with request body and headers"/>
+
+    <property name="httpPlaceOrderConsumer"
+        value="HttpService #consumerPlaceOrder should place consumer order via POST with request body and headers"/>
+
+    <property name="httpUpdateOrderStatus"
+        value="HttpService #updateOrderStatus should update order status via PUT with headers"/>
+
+    <property name="httpAddFeedback"
+        value="HttpService #addConsumerFeedBack should add feedback via POST with headers"/>
+
+    <property name="httpCreateProduct"
+        value="HttpService #createProduct should create product via POST with headers"/>
+
+    <property name="httpUpdateProduct"
+        value="HttpService #updateProduct should update product via PUT with headers"/>
+
+    <property name="httpAddInventory"
+        value="HttpService #addInventory should add inventory via POST with headers"/>
+
+    <property name="httpUpdateInventory"
+        value="HttpService #updateInventory should update inventory via PUT with headers"/>
+
+    <property name="httpLogin"
+        value="HttpService #Login should authenticate user via POST and return token"/>
+
+    <property name="httpRegister"
+        value="HttpService #registerUser should register user via POST"/>
+
+
+    <!-- =============================== -->
+    <!-- Backend (Spring Boot) Tests -->
+    <!-- =============================== -->
+
+    <property name="backendRegisterUser"
+        value="Backend should register user and persist user details successfully"/>
+
+    <property name="backendLoginUser"
+        value="Backend should login user and return authentication token"/>
+
+    <property name="backendLoginInvalid"
+        value="Backend should return unauthorized for invalid login credentials"/>
+
+    <property name="backendCreateProduct"
+        value="Backend Manufacturer API should create product successfully"/>
+
+    <property name="backendUpdateProduct"
+        value="Backend Manufacturer API should update product successfully"/>
+
+    <property name="backendGetManufacturerProducts"
+        value="Backend Manufacturer API should retrieve all products of manufacturer"/>
+
+    <property name="backendBrowseProducts"
+        value="Backend Wholesaler API should browse all available products"/>
+
+    <property name="backendPlaceOrderWholesaler"
+        value="Backend Wholesaler API should place order successfully"/>
+
+    <property name="backendUpdateOrderStatus"
+        value="Backend Wholesaler API should update order status successfully"/>
+
+    <property name="backendGetWholesalerOrders"
+        value="Backend Wholesaler API should retrieve all wholesaler orders"/>
+
+    <property name="backendAddInventory"
+        value="Backend Wholesaler API should add inventory successfully"/>
+
+    <property name="backendUpdateInventory"
+        value="Backend Wholesaler API should update inventory successfully"/>
+
+    <property name="backendGetInventories"
+        value="Backend Wholesaler API should retrieve all inventories"/>
+
+    <property name="backendPlaceOrderConsumer"
+        value="Backend Consumer API should place order successfully"/>
+
+    <property name="backendGetConsumerOrders"
+        value="Backend Consumer API should retrieve all consumer orders"/>
+
+    <property name="backendProvideFeedback"
+        value="Backend Consumer API should provide feedback successfully"/>
+
+    <property name="backendManufacturerForbidden"
+        value="Backend should restrict manufacturer APIs for unauthorized roles"/>
+
+    <property name="backendWholesalerForbidden"
+        value="Backend should restrict wholesaler APIs for unauthorized roles"/>
+
+    <property name="backendConsumerForbidden"
+        value="Backend should restrict consumer APIs for unauthorized roles"/>
+
+</properties>
