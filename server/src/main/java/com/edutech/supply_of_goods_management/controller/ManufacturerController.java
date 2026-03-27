@@ -1,6 +1,7 @@
 package com.edutech.supply_of_goods_management.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.edutech.supply_of_goods_management.entity.Product;
@@ -20,6 +21,7 @@ public class ManufacturerController {
 
     // ✅ Create Product
     @PostMapping("/product")
+    @PreAuthorize("hasAuthority('WHOLESALER')")
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
         return ResponseEntity.ok(productService.createProduct(product));
     }

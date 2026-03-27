@@ -10,8 +10,8 @@ public class OrderStateMachine {
             new EnumMap<>(OrderStatus.class);
 
     static {
-        transitions.put(OrderStatus.PLACED,
-                EnumSet.of(OrderStatus.CONFIRMED, OrderStatus.CANCELLED));
+        transitions.put(OrderStatus.PENDING,
+                EnumSet.of(OrderStatus.CONFIRMED,OrderStatus.SHIPPED, OrderStatus.CANCELLED));
 
         transitions.put(OrderStatus.CONFIRMED,
                 EnumSet.of(OrderStatus.SHIPPED, OrderStatus.CANCELLED));
