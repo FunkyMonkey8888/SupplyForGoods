@@ -9,5 +9,5 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './add-inventory.component.html',
   styleUrls: ['./add-inventory.component.scss']
 })
-export class AddInventoryComponent //todo: complete missing code
+export class AddInventoryComponent {//todo: complete missing code
 }

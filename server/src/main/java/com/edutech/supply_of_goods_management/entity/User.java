@@ -10,6 +10,6 @@ import java.util.List;
 
 
 @Table(name = "users") // do not change table name ( do not change this line)
-public class User {
+public class User { 
     // implement the entity here
 }
