@@ -8,9 +8,9 @@ import com.edutech.supply_of_goods_management.entity.Order;
 
 import java.util.List;
 
-import org.springframework.stereotype.Repository;
+public interface OrderRepository extends JpaRepository<Order, Long> {
 
-@Repository
-public interface OrderRepository  {
-    // implement the repository here
+    List<Order> findByUserId(Long userId);
+
+    List<Order> findByProductId(Long productId);
 }

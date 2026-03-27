@@ -1,15 +1,19 @@
 package com.edutech.supply_of_goods_management.repository;
 
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 
 import com.edutech.supply_of_goods_management.entity.User;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface UserRepository {
+public interface UserRepository extends JpaRepository<User, Long> {
 
-   Object findByUsername(String username);
-   // implement the repository here
+    Optional<User> findByUsername(String username);
+
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
 }

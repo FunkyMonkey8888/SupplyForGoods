@@ -8,9 +8,7 @@ import com.edutech.supply_of_goods_management.entity.Product;
 
 import java.util.List;
 
-import org.springframework.stereotype.Repository;
+public interface ProductRepository extends JpaRepository<Product, Long> {
 
-@Repository
-public interface ProductRepository  {
-    // implement the repository here
+    List<Product> findByManufacturerId(Long manufacturerId);
 }
