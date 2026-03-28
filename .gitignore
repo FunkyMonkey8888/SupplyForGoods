@@ -1,0 +1,9 @@
+# Maven / Java build output
+target/
+*.class
+*.jar
+
+# Maven status
+server/target/
+server/target/**
+``
