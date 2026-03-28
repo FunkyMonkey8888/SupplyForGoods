@@ -24,6 +24,9 @@ public class Order {
     // @Enumerated(EnumType.STRING)
     // // @Column(nullable = false)
     // private OrderStatus orderStatus;
+    // @Enumerated(EnumType.STRING)
+    // // @Column(nullable = false)
+    // private OrderStatus orderStatus;
 
     private String status;
 
@@ -67,7 +70,13 @@ public class Order {
     // public OrderStatus getOrderStatus() {
     //     return orderStatus;
     // }
+    // public OrderStatus getOrderStatus() {
+    //     return orderStatus;
+    // }
 
+    // public void setOrderStatus(OrderStatus orderStatus) {
+    //     this.orderStatus = orderStatus;
+    // }
     // public void setOrderStatus(OrderStatus orderStatus) {
     //     this.orderStatus = orderStatus;
     // }

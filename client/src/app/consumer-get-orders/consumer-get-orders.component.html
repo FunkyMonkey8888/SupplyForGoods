@@ -1,1 +1,55 @@
-//todo: complete missing code
+<div class="consumer-orders-container">
+
+  <h2>My Orders</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let o of orderList">
+        <td>{{ o.id }}</td>
+        <td>{{ o.product?.name }}</td>
+        <td>{{ o.quantity }}</td>
+        <td>{{ o.orderStatus || o.status }}</td>
+        <td>
+          <button (click)="addFeedback(o)">
+            Give Feedback
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- FEEDBACK FORM -->
+  <form *ngIf="updateId" [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+
+    <div class="form-group">
+      <label>Feedback</label>
+      <textarea rows="3" formControlName="content"></textarea>
+      <small *ngIf="itemForm.get('content')?.touched && itemForm.get('content')?.invalid">
+        Feedback is required
+      </small>
+    </div>
+
+    <button type="submit">Submit Feedback</button>
+  </form>
+
+  <!-- SUCCESS MESSAGE -->
+  <p class="success" *ngIf="showMessage">
+    {{ responseMessage }}
+  </p>
+
+  <!-- ERROR MESSAGE -->
+  <p class="error" *ngIf="showError">
+    {{ errorMessage }}
+  </p>
+
+</div>

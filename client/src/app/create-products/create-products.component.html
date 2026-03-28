@@ -1,1 +1,78 @@
-//todo: complete missing code
+<div class="products-container">
+
+  <h2>Manage Products</h2>
+
+  <!-- PRODUCT FORM -->
+  <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+
+    <div class="form-group">
+      <label>Product Name</label>
+      <input type="text" formControlName="name" />
+      <small *ngIf="itemForm.get('name')?.touched && itemForm.get('name')?.invalid">
+        Product name is required
+      </small>
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <input type="text" formControlName="description" />
+    </div>
+
+    <div class="form-group">
+      <label>Price</label>
+      <input type="number" formControlName="price" />
+      <small *ngIf="itemForm.get('price')?.touched && itemForm.get('price')?.invalid">
+        Price is required
+      </small>
+    </div>
+
+    <div class="form-group">
+      <label>Stock Quantity</label>
+      <input type="number" formControlName="stockQuantity" />
+      <small *ngIf="itemForm.get('stockQuantity')?.touched && itemForm.get('stockQuantity')?.invalid">
+        Stock quantity is required
+      </small>
+    </div>
+
+    <button type="submit">
+      {{ updateId ? 'Update Product' : 'Create Product' }}
+    </button>
+
+  </form>
+
+  <!-- SUCCESS MESSAGE -->
+  <p class="success" *ngIf="showMessage">
+    {{ responseMessage }}
+  </p>
+
+  <!-- ERROR MESSAGE -->
+  <p class="error" *ngIf="showError">
+    {{ errorMessage }}
+  </p>
+
+  <!-- PRODUCT LIST -->
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let p of productList">
+        <td>{{ p.name }}</td>
+        <td>{{ p.description }}</td>
+        <td>{{ p.price }}</td>
+        <td>{{ p.stockQuantity }}</td>
+        <td>
+          <button (click)="edit(p)">Edit</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>

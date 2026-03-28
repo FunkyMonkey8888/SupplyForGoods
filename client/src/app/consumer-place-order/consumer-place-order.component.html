@@ -1,1 +1,59 @@
-//todo: complete missing code
+<div class="consumer-order-container">
+
+  <h2>Place Order</h2>
+
+  <!-- PRODUCT LIST -->
+  <table>
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Description</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let p of productList">
+        <td>{{ p.name }}</td>
+        <td>{{ p.description }}</td>
+        <td>{{ p.price }}</td>
+        <td>{{ p.stockQuantity }}</td>
+        <td>
+          <button (click)="addToOrder(p)">Select</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ORDER FORM -->
+  <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+
+    <div class="form-group">
+      <label>Quantity</label>
+      <input type="number" formControlName="quantity" />
+      <small *ngIf="itemForm.get('quantity')?.touched && itemForm.get('quantity')?.invalid">
+        Quantity is required
+      </small>
+    </div>
+
+    <div class="form-group">
+      <label>Status</label>
+      <input type="text" formControlName="status" readonly />
+    </div>
+
+    <button type="submit">Place Order</button>
+  </form>
+
+  <!-- SUCCESS MESSAGE -->
+  <p class="success" *ngIf="showMessage">
+    {{ responseMessage }}
+  </p>
+
+  <!-- ERROR MESSAGE -->
+  <p class="error" *ngIf="showError">
+    {{ errorMessage }}
+  </p>
+
+</div>

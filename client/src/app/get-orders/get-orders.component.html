@@ -1,1 +1,60 @@
-//todo: complete missing code
+<div class="orders-container">
+
+  <h2>Wholesaler Orders</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let o of orderList">
+        <td>{{ o.id }}</td>
+        <td>{{ o.product?.name }}</td>
+        <td>{{ o.quantity }}</td>
+        <td>{{ o.orderStatus || o.status }}</td>
+        <td>
+          <button (click)="processOrder(o)">
+            Update Status
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- STATUS UPDATE FORM -->
+  <form *ngIf="updateId" [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+
+    <div class="form-group">
+      <label>Order Status</label>
+      <select formControlName="status">
+        <option value="">Select Status</option>
+        <option *ngFor="let s of statusList" [value]="s">
+          {{ s }}
+        </option>
+      </select>
+      <small *ngIf="itemForm.get('status')?.touched && itemForm.get('status')?.invalid">
+        Status is required
+      </small>
+    </div>
+
+    <button type="submit">Update</button>
+  </form>
+
+  <!-- SUCCESS MESSAGE -->
+  <p class="success" *ngIf="showMessage">
+    {{ responseMessage }}
+  </p>
+
+  <!-- ERROR MESSAGE -->
+  <p class="error" *ngIf="showError">
+    {{ errorMessage }}
+  </p>
+
+</div>

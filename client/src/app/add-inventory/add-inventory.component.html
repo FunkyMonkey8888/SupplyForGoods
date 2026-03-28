@@ -1,1 +1,77 @@
-//todo: complete missing code
+<div class="inventory-container">
+
+  <h2>Manage Inventory</h2>
+
+  <!-- PRODUCT LIST -->
+  <h3>Products</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Description</th>
+        <th>Stock</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let p of productList">
+        <td>{{ p.name }}</td>
+        <td>{{ p.description }}</td>
+        <td>{{ p.stockQuantity }}</td>
+        <td>
+          <button (click)="addInventory(p)">Add</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- INVENTORY LIST -->
+  <h3>My Inventory</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Stock Quantity</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let inv of inventoryList">
+        <td>{{ inv.product?.name }}</td>
+        <td>{{ inv.stockQuantity }}</td>
+        <td>
+          <button (click)="editInventory(inv)">Edit</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- INVENTORY FORM -->
+  <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+
+    <div class="form-group">
+      <label>Stock Quantity</label>
+      <input type="number" formControlName="stockQuantity" />
+      <small *ngIf="itemForm.get('stockQuantity')?.touched && itemForm.get('stockQuantity')?.invalid">
+        Stock quantity is required
+      </small>
+    </div>
+
+    <button type="submit">
+      {{ updateId ? 'Update Inventory' : 'Add Inventory' }}
+    </button>
+  </form>
+
+  <!-- SUCCESS MESSAGE -->
+  <p class="success" *ngIf="showMessage">
+    {{ responseMessage }}
+  </p>
+
+  <!-- ERROR MESSAGE -->
+  <p class="error" *ngIf="showError">
+    {{ errorMessage }}
+  </p>
+
+</div>

@@ -1,0 +1,73 @@
+.orders-container {
+  width: 90%;
+  margin: 30px auto;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 25px;
+
+  th,
+  td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+  }
+
+  th {
+    background-color: #f4f4f4;
+  }
+
+  button {
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+}
+
+.form-group {
+  margin-bottom: 15px;
+
+  label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  select {
+    width: 100%;
+    padding: 8px;
+  }
+
+  small {
+    color: red;
+  }
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 10px;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.success {
+  color: green;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 15px;
+}
+
+.error {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 15px;
+}

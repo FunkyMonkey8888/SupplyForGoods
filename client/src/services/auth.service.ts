@@ -6,43 +6,69 @@ import { Injectable } from '@angular/core';
 export class AuthService {
 
   private token: string | null = null;
-  private isLoggedIn: boolean = false;
+  private isLoggedIn = false;
 
   constructor() {}
 
-  // Method to save token received from login
-  saveToken(token: string) {
+  /* -------------------------------
+     TOKEN MANAGEMENT
+  -------------------------------- */
+
+  saveToken(token: string): void {
     this.token = token;
     this.isLoggedIn = true;
-    // Optionally, you can save the token to local storage or a cookie for persistence
     localStorage.setItem('token', token);
   }
-   SetRole(role:any)
-  {
-    localStorage.setItem('role',role);
-  }
-  get getRole ():string|null
-  {
-    return localStorage.getItem('role');
-  }
-  // Method to retrieve login status
-  get getLoginStatus(): boolean {
-  
-      return !!localStorage.getItem('token');
-   
-  }
+
   getToken(): string | null {
-   this.token= localStorage.getItem('token');
+    if (!this.token) {
+      this.token = localStorage.getItem('token');
+    }
     return this.token;
   }
-  logout(){
+
+  /* -------------------------------
+     ROLE MANAGEMENT
+  -------------------------------- */
+
+  setRole(role: string): void {
+    localStorage.setItem('role', role);
+  }
+
+  get getRole(): string | null {
+    return localStorage.getItem('role');
+  }
+
+  /* -------------------------------
+     LOGIN STATUS
+  -------------------------------- */
+
+  get getLoginStatus(): boolean {
+    return localStorage.getItem('token') !== null;
+  }
+
+  /* -------------------------------
+     USER ID MANAGEMENT
+  -------------------------------- */
+
+  saveUserId(userId: string): void {
+    localStorage.setItem('userId', userId);
+  }
+
+  getUserId(): string | null {
+    return localStorage.getItem('userId');
+  }
+
+  /* -------------------------------
+     LOGOUT
+  -------------------------------- */
+
+  logout(): void {
+    this.token = null;
+    this.isLoggedIn = false;
+
     localStorage.removeItem('token');
     localStorage.removeItem('role');
-     this.token=null;
-     this.isLoggedIn=false
-   }
-   saveUserId(userid: string) {
-  
-    localStorage.setItem('userId',userid);
+    localStorage.removeItem('userId');
   }
 }
