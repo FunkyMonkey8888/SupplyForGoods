@@ -88,7 +88,7 @@ public class OrderService {
         return orderRepo.save(order);
     }
 
-    /* ---------------- GET ORDERS ---------------- */
+    
 
     public List<Order> getOrdersByUser(Long userId) {
         return orderRepo.findByUserId(userId);
@@ -100,6 +100,7 @@ public class OrderService {
 
         switch (current) {
             case "PENDING":
+            case "PLACED":
                 return next.equals("CONFIRMED")
                         || next.equals("SHIPPED")
                         || next.equals("CANCELLED");

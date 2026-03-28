@@ -9,6 +9,7 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
+<<<<<<< HEAD
 export class LoginComponent {
 
   itemForm: FormGroup;
@@ -22,12 +23,28 @@ export class LoginComponent {
     private authService: AuthService,
     private router: Router
   ) {
+=======
+export class LoginComponent implements OnInit {
+
+  itemForm!: FormGroup;
+  message: string = '';
+
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpService,
+    private router: Router,
+    private auth: AuthService
+  ) {}
+
+  ngOnInit(): void {
+>>>>>>> 53ec9a5451e84798ae6dac9500784838a5976677
     this.itemForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
   }
 
+<<<<<<< HEAD
   onLogin() {
     if (this.itemForm.invalid) {
       this.itemForm.markAllAsTouched();
@@ -52,4 +69,26 @@ export class LoginComponent {
   registration() {
     this.router.navigateByUrl('/registration');
   }
+=======
+  onSubmit(): void {
+    if (this.itemForm.invalid) {
+      this.message = "Please fill all fields.";
+      return;
+    }
+
+    this.http.Login(this.itemForm.value).subscribe({
+      next: (res) => {
+        // Save token, role, userId
+        this.auth.saveToken(res.token);
+        this.auth.SetRole(res.role);
+        this.auth.saveUserId(res.userId);
+
+        this.router.navigate(['/dashboard']);
+      },
+      error: () => {
+        this.message = "Invalid username or password.";
+      }
+    });
+  }
+>>>>>>> 53ec9a5451e84798ae6dac9500784838a5976677
 }

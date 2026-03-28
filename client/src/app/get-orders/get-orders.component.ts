@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpService } from '../../services/http.service';
 import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-get-orders',
@@ -9,6 +10,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class GetOrdersComponent implements OnInit {
 
+<<<<<<< HEAD
   formModel: any = { status: null };
   showError: boolean = false;
   errorMessage: any;
@@ -82,3 +84,32 @@ export class GetOrdersComponent implements OnInit {
     }
   }
 }
+=======
+  orders: any[] = [];
+  message: string = '';
+
+  constructor(
+    private http: HttpService,
+    private auth: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    const userId = localStorage.getItem('userId');
+
+    if (!userId) {
+      this.message = "User not logged in";
+      return;
+    }
+
+    this.http.getOrderByWholesalers(userId).subscribe({
+      next: (res) => {
+        this.orders = res;
+      },
+      error: () => {
+        this.message = "Failed to load orders.";
+      }
+    });
+  }
+}
+>>>>>>> 53ec9a5451e84798ae6dac9500784838a5976677

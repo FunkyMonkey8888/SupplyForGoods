@@ -118,9 +118,7 @@ public class UserService implements UserDetailsService {
                 ? "ROLE_CONSUMER"
                 : user.getRole().trim().toUpperCase();
 
-        String authority = roleFromDb.startsWith("ROLE_")
-                ? roleFromDb
-                : "ROLE_" + roleFromDb;
+        String authority = roleFromDb;
 
         return org.springframework.security.core.userdetails.User
                 .builder()
