@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { HttpService } from '../../services/http.service';
 import { AuthService } from '../../services/auth.service';
 import { DatePipe } from '@angular/common';
@@ -11,4 +9,36 @@ import { DatePipe } from '@angular/common';
   styleUrls: ['./consumer-get-orders.component.scss'],
   providers: [DatePipe]
 })
-export class ConsumerGetOrdersComponent //todo: complete missing code
+export class ConsumerGetOrdersComponent implements OnInit {
+
+  orders: any[] = [];
+  message: string = '';
+
+  constructor(
+    private http: HttpService,
+    private auth: AuthService,
+    private datePipe: DatePipe
+  ) {}
+
+  ngOnInit(): void {
+    const userId = localStorage.getItem('userId');
+
+    if (!userId) {
+      this.message = "User not logged in.";
+      return;
+    }
+
+    this.http.getOrderConsumer(userId).subscribe({
+      next: (res) => {
+        this.orders = res;
+      },
+      error: () => {
+        this.message = "Failed to load orders.";
+      }
+    });
+  }
+
+  formatDate(date: any) {
+    return this.datePipe.transform(date, 'short');
+  }
+}

@@ -21,7 +21,6 @@ public class ManufacturerController {
 
     // ✅ Create Product
     @PostMapping("/product")
-    @PreAuthorize("hasAuthority('WHOLESALER')")
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
         return ResponseEntity.ok(productService.createProduct(product));
     }

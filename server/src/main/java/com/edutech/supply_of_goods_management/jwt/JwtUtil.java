@@ -1,3 +1,4 @@
+
 package com.edutech.supply_of_goods_management.jwt;
 
 import io.jsonwebtoken.Claims;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+
 @Service
 public class JwtUtil {
 
@@ -28,7 +30,7 @@ public class JwtUtil {
     private String secret;
 
     // @Value("${app.jwt.expiration-ms}")
-    private long expirationMs = 86400L;
+    private long expirationMs = 1000*60*60L;
 
 
     private Key key() {

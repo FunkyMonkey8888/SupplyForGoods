@@ -42,7 +42,7 @@ import { ConsumerGetOrdersComponent } from './consumer-get-orders/consumer-get-o
     ReactiveFormsModule,
     HttpClientModule 
   ],
-  providers: [HttpService,HttpClientModule ],
+  providers: [HttpService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

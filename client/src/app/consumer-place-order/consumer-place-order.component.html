@@ -1,1 +1,107 @@
-//todo: complete missing code
+<!-- 🌟 Full Modern Place Order UI -->
+<div class="container d-flex justify-content-center align-items-center mt-4"
+     style="min-height: 75vh; font-family: 'Poppins', sans-serif;">
+
+  <div class="card p-4 shadow"
+       style="
+         width: 100%;
+         max-width: 500px;
+         border-radius: 18px;
+         background: linear-gradient(135deg, #ffffff 0%, #f4f9ff 100%);
+         box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+       ">
+
+    <!-- Top Icon -->
+    <div class="text-center mb-3">
+      <img src="https://cdn-icons-png.flaticon.com/512/3502/3502643.png" width="70">
+    </div>
+
+    <h3 class="text-center mb-3"
+        style="font-weight: 700; color: #2f3542; font-family: 'Poppins', sans-serif;">
+      Place Order (Consumer)
+    </h3>
+
+    <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+
+      <!-- ✅ Product ID -->
+      <div class="mb-3">
+        <label class="form-label" style="font-weight: 600; color: #444;">
+          Product ID
+        </label>
+        <input type="number"
+               class="form-control"
+               formControlName="productId"
+               placeholder="Enter product ID"
+               style="
+                 height: 44px;
+                 border-radius: 10px;
+                 padding: 10px;
+                 border: 1px solid #ccc;
+                 transition: 0.25s;
+               ">
+      </div>
+
+      <!-- ✅ Quantity -->
+      <div class="mb-3">
+        <label class="form-label" style="font-weight: 600; color: #444;">
+          Quantity
+        </label>
+        <input type="number"
+               class="form-control"
+               formControlName="quantity"
+               placeholder="Enter quantity"
+               style="
+                 height: 44px;
+                 border-radius: 10px;
+                 padding: 10px;
+                 border: 1px solid #ccc;
+               ">
+      </div>
+
+      <!-- ✅ Status -->
+      <div class="mb-3">
+        <label class="form-label" style="font-weight: 600; color: #444;">
+          Status
+        </label>
+        <input type="text"
+               class="form-control"
+               formControlName="status"
+               placeholder="Enter status (PENDING)"
+               style="
+                 height: 44px;
+                 border-radius: 10px;
+                 padding: 10px;
+                 border: 1px solid #ccc;
+               ">
+      </div>
+
+      <!-- ❌ Error Message -->
+      <div *ngIf="message"
+           class="alert alert-danger text-center"
+           style="border-radius: 10px; font-weight: 500;">
+        {{ message }}
+      </div>
+
+      <!-- ✅ Submit Button (Modern) -->
+      <button class="btn w-100"
+              type="submit"
+              [disabled]="itemForm.invalid"
+              style="
+                background: linear-gradient(90deg, #1e90ff, #00b4d8);
+                border: none;
+                padding: 12px;
+                border-radius: 10px;
+                font-size: 17px;
+                font-weight: 600;
+                color: white;
+                transition: 0.25s;
+                font-family: 'Poppins', sans-serif;
+              "
+              onmouseover="this.style.transform='scale(1.03)'"
+              onmouseout="this.style.transform='scale(1)'">
+        Place Order
+      </button>
+
+    </form>
+  </div>
+</div>
