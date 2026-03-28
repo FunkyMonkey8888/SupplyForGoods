@@ -1,3 +1,25 @@
-a{
-    cursor: pointer;
+.container {
+  max-width: 400px;
+  background-color: #f9f9f9;
+  padding: 25px;
+  border-radius: 6px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: 500;
+}
+
+button {
+  margin-top: 10px;
+}
+
+a {
+  cursor: pointer;
+  text-decoration: none;
 }

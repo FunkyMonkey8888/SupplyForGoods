@@ -1,1 +1,53 @@
-//todo: complete missing code
+<div class="container mt-4">
+  <h2>My Orders</h2>
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Status</th>
+        <th>Feedback</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let o of orderList">
+        <td>{{ o.id }}</td>
+        <td>{{ o.product?.name }}</td>
+        <td>{{ o.quantity }}</td>
+        <td>{{ o.status }}</td>
+        <td>
+          <button
+            class="btn btn-sm btn-primary"
+            (click)="addFeedback(o)"
+            [disabled]="o.status !== 'DELIVERED'">
+            Add Feedback
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="updateId" class="mt-3">
+    <h4>Submit Feedback</h4>
+
+    <textarea
+      class="form-control mb-2"
+      rows="3"
+      [(ngModel)]="formModel.content">
+    </textarea>
+
+    <button class="btn btn-success" (click)="onSubmit()">
+      Submit
+    </button>
+  </div>
+
+  <div *ngIf="showMessage" class="alert alert-success mt-3">
+    {{ responseMessage }}
+  </div>
+
+  <div *ngIf="showError" class="alert alert-danger mt-3">
+    {{ errorMessage }}
+  </div>
+</div>

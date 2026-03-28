@@ -1,3 +1,41 @@
-<div class="row text-center">
-<h1 class="text-capitalize text-uppercase">Supply-of-Goods Management and Distribution Platform</h1>
+<div class="container mt-4">
+  <h2>Dashboard</h2>
+
+  <div class="menu">
+
+    <div *ngIf="role === 'MANUFACTURER'">
+      <a routerLink="/create-product" class="btn btn-primary w-100 mb-2">
+        Create / Update Products
+      </a>
+    </div>
+
+    <div *ngIf="role === 'WHOLESALER'">
+      <a routerLink="/place-product" class="btn btn-primary w-100 mb-2">
+        Place Order
+      </a>
+
+      <a routerLink="/get-orders" class="btn btn-secondary w-100 mb-2">
+        Manage Orders
+      </a>
+
+      <a routerLink="/add-inventory" class="btn btn-success w-100 mb-2">
+        Manage Inventory
+      </a>
+    </div>
+
+    <div *ngIf="role === 'CONSUMER'">
+      <a routerLink="/consumer-place-order" class="btn btn-primary w-100 mb-2">
+        Browse & Place Order
+      </a>
+
+      <a routerLink="/consumer-get-orders" class="btn btn-secondary w-100 mb-2">
+        My Orders & Feedback
+      </a>
+    </div>
+
+    <button class="btn btn-danger w-100 mt-3" (click)="logout()">
+      Logout
+    </button>
+
+  </div>
 </div>

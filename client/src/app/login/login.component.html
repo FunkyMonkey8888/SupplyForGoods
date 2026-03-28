@@ -1,1 +1,29 @@
-//todo: complete missing code
+<div class="container mt-5">
+  <h2>Login</h2>
+
+  <form [formGroup]="itemForm" (ngSubmit)="onLogin()">
+
+    <div class="mb-3">
+      <label>Username</label>
+      <input type="text" class="form-control" formControlName="username">
+    </div>
+
+    <div class="mb-3">
+      <label>Password</label>
+      <input type="password" class="form-control" formControlName="password">
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">
+      Login
+    </button>
+
+  </form>
+
+  <div *ngIf="showError" class="alert alert-danger mt-3">
+    {{ errorMessage }}
+  </div>
+
+  <div class="text-center mt-3">
+    <a href="javascript:void(0)" (click)="registration()">New user? Register here</a>
+  </div>
+</div>

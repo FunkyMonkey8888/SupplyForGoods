@@ -1,1 +1,75 @@
-//todo: complete missing code
+<div class="container mt-4">
+  <h2>Add / Update Inventory</h2>
+
+  <div class="row">
+    <div class="col-md-5">
+      <h4>Select Product</h4>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of productList">
+            <td>{{ p.name }}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" (click)="selectProduct(p)">
+                Select
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-md-7">
+      <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+
+        <div class="mb-3">
+          <label>Stock Quantity</label>
+          <input type="number" class="form-control" formControlName="stockQuantity">
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">
+          {{ updateId ? 'Update Inventory' : 'Add Inventory' }}
+        </button>
+
+      </form>
+
+      <div *ngIf="showMessage" class="alert alert-success mt-3">
+        {{ responseMessage }}
+      </div>
+
+      <div *ngIf="showError" class="alert alert-danger mt-3">
+        {{ errorMessage }}
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <h4>My Inventory</h4>
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Stock</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let i of orderList">
+        <td>{{ i.product?.name }}</td>
+        <td>{{ i.stockQuantity }}</td>
+        <td>
+          <button class="btn btn-sm btn-secondary" (click)="editInventory(i)">
+            Edit
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { RegistrationComponent } from './registration/registration.component';
 import { AppComponent } from './app.component';
-import { DashbaordComponent } from './dashbaord/dashbaord.component';
+import { DashboardComponent } from './dashbaord/dashbaord.component';
 import { CreateProductsComponent } from './create-products/create-products.component';
 
 
@@ -18,7 +18,7 @@ import { ConsumerGetOrdersComponent } from './consumer-get-orders/consumer-get-o
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'registration', component: RegistrationComponent },
-  { path: 'dashboard', component: DashbaordComponent },  
+  { path: 'dashboard', component: DashboardComponent },  
   { path: 'create-product', component: CreateProductsComponent }, 
   { path: 'place-product', component: PlaceOrderComponent }, 
   { path: 'add-inventory', component: AddInventoryComponent }, 

@@ -1,1 +1,66 @@
-//todo: complete missing code
+<div class="container mt-4">
+  <h2>Create / Update Products</h2>
+
+  <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+
+    <div class="mb-3">
+      <label>Product Name</label>
+      <input type="text" class="form-control" formControlName="name">
+    </div>
+
+    <div class="mb-3">
+      <label>Description</label>
+      <input type="text" class="form-control" formControlName="description">
+    </div>
+
+    <div class="mb-3">
+      <label>Price</label>
+      <input type="number" class="form-control" formControlName="price">
+    </div>
+
+    <div class="mb-3">
+      <label>Stock Quantity</label>
+      <input type="number" class="form-control" formControlName="stockQuantity">
+    </div>
+
+    <button type="submit" class="btn btn-success w-100">
+      {{ updateId ? 'Update Product' : 'Create Product' }}
+    </button>
+
+  </form>
+
+  <div *ngIf="showMessage" class="alert alert-success mt-3">
+    {{ responseMessage }}
+  </div>
+
+  <div *ngIf="showError" class="alert alert-danger mt-3">
+    {{ errorMessage }}
+  </div>
+
+  <hr>
+
+  <h4>My Products</h4>
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of productList">
+        <td>{{ p.name }}</td>
+        <td>{{ p.price }}</td>
+        <td>{{ p.stockQuantity }}</td>
+        <td>
+          <button class="btn btn-sm btn-primary" (click)="edit(p)">
+            Edit
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
