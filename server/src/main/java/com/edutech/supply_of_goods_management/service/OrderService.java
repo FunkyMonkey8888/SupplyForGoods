@@ -99,7 +99,8 @@ public class OrderService {
     private boolean isValidTransition(String current, String next) {
 
         switch (current) {
-            case "PENDING":
+            case "PENDING" :
+            case "PLACED":
                 return next.equals("CONFIRMED")
                         || next.equals("SHIPPED")
                         || next.equals("CANCELLED");
