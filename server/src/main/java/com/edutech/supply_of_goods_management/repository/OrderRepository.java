@@ -8,6 +8,9 @@ import com.edutech.supply_of_goods_management.entity.Order;
 
 import java.util.List;
 
-public interface OrderRepository  {
-    // implement the repository here
+public interface OrderRepository extends JpaRepository<Order, Long> {
+
+    List<Order> findByUserId(Long userId);
+
+    List<Order> findByProductId(Long productId);
 }
