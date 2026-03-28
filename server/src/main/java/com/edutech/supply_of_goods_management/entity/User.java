@@ -2,6 +2,7 @@ package com.edutech.supply_of_goods_management.entity;
  
  
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
  
 import javax.persistence.*;
@@ -9,6 +10,7 @@ import java.util.List;
  
  @Entity
 @Table(name = "users") // do not change table name ( do not change this line)
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
  
     @Id
@@ -28,9 +30,11 @@ public class User {
     private String email;
  
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Order> orders;
  
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Feedback> feedbacks;
  
     public User() {}

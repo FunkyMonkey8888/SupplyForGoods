@@ -6,4 +6,4 @@ target/
 # Maven status
 server/target/
 server/target/**
-``
+``server/target/
