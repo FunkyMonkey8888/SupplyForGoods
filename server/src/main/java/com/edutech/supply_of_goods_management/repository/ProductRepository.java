@@ -8,6 +8,7 @@ import com.edutech.supply_of_goods_management.entity.Product;
 
 import java.util.List;
 
-public interface ProductRepository  {
-    // implement the repository here
+public interface ProductRepository extends JpaRepository<Product, Long> {
+
+    List<Product> findByManufacturerId(Long manufacturerId);
 }
