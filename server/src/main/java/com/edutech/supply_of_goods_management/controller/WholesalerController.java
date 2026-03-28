@@ -46,7 +46,7 @@ public class WholesalerController {
     // ✅ Update Order Status
     @PutMapping("/order/{id}")
     public ResponseEntity<Order> updateOrderStatus(@PathVariable Long id,
-                                                   @RequestParam OrderStatus status) {
+                                                   @RequestParam String status) {
         return ResponseEntity.ok(orderService.updateOrderStatus(id, status));
     }
 
