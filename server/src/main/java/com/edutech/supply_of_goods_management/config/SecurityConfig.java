@@ -44,22 +44,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .antMatchers("/api/user/register", "/api/user/login").permitAll()
 
-                .antMatchers("/api/manufacturers/product").hasAuthority("MANUFACTURER")
-                .antMatchers("/api/manufacturers/product/*").hasAuthority("MANUFACTURER")
-                .antMatchers("/api/manufacturers/products").hasAuthority("MANUFACTURER")
+                .antMatchers("/api/manufacturers/product").hasAuthority("ROLE_MANUFACTURER")
+                .antMatchers("/api/manufacturers/product/*").hasAuthority("ROLE_MANUFACTURER")
+                .antMatchers("/api/manufacturers/products").hasAuthority("ROLE_MANUFACTURER")
 
-                .antMatchers(HttpMethod.GET, "/api/wholesalers/products").hasAuthority("WHOLESALER")
-                .antMatchers(HttpMethod.POST, "/api/wholesalers/order").hasAuthority("WHOLESALER")
-                .antMatchers(HttpMethod.PUT, "/api/wholesalers/order/*").hasAuthority("WHOLESALER")
-                .antMatchers(HttpMethod.GET, "/api/wholesalers/orders").hasAuthority("WHOLESALER")
-                .antMatchers(HttpMethod.POST, "/api/wholesalers/inventories").hasAuthority("WHOLESALER")
-                .antMatchers(HttpMethod.PUT, "/api/wholesalers/inventories/*").hasAuthority("WHOLESALER")
-                .antMatchers(HttpMethod.GET, "/api/wholesalers/inventories").hasAuthority("WHOLESALER")
+                .antMatchers(HttpMethod.GET, "/api/wholesalers/products").hasAuthority("ROLE_WHOLESALER")
+                .antMatchers(HttpMethod.POST, "/api/wholesalers/order").hasAuthority("ROLE_WHOLESALER")
+                .antMatchers(HttpMethod.PUT, "/api/wholesalers/order/*").hasAuthority("ROLE_WHOLESALER")
+                .antMatchers(HttpMethod.GET, "/api/wholesalers/orders").hasAuthority("ROLE_WHOLESALER")
+                .antMatchers(HttpMethod.POST, "/api/wholesalers/inventories").hasAuthority("ROLE_WHOLESALER")
+                .antMatchers(HttpMethod.PUT, "/api/wholesalers/inventories/*").hasAuthority("ROLE_WHOLESALER")
+                .antMatchers(HttpMethod.GET, "/api/wholesalers/inventories").hasAuthority("ROLE_WHOLESALER")
 
-                .antMatchers(HttpMethod.GET, "/api/consumers/products").hasAuthority("CONSUMER")
-                .antMatchers(HttpMethod.POST, "/api/consumers/order").hasAuthority("CONSUMER")
-                .antMatchers(HttpMethod.GET, "/api/consumers/orders").hasAuthority("CONSUMER")
-                .antMatchers(HttpMethod.POST, "/api/consumers/order/{orderId}/feedback").hasAuthority("CONSUMER")
+                .antMatchers(HttpMethod.GET, "/api/consumers/products").hasAuthority("ROLE_CONSUMER")
+                .antMatchers(HttpMethod.POST, "/api/consumers/order").hasAuthority("ROLE_CONSUMER")
+                .antMatchers(HttpMethod.GET, "/api/consumers/orders").hasAuthority("ROLE_CONSUMER")
+                .antMatchers(HttpMethod.POST, "/api/consumers/order/*/feedback").hasAuthority("ROLE_CONSUMER")
 
                 .anyRequest().authenticated()
 
