@@ -3,9 +3,11 @@ package com.edutech.supply_of_goods_management.service;
 
 import org.springframework.stereotype.Service;
 
+import com.edutech.supply_of_goods_management.entity.Inventory;
 import com.edutech.supply_of_goods_management.entity.Order;
 import com.edutech.supply_of_goods_management.entity.Product;
 import com.edutech.supply_of_goods_management.entity.User;
+import com.edutech.supply_of_goods_management.repository.InventoryRepository;
 import com.edutech.supply_of_goods_management.repository.OrderRepository;
 import com.edutech.supply_of_goods_management.repository.ProductRepository;
 import com.edutech.supply_of_goods_management.repository.UserRepository;
@@ -20,16 +22,19 @@ public class OrderService {
     private final ProductRepository productRepo;
     private final UserRepository userRepo;
     private final InventoryService inventoryService;
+    private final InventoryRepository inventoryRepo;
 
     public OrderService(OrderRepository orderRepo,
                         ProductRepository productRepo,
                         UserRepository userRepo,
-                        InventoryService inventoryService) {
+                        InventoryService inventoryService,
+                        InventoryRepository ir) {
 
         this.orderRepo = orderRepo;
         this.productRepo = productRepo;
         this.userRepo = userRepo;
         this.inventoryService = inventoryService;
+        this.inventoryRepo = ir;
     }
 
     /* ---------------- PLACE ORDER ---------------- */
@@ -45,8 +50,22 @@ public class OrderService {
         order.setProduct(product);
         order.setUser(user);
 
-        // ✅ Tests expect initial status as STRING
+        
         order.setStatus("PENDING");
+        
+        if (product.getStockQuantity() < order.getQuantity()) {
+            throw new IllegalArgumentException("Insufficient product stock");
+        }
+
+        // Inventory inventory = inventoryRepo
+        //             .findByProductAndWholesalerId(product, userId)
+        //             .orElseThrow(() -> new RuntimeException("Inventory not found"));
+
+        // if (inventory.getStockQuantity() < order.getQuantity()) {
+        //     throw new RuntimeException("Insufficient inventory stock");
+        // }
+
+
 
         return orderRepo.save(order);
     }

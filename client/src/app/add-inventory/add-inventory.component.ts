@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { HttpService } from '../../services/http.service';
 import { AuthService } from '../../services/auth.service';
 
@@ -11,42 +10,82 @@ import { AuthService } from '../../services/auth.service';
 })
 export class AddInventoryComponent implements OnInit {
 
-  itemForm!: FormGroup;
-  message: string = '';
+  inventoryForm!: FormGroup;
+
+  products: any[] = [];
+  selectedProduct: any = null;
+
+  wholesalerId!: number | string;
+
+  loading = false;
+  successMessage = '';
+  errorMessage = '';
 
   constructor(
     private fb: FormBuilder,
     private http: HttpService,
-    private auth: AuthService,
-    private router: Router
+    private auth: AuthService
   ) {}
 
   ngOnInit(): void {
-    this.itemForm = this.fb.group({
-      productId: ['', Validators.required],
-      stockQuantity: ['', Validators.required]
+    this.wholesalerId = this.auth.getUserId()!;
+    this.buildForm();
+    this.loadProducts();
+  }
+
+  private buildForm(): void {
+    this.inventoryForm = this.fb.group({
+      stockQuantity: ['', [Validators.required, Validators.min(1)]]
     });
   }
 
-  onSubmit(): void {
-    if (this.itemForm.invalid) {
-      this.message = "Please fill all fields correctly.";
+  private loadProducts(): void {
+    this.http.getProductsByWholesaler().subscribe({
+      next: res => this.products = res,
+      error: () => this.errorMessage = 'Failed to load products'
+    });
+  }
+
+  selectProduct(product: any): void {
+    this.selectedProduct = product;
+    this.successMessage = '';
+    this.errorMessage = '';
+  }
+
+  addInventory(): void {
+
+    if (!this.selectedProduct) {
+      this.errorMessage = 'Please select a product';
       return;
     }
 
-    const productId = this.itemForm.value.productId;
+    if (this.inventoryForm.invalid) {
+      this.inventoryForm.markAllAsTouched();
+      return;
+    }
 
-    const payload = {
-      stockQuantity: this.itemForm.value.stockQuantity
-    };
+    this.loading = true;
 
-    this.http.addInventory(payload, productId).subscribe({
+    this.http.addInventory(
+      { stockQuantity: this.inventoryForm.value.stockQuantity ,
+        wholesalerId: this.wholesalerId,
+      },
+      this.selectedProduct.id,
+      this.wholesalerId
+    ).subscribe({
       next: () => {
-        this.message = "";
-        this.router.navigate(['/get-orders']);
+        this.successMessage =
+          `Inventory added for ${this.selectedProduct.name}`;
+        this.loading = false;
+        this.inventoryForm.reset();
+        this.selectedProduct = null;
       },
       error: () => {
-        this.message = "Failed to add inventory.";
+        this.errorMessage = 'Failed to add inventory';
+        this.loading = false;
+        setTimeout(() => {
+          this.errorMessage = ''
+        }, 3000);
       }
     });
   }

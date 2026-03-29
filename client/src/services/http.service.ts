@@ -174,13 +174,20 @@ updateProduct(id: any, details?: any): Observable<any> {
     this.getHeaders()
   );
 }
-  addInventory(details: any, productId: any): Observable<any> {
-    return this.http.post(
-      `${this.serverName}/api/wholesalers/inventories?productId=${productId}`,
-      details,
-      this.getHeaders()
-    );
-  }
+  // addInventory(details: any, productId: any): Observable<any> {
+  //   return this.http.post(
+  //     `${this.serverName}/api/wholesalers/inventories?productId=${productId}`,
+  //     details,
+  //     this.getHeaders()
+  //   );
+  // }
+      addInventory(details: any, productId: any, wholesalerId: any): Observable<any> {
+      return this.http.post(
+        `${this.serverName}/api/wholesalers/inventories?productId=${productId}&wholesalerId=${wholesalerId}`,
+        details,
+        this.getHeaders()
+      );
+    }
 
   updateInventory(stockQuantity: any, inventoryId: any): Observable<any> {
     return this.http.put(
@@ -204,5 +211,9 @@ updateProduct(id: any, details?: any): Observable<any> {
       details,
       this.getHeaders()
     );
+  }
+
+  deleteProductByManufacturer(id:any){
+    return this.http.delete(`${this.serverName}/api/manufacturers/product/${id}`)
   }
 }

@@ -12,7 +12,7 @@ import { DatePipe } from '@angular/common';
 export class ConsumerGetOrdersComponent implements OnInit {
 
   orders: any[] = [];
-  message: string = '';
+  message = '';
 
   constructor(
     private http: HttpService,
@@ -21,24 +21,28 @@ export class ConsumerGetOrdersComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const userId = localStorage.getItem('userId');
+    const userId = this.auth.getUserId();
 
     if (!userId) {
-      this.message = "User not logged in.";
+      this.message = 'User not logged in.';
       return;
     }
 
+    this.loadOrders(userId);
+  }
+
+  private loadOrders(userId: number | string): void {
     this.http.getOrderConsumer(userId).subscribe({
       next: (res) => {
         this.orders = res;
       },
       error: () => {
-        this.message = "Failed to load orders.";
+        this.message = 'Failed to load orders.';
       }
     });
   }
 
-  formatDate(date: any) {
+  formatDate(date: any): string | null {
     return this.datePipe.transform(date, 'short');
   }
 }

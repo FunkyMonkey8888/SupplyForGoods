@@ -2,13 +2,15 @@ package com.edutech.supply_of_goods_management.entity;
  
  
 import com.fasterxml.jackson.annotation.JsonIgnore;
- 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
  @Entity
 @Table(name = "products") // do not change table name ( do not change this line)
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Product {
 
  

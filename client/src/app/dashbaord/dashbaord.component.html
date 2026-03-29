@@ -1,136 +1,130 @@
-<!-- 🌟 Full Dashboard UI -->
-<div class="container mt-5"
-     style="max-width: 800px; font-family: 'Poppins', sans-serif;">
+<div class="dashboard-container">
 
-  <div class="card shadow-lg p-4"
-       style="
-         border-radius: 20px;
-         background: linear-gradient(135deg, #ffffff 0%, #f1f7ff 100%);
-         box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
-       ">
-
-    <!-- Page Icon -->
-    <div class="text-center mb-4">
-      https://cdn-icons-png.flaticon.com/512/854/854878.png
+  <!-- ================= HEADER ================= -->
+  <header class="dashboard-header">
+    <div>
+      <h2>Welcome, {{ username }}</h2>
+      <span class="role-badge">{{ role }}</span>
     </div>
+    <img
+      class="header-icon"
+      src="https://cdn-icons-png.flaticon.com/512/854/854878.png"
+      alt="Dashboard">
+  </header>
 
-    <!-- Title -->
-    <h2 class="text-center mb-2"
-        style="font-weight: 700; color: #2f3542;">
-      Welcome to the Supply‑of‑Goods Platform
-    </h2>
-
-    <p class="text-center text-muted mb-4"
-       style="font-size: 15px;">
-      Logged in as <b style="color:#2f80ed;">{{ role }}</b>
-    </p>
-
-    <hr style="opacity: 0.2;">
-
-    <!-- ✅ MANUFACTURER SECTION -->
-    <div *ngIf="role === 'MANUFACTURER'" class="mt-4">
-
-      <h4 style="font-weight: 600; color: #1e293b;">
-        Manufacturer Options
-      </h4>
-
-      <ul class="list-group my-3"
-          style="border-radius: 14px; overflow: hidden;">
-
-        <li class="list-group-item"
-            style="cursor: pointer; transition: 0.2s;"
-            onmouseover="this.style.background='#f1f7ff'"
-            onmouseout="this.style.background='white'">
-          <a routerLink="/create-product" class="text-decoration-none"
-             style="color: #1e90ff; font-weight: 500;">
-            ➤ Create Products
-          </a>
-        </li>
-
-      </ul>
-    </div>
-
-    <!-- ✅ WHOLESALER SECTION -->
-    <div *ngIf="role === 'WHOLESALER'" class="mt-4">
-
-      <h4 style="font-weight: 600; color: #1e293b;">
-        Wholesaler Options
-      </h4>
-
-      <ul class="list-group my-3"
-          style="border-radius: 14px; overflow: hidden;">
-
-        <li class="list-group-item"
-            style="cursor: pointer; transition: 0.2s;"
-            onmouseover="this.style.background='#eaf4ff'"
-            onmouseout="this.style.background='white'">
-          <a routerLink="/get-orders"
-             class="text-decoration-none"
-             style="color: #1e90ff; font-weight: 500;">
-            ➤ View Orders
-          </a>
-        </li>
-
-        <li class="list-group-item"
-            style="cursor: pointer; transition: 0.2s;"
-            onmouseover="this.style.background='#eaf4ff'"
-            onmouseout="this.style.background='white'">
-          <a routerLink="/place-product"
-             class="text-decoration-none"
-             style="color: #1e90ff; font-weight: 500;">
-            ➤ Place Order
-          </a>
-        </li>
-
-        <li class="list-group-item"
-            style="cursor: pointer; transition: 0.2s;"
-            onmouseover="this.style.background='#eaf4ff'"
-            onmouseout="this.style.background='white'">
-          <a routerLink="/add-inventory"
-             class="text-decoration-none"
-             style="color: #1e90ff; font-weight: 500;">
-            ➤ Add Inventory
-          </a>
-        </li>
-
-      </ul>
-    </div>
-
-    <!-- ✅ CONSUMER SECTION -->
-    <div *ngIf="role === 'CONSUMER'" class="mt-4">
-
-      <h4 style="font-weight: 600; color: #1e293b;">
-        Consumer Options
-      </h4>
-
-      <ul class="list-group my-3"
-          style="border-radius: 14px; overflow: hidden;">
-
-        <li class="list-group-item"
-            style="cursor: pointer; transition: 0.2s;"
-            onmouseover="this.style.background='#fff3e8'"
-            onmouseout="this.style.background='white'">
-          <a routerLink="/consumer-place-order"
-             class="text-decoration-none"
-             style="color: #ff7f3f; font-weight: 500;">
-            ➤ Place Order
-          </a>
-        </li>
-
-        <li class="list-group-item"
-            style="cursor: pointer; transition: 0.2s;"
-            onmouseover="this.style.background='#fff3e8'"
-            onmouseout="this.style.background='white'">
-          <a routerLink="/consumer-get-orders"
-             class="text-decoration-none"
-             style="color: #ff7f3f; font-weight: 500;">
-            ➤ View My Orders
-          </a>
-        </li>
-
-      </ul>
-    </div>
-
+  <!-- ================= LOADING / ERROR ================= -->
+  <div *ngIf="loading" class="alert alert-info">
+    Loading dashboard data...
   </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- ================= MANUFACTURER VIEW ================= -->
+  <section *ngIf="role === 'MANUFACTURER'" class="role-section manufacturer">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3>My Products</h3>
+      <a routerLink="/create-product" class="btn btn-primary">
+        + Create Product
+      </a>
+    </div>
+
+    <div *ngIf="products.length > 0; else noProducts" class="card-grid">
+      <div class="card" *ngFor="let product of products">
+        <h4>{{ product.name }}</h4>
+        <p>{{ product.description }}</p>
+        <strong>₹{{ product.price }}</strong>
+      </div>
+    </div>
+
+    <ng-template #noProducts>
+      <p class="text-muted">You have not created any products yet.</p>
+    </ng-template>
+  </section>
+
+  <!-- ================= CONSUMER VIEW ================= -->
+  <section *ngIf="role === 'CONSUMER'" class="role-section consumer">
+
+    <h3>My Orders</h3>
+
+    <div *ngIf="consumerOrders.length > 0; else noOrders" class="table-responsive">
+      <table class="table table-bordered">
+        <thead class="table-light">
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of consumerOrders">
+            <td>{{ order.product?.name }}</td>
+            <td>{{ order.quantity }}</td>
+            <td>{{ order.status }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #noOrders>
+      <p class="text-muted">You have not placed any orders yet.</p>
+    </ng-template>
+  </section>
+
+  <!-- ================= WHOLESALER VIEW ================= -->
+  <section *ngIf="role === 'WHOLESALER'" class="role-section wholesaler">
+
+    <!-- Orders -->
+    <h3>Orders Assigned to Me</h3>
+
+    <div *ngIf="wholesalerOrders.length > 0; else noWhOrders" class="table-responsive mb-4">
+      <table class="table table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of wholesalerOrders">
+            <td>{{ order.product?.name }}</td>
+            <td>{{ order.quantity }}</td>
+            <td>{{ order.status }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #noWhOrders>
+      <p class="text-muted">No orders assigned to you yet.</p>
+    </ng-template>
+
+    <!-- Inventory -->
+    <h3 class="mt-4">My Inventory</h3>
+
+    <div *ngIf="inventories.length > 0; else noInventory" class="table-responsive">
+      <table class="table table-bordered">
+        <thead class="table-light">
+          <tr>
+            <th>Product</th>
+            <th>Stock Quantity</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let inv of inventories">
+            <td>{{ inv.product?.name }}</td>
+            <td>{{ inv.stockQuantity }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #noInventory>
+      <p class="text-muted">You have not added inventory yet.</p>
+    </ng-template>
+  </section>
 
 </div>

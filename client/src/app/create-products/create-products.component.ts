@@ -49,8 +49,8 @@ export class CreateProductsComponent implements OnInit {
         this.message = "";
         this.router.navigate(['/dashboard']);
       },
-      error: () => {
-        this.message = "Failed to create product.";
+      error: (error) => {
+        this.message = "Failed to create product."; 
       }
     });
   }

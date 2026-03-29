@@ -37,4 +37,11 @@ public class ManufacturerController {
     public ResponseEntity<List<Product>> getAllProductsOfManufacturer(@RequestParam Long manufacturerId) {
         return ResponseEntity.ok(productService.getProductsByManufacturer(manufacturerId));
     }
+
+    @DeleteMapping("/product/{id}")
+    public ResponseEntity<Void> deleteProductByManufacturer(@PathVariable Long id){
+        productService.deleteProduct(id);
+        return ResponseEntity.status(204).build();
+    }
+
 }

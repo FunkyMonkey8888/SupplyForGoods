@@ -15,6 +15,7 @@ public class ProductService {
     }
 
     public Product createProduct(Product product) {
+        if(product.getPrice() <=0 || product.getStockQuantity() <=0) throw new IllegalArgumentException("Price or quantity cannot be less than 0");
         return repo.save(product);
     }
 
@@ -34,5 +35,9 @@ public class ProductService {
 
     public List<Product> getAllProducts() {
         return repo.findAll();
+    }
+
+    public void deleteProduct(Long id){
+        repo.deleteById(id);
     }
 }

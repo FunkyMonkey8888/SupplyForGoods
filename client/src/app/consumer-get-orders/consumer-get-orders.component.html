@@ -1,76 +1,70 @@
-<!-- 🌟 Modern Orders Page Container -->
-<div class="container py-4" 
-     style="max-width: 900px; font-family: 'Poppins', sans-serif;">
+<div class="container py-4 consumer-orders">
 
-  <!-- 🔥 Title Area with Icon -->
+  <!-- Header -->
   <div class="d-flex align-items-center mb-4">
-   https://cdn-icons-png.flaticon.com/512/3500/3500833.png
-    <h2 class="ms-2 mb-0" 
-        style="font-weight: 700; color: #2f3542;">
-      Your Orders
-    </h2>
+    <img src="https://cdn-icons-png.flaticon.com/512/3500/3500833.png"
+         width="40"
+         class="me-2"
+         alt="orders-icon">
+    <h2 class="fw-bold mb-0">Your Orders</h2>
   </div>
 
-  <!-- ❌ Error Message -->
-  <div *ngIf="message" 
-       class="alert alert-danger" 
-       style="border-radius: 10px; font-size: 15px; font-weight: 500;">
+  <!-- Error Message -->
+  <div *ngIf="message"
+       class="alert alert-danger">
     {{ message }}
   </div>
 
-  <!-- ✅ Orders Table -->
-  <div *ngIf="orders.length > 0" 
-       class="card shadow-sm p-3"
-       style="
-          border-radius: 14px;
-          background: linear-gradient(135deg, #ffffff 0%, #f7faff 100%);
-       ">
-    
-    <table class="table align-middle"
-           style="border-radius: 14px; overflow: hidden;">
-      
-      <thead style="background: #2f3542; color: white;">
+  <!-- Orders Table -->
+  <div *ngIf="orders.length > 0"
+       class="card shadow-sm">
+
+    <table class="table align-middle mb-0">
+      <thead class="table-dark">
         <tr>
           <th>Order ID</th>
+          <th>Product</th>
           <th>Quantity</th>
           <th>Status</th>
-          <th>Product ID</th>
-          <th>Placed Date</th>
+          <th>Placed On</th>
         </tr>
       </thead>
 
       <tbody>
-        <tr *ngFor="let o of orders"
-            style="transition: 0.2s;"
-            onmouseover="this.style.background='#f1f7ff'"
-            onmouseout="this.style.background='transparent'">
-          
-          <td style="font-weight: 600;">{{ o.id }}</td>
-          <td>{{ o.quantity }}</td>
+        <tr *ngFor="let order of orders">
+          <td>{{ order.id }}</td>
+
+          <td>
+            {{ order.product?.name || 'N/A' }}
+          </td>
+
+          <td>{{ order.quantity }}</td>
+
           <td>
             <span class="badge"
                   [ngClass]="{
-                    'bg-success': o.status === 'CONFIRMED',
-                    'bg-warning text-dark': o.status === 'PENDING' || o.status === 'PLACED',
-                    'bg-primary': o.status === 'SHIPPED',
-                    'bg-danger': o.status === 'CANCELLED'
-                  }"
-                  style="padding: 6px 10px; font-size: 13px;">
-              {{ o.status || o.orderStatus }}
+                    'bg-success': order.status === 'CONFIRMED',
+                    'bg-warning text-dark': order.status === 'PENDING' || order.status === 'PLACED',
+                    'bg-primary': order.status === 'SHIPPED',
+                    'bg-danger': order.status === 'CANCELLED'
+                  }">
+              {{ order.status }}
             </span>
           </td>
-          <td>{{ o.product?.id }}</td>
-          <td>{{ formatDate(o.timestamp) }}</td>
+
+          <td>
+            {{ formatDate(order.timestamp) || '-' }}
+          </td>
         </tr>
       </tbody>
     </table>
+
   </div>
 
-  <!-- ℹ️ No Orders -->
+  <!-- No Orders -->
   <p *ngIf="orders.length === 0 && !message"
-     class="text-muted text-center mt-3"
-     style="font-style: italic; font-size: 16px;">
-    No orders found.
+     class="text-muted text-center mt-4">
+    You have not placed any orders yet.
   </p>
 
 </div>

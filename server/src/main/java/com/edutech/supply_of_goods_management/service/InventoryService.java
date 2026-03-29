@@ -28,6 +28,8 @@ public class InventoryService {
         Product product = productRepo.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
+        // if(inventory.getWholesalerId() == null ) throw new IllegalArgumentException("Wholesaler cannot be null");
+
         inventory.setProduct(product);
         return repo.save(inventory);
     }

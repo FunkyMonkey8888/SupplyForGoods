@@ -12,7 +12,8 @@ import { AuthService } from '../../services/auth.service';
 export class LoginComponent implements OnInit {
 
   itemForm!: FormGroup;
-  message: string = '';
+  message = '';
+  loading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -30,21 +31,29 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     if (this.itemForm.invalid) {
-      this.message = "Please fill all fields.";
+      this.message = 'Please fill all fields.';
       return;
     }
 
+    this.loading = true;
+    this.message = '';
+
     this.http.Login(this.itemForm.value).subscribe({
       next: (res) => {
-        // Save token, role, userId
-        this.auth.saveToken(res.token);
-        this.auth.SetRole(res.role);
-        this.auth.saveUserId(res.userId);
+        // ✅ SAVE EVERYTHING AT ONCE (IMPORTANT)
+        this.auth.saveLoginData(
+          res.token,
+          res.role,
+          res.userId,
+          res.username
+        );
 
+        // ✅ AUTO‑REDIRECT
         this.router.navigate(['/dashboard']);
       },
       error: () => {
-        this.message = "Invalid username or password.";
+        this.message = 'Invalid username or password.';
+        this.loading = false;
       }
     });
   }
