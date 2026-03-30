@@ -56,39 +56,63 @@ public class OrderService {
     }
 
 
+    // @Transactional
+    // public Order updateOrderStatus(Long orderId, String newStatus) {
+
+    //     Order order = orderRepo.findById(orderId)
+    //             .orElseThrow(() -> new RuntimeException("Order not found"));
+
+    //     String currentStatus = order.getStatus();
+
+    //     if (currentStatus == null || currentStatus.isBlank()) {
+    //         throw new IllegalStateException("Order status is not initialized");
+    //     }
+
+    //     newStatus = newStatus.toUpperCase();
+
+    //     if (!isValidTransition(currentStatus, newStatus)) {
+    //         throw new IllegalStateException(
+    //                 "Invalid order status transition from " +
+    //                         currentStatus + " to " + newStatus
+    //         );
+    //     }
+
+    //     // ✅ Inventory hooks
+    //     if ("CONFIRMED".equals(newStatus)) {
+    //         inventoryService.reserveInventory(order);
+    //     }
+
+    //     if ("CANCELLED".equals(newStatus)) {
+    //         inventoryService.releaseInventory(order);
+    //     }
+
+    //     order.setStatus(newStatus);
+    //     return orderRepo.save(order);
+    // }
     @Transactional
-    public Order updateOrderStatus(Long orderId, String newStatus) {
+public Order updateOrderStatus(Long orderId, String status) {
 
-        Order order = orderRepo.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+    Order order = orderRepo.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        String currentStatus = order.getStatus();
+    if ("CONFIRMED".equals(status)) {
+        try {
+            inventoryService.reserveInventory(order);
+        } catch (RuntimeException ex) {
 
-        if (currentStatus == null || currentStatus.isBlank()) {
-            throw new IllegalStateException("Order status is not initialized");
-        }
+            // ✅ Inventory issue → delete product
+            Product product = order.getProduct();
+            productRepo.deleteById(product.getId());
 
-        newStatus = newStatus.toUpperCase();
-
-        if (!isValidTransition(currentStatus, newStatus)) {
-            throw new IllegalStateException(
-                    "Invalid order status transition from " +
-                            currentStatus + " to " + newStatus
+            throw new RuntimeException(
+                "Inventory unavailable. Product has been removed."
             );
         }
-
-        // ✅ Inventory hooks
-        if ("CONFIRMED".equals(newStatus)) {
-            inventoryService.reserveInventory(order);
-        }
-
-        if ("CANCELLED".equals(newStatus)) {
-            inventoryService.releaseInventory(order);
-        }
-
-        order.setStatus(newStatus);
-        return orderRepo.save(order);
     }
+
+    order.setStatus(status);
+    return orderRepo.save(order);
+}
 
 
     public List<Order> getOrdersByUser(Long userId) {

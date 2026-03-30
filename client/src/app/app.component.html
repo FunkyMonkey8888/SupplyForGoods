@@ -1,4 +1,3 @@
-<!-- ===================== NAVBAR ===================== -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm px-3">
 
   <div class="container-fluid">
@@ -21,7 +20,6 @@
     <!-- Navbar Content -->
     <div class="collapse navbar-collapse" [class.show]="isMenuOpen">
 
-      <!-- ================= LEFT: ROLE‑BASED LINKS ================= -->
       <ul class="navbar-nav me-auto" *ngIf="IsLoggin">
 
         <!-- MANUFACTURER -->
@@ -48,7 +46,7 @@
         </li>
 
         <li class="nav-item" *ngIf="roleName === 'WHOLESALER'">
-          <a class="nav-link" routerLink="/place-order">
+          <a class="nav-link" routerLink="/place-product">
             <i class="bi bi-cart-check me-1"></i>
             Place Order
           </a>

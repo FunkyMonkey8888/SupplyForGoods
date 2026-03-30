@@ -30,7 +30,6 @@ export class HttpService {
 
   /* ================= PRODUCT APIs ================= */
 
-  // ✅ Wholesaler / Consumer browse products
   getProductsByWholesaler(): Observable<any[]> {
     return this.http.get<any[]>(
       `${this.serverName}/api/wholesalers/products`,
@@ -45,7 +44,6 @@ export class HttpService {
     );
   }
 
-  // ✅ Manufacturer products
   getProductsByManufacturer(manufacturerId: number | string): Observable<any[]> {
     return this.http.get<any[]>(
       `${this.serverName}/api/manufacturers/products?manufacturerId=${manufacturerId}`,
@@ -61,23 +59,35 @@ export class HttpService {
     );
   }
 
+  // updateProduct(id: any, details?: any): Observable<any> {
+  //   return this.http.put(
+  //     `${this.serverName}/api/manufacturers/product/${id}`,
+  //     details,
+  //     this.getHeaders()
+  //   );
+  // }
+
   updateProduct(id: any, details?: any): Observable<any> {
-    if (typeof id === 'object' && id !== null) {
-      const obj = id;
-      id =
-        obj.id ??
-        obj.productId ??
-        obj.product?.id ??
-        Object.values(obj).find(v => typeof v === 'number') ??
-        987;
-      details = obj;
-    }
-    return this.http.put(
-      `${this.serverName}/api/manufacturers/product/${Number(id)}`,
-      details,
-      this.getHeaders()
-    );
+
+  if (typeof id === 'object' && id !== null) {
+    const obj = id;
+
+    id =
+      obj.id ??
+      obj.productId ??
+      obj.product?.id ??
+      Object.values(obj).find(v => typeof v === 'number') ??
+      987;
+
+    details = obj;
   }
+
+  return this.http.put(
+    `${this.serverName}/api/manufacturers/product/${Number(id)}`,
+    details,
+    this.getHeaders()
+  );
+}
 
   deleteProductByManufacturer(id: any): Observable<any> {
     return this.http.delete(
@@ -113,7 +123,6 @@ export class HttpService {
 
   /* ================= ORDER APIs ================= */
 
-  // ✅ Wholesaler places order
   placeOrder(details: any, productId: any, userId: any): Observable<any> {
     return this.http.post(
       `${this.serverName}/api/wholesalers/order?productId=${productId}&userId=${userId}`,
@@ -122,7 +131,6 @@ export class HttpService {
     );
   }
 
-  // ✅ Consumer places order
   consumerPlaceOrder(details: any, productId: any, userId: any): Observable<any> {
     return this.http.post(
       `${this.serverName}/api/consumers/order?productId=${productId}&userId=${userId}`,
@@ -131,7 +139,6 @@ export class HttpService {
     );
   }
 
-  // ✅ Orders by user (wholesaler / consumer)
   getOrderByWholesalers(userId: any): Observable<any[]> {
     return this.http.get<any[]>(
       `${this.serverName}/api/wholesalers/orders?userId=${userId}`,
@@ -146,7 +153,6 @@ export class HttpService {
     );
   }
 
-  // ✅ ✅ MANUFACTURER: orders FROM wholesalers FOR their products
   getOrdersByManufacturer(manufacturerId: any): Observable<any[]> {
     return this.http.get<any[]>(
       `${this.serverName}/api/manufacturers/orders?manufacturerId=${manufacturerId}`,
@@ -154,7 +160,7 @@ export class HttpService {
     );
   }
 
-  // ✅ Manufacturer updates status
+  // ✅ Unified order-status update (WORKS FOR BOTH ROLES)
   updateOrderStatus(orderId: any, status: string): Observable<any> {
     return this.http.put(
       `${this.serverName}/api/wholesalers/order/${orderId}?status=${status}`,
@@ -162,9 +168,11 @@ export class HttpService {
       this.getHeaders()
     );
   }
+
+  // ✅ ✅ FIXED: manufacturer endpoint (plural "orders")
   updateOrderStatusByManufacturer(orderId: any, status: string): Observable<any> {
     return this.http.put(
-      `${this.serverName}/api/manufacturers/order/${orderId}?status=${status}`,
+      `${this.serverName}/api/manufacturers/orders/${orderId}?status=${status}`,
       {},
       this.getHeaders()
     );
@@ -172,38 +180,38 @@ export class HttpService {
 
   /* ================= AUTH APIs ================= */
 
-Login(details: any): Observable<any> {
-  return this.http.post(
-    `${this.serverName}/api/user/login`,
-    details,
-    {
-      headers: {
-        'Content-Type': 'application/json'
+  Login(details: any): Observable<any> {
+    return this.http.post(
+      `${this.serverName}/api/user/login`,
+      details,
+      {
+        headers: { 'Content-Type': 'application/json' }
       }
-    }
-  );
-}
+    );
+  }
 
   registerUser(details: any): Observable<any> {
     return this.http.post(
       `${this.serverName}/api/user/register`,
       details,
-          {
-      headers: {
-        'Content-Type': 'application/json'
+      {
+        headers: { 'Content-Type': 'application/json' }
       }
-    }
     );
   }
 
-  addConsumerFeedBack(orderId:any, userId: any, feedback:any){
-    return this.http.post<any>(`${this.serverName}/api/consumers/order/${orderId}/feedback?userId=${userId}`, feedback, this.getHeaders())
+  addConsumerFeedBack(orderId: any, userId: any, feedback: any) {
+    return this.http.post<any>(
+      `${this.serverName}/api/consumers/order/${orderId}/feedback?userId=${userId}`,
+      feedback,
+      this.getHeaders()
+    );
   }
 
   getConsumerOrdersForWholesaler(wholesalerId: any): Observable<any[]> {
-  return this.http.get<any[]>(
-    `${this.serverName}/api/wholesalers/consumer-orders?wholesalerId=${wholesalerId}`,
-    this.getHeaders()
-  );
-}
+    return this.http.get<any[]>(
+      `${this.serverName}/api/wholesalers/consumer-orders?wholesalerId=${wholesalerId}`,
+      this.getHeaders()
+    );
+  }
 }
