@@ -122,6 +122,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/manufacturers/product").hasAuthority("MANUFACTURER")
                 .antMatchers("/api/manufacturers/product/*").hasAuthority("MANUFACTURER")
                 .antMatchers("/api/manufacturers/products").hasAuthority("MANUFACTURER")
+                .antMatchers("/api/manufacturers/orders").hasAuthority("MANUFACTURER")
+                .antMatchers("/api/manufacturers/*").hasAuthority("MANUFACTURER")
+
 
                 // ✅ WHOLESALER ENDPOINTS
                 .antMatchers(HttpMethod.GET, "/api/wholesalers/products").hasAuthority("WHOLESALER")
@@ -137,6 +140,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/consumers/order").hasAuthority("CONSUMER")
                 .antMatchers(HttpMethod.GET, "/api/consumers/orders").hasAuthority("CONSUMER")
                 .antMatchers(HttpMethod.POST, "/api/consumers/order/{orderId}/feedback").hasAuthority("CONSUMER")
+                
 
                 // ✅ ALL OTHER ENDPOINTS REQUIRE AUTH
                 .anyRequest().authenticated()

@@ -1,48 +1,75 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpService } from '../../services/http.service';
 import { AuthService } from '../../services/auth.service';
-import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-consumer-get-orders',
   templateUrl: './consumer-get-orders.component.html',
-  styleUrls: ['./consumer-get-orders.component.scss'],
-  providers: [DatePipe]
+  styleUrls: ['./consumer-get-orders.component.scss']
 })
 export class ConsumerGetOrdersComponent implements OnInit {
 
   orders: any[] = [];
-  message = '';
+  userId!: number;
+
+  activeOrderId: number | null = null;
+
+  ratings: { [orderId: number]: number } = {};
+  comments: { [orderId: number]: string } = {};
+
+  /** ✅ Track submitted feedback locally */
+  submittedFeedback: {
+    [orderId: number]: { rating: number; comment: string }
+  } = {};
 
   constructor(
     private http: HttpService,
-    private auth: AuthService,
-    private datePipe: DatePipe
+    private auth: AuthService
   ) {}
 
   ngOnInit(): void {
-    const userId = this.auth.getUserId();
-
-    if (!userId) {
-      this.message = 'User not logged in.';
-      return;
-    }
-
-    this.loadOrders(userId);
+    this.userId = Number(this.auth.getUserId());
+    this.loadOrders();
   }
 
-  private loadOrders(userId: number | string): void {
-    this.http.getOrderConsumer(userId).subscribe({
-      next: (res) => {
-        this.orders = res;
-      },
-      error: () => {
-        this.message = 'Failed to load orders.';
-      }
+  loadOrders(): void {
+    this.http.getOrderConsumer(this.userId).subscribe({
+      next: res => this.orders = res,
+      error: () => alert('Failed to load orders')
     });
   }
 
-  formatDate(date: any): string | null {
-    return this.datePipe.transform(date, 'short');
+  openFeedback(orderId: number): void {
+    if (this.submittedFeedback[orderId]) return;
+
+    this.activeOrderId = orderId;
+    this.ratings[orderId] = this.ratings[orderId] || 0;
+    this.comments[orderId] = this.comments[orderId] || '';
+  }
+
+  setRating(orderId: number, rating: number): void {
+    this.ratings[orderId] = rating;
+  }
+
+  submitFeedback(orderId: number): void {
+    const rating = this.ratings[orderId];
+    const comment = this.comments[orderId];
+
+    if (!rating) {
+      alert('Please select a rating');
+      return;
+    }
+
+    const payload = { rating, comment };
+
+    this.http.addConsumerFeedBack(orderId, this.userId, payload).subscribe({
+      next: () => {
+        /** ✅ Save feedback locally for viewing */
+        this.submittedFeedback[orderId] = { rating, comment };
+
+        this.activeOrderId = null;
+      },
+      error: () => alert('Failed to submit feedback')
+    });
   }
 }

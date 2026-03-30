@@ -1,33 +1,56 @@
+<!-- ✅ LANDING VIEW (NOT LOGGED IN) -->
+<div *ngIf="!isLoggedIn" class="text-center py-5">
+  <h2 class="fw-bold">Welcome to SupplyChain Pro</h2>
+  <p class="text-muted mt-2">
+    Manage products, inventory, and orders seamlessly across the supply chain.
+  </p>
+
+  <div class="mt-4">
+    <a routerLink="/registration" class="btn btn-primary me-3">
+      Get Started
+    </a>
+    <a routerLink="/login" class="btn btn-outline-secondary">
+      Login
+    </a>
+  </div>
+</div>
+
+<!-- ✅ ACTUAL DASHBOARD (LOGGED IN ONLY) -->
+<div *ngIf="isLoggedIn">
+
+  <!-- existing dashboard content -->
+  <!-- <header class="dashboard-header">
+    <h2>Welcome, {{ username }}</h2>
+    <span class="role-badge">{{ role }}</span>
+  </header> -->
+
+  <!-- rest of your role-based sections -->
+
+
 <div class="dashboard-container">
 
-  <!-- ================= HEADER ================= -->
+  <!-- HEADER -->
   <header class="dashboard-header">
     <div>
       <h2>Welcome, {{ username }}</h2>
       <span class="role-badge">{{ role }}</span>
     </div>
-    <img
-      class="header-icon"
-      src="https://cdn-icons-png.flaticon.com/512/854/854878.png"
-      alt="Dashboard">
   </header>
 
-  <!-- ================= LOADING / ERROR ================= -->
-  <div *ngIf="loading" class="alert alert-info">
-    Loading dashboard data...
-  </div>
+  <!-- ERROR -->
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
 
-  <div *ngIf="error" class="alert alert-danger">
-    {{ error }}
-  </div>
+  <!-- ================= MANUFACTURER ================= -->
+  <section *ngIf="role === 'MANUFACTURER'" class="role-section">
+    <h3>Manufacturer Dashboard</h3>
 
-  <!-- ================= MANUFACTURER VIEW ================= -->
-  <section *ngIf="role === 'MANUFACTURER'" class="role-section manufacturer">
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h3>My Products</h3>
+    <div class="actions mb-3">
       <a routerLink="/create-product" class="btn btn-primary">
         + Create Product
+      </a>
+
+      <a routerLink="/get-orders" class="btn btn-warning ms-2">
+        Review Orders
       </a>
     </div>
 
@@ -40,91 +63,71 @@
     </div>
 
     <ng-template #noProducts>
-      <p class="text-muted">You have not created any products yet.</p>
+      <p class="text-muted">No products created yet.</p>
     </ng-template>
   </section>
 
-  <!-- ================= CONSUMER VIEW ================= -->
-  <section *ngIf="role === 'CONSUMER'" class="role-section consumer">
+  <!-- ================= CONSUMER ================= -->
+  <section *ngIf="role === 'CONSUMER'" class="role-section">
+    <h3>Consumer Dashboard</h3>
 
-    <h3>My Orders</h3>
+    <div class="actions mb-3">
+      <a routerLink="/consumer-place-order" class="btn btn-primary">
+        Browse Products
+      </a>
 
-    <div *ngIf="consumerOrders.length > 0; else noOrders" class="table-responsive">
-      <table class="table table-bordered">
-        <thead class="table-light">
-          <tr>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let order of consumerOrders">
-            <td>{{ order.product?.name }}</td>
-            <td>{{ order.quantity }}</td>
-            <td>{{ order.status }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <a routerLink="/consumer-place-order" class="btn btn-success ms-2">
+        Place Order
+      </a>
+
+      <a routerLink="/consumer-get-orders" class="btn btn-outline-dark ms-2">
+        My Orders
+      </a>
     </div>
 
-    <ng-template #noOrders>
-      <p class="text-muted">You have not placed any orders yet.</p>
-    </ng-template>
+    <p class="text-muted">
+      Use the actions above to browse products and track your orders.
+    </p>
   </section>
 
-  <!-- ================= WHOLESALER VIEW ================= -->
-  <section *ngIf="role === 'WHOLESALER'" class="role-section wholesaler">
+  <!-- ================= WHOLESALER ================= -->
+  <section *ngIf="role === 'WHOLESALER'" class="role-section">
+    <h3>Wholesaler Dashboard</h3>
 
-    <!-- Orders -->
-    <h3>Orders Assigned to Me</h3>
+    <div class="actions mb-3">
+      <a routerLink="/add-inventory" class="btn btn-primary">
+        Add Inventory
+      </a>
 
-    <div *ngIf="wholesalerOrders.length > 0; else noWhOrders" class="table-responsive mb-4">
-      <table class="table table-striped">
-        <thead class="table-dark">
-          <tr>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let order of wholesalerOrders">
-            <td>{{ order.product?.name }}</td>
-            <td>{{ order.quantity }}</td>
-            <td>{{ order.status }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <a routerLink="/place-product" class="btn btn-success ms-2">
+        Place Order
+      </a>
+
+      <a routerLink="/get-orders" class="btn btn-outline-dark ms-2">
+        View Orders
+      </a>
     </div>
 
-    <ng-template #noWhOrders>
-      <p class="text-muted">No orders assigned to you yet.</p>
-    </ng-template>
+    <h5 class="mt-4">My Inventory</h5>
+    <table class="table table-bordered" *ngIf="inventories.length > 0">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Stock</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let inv of inventories">
+          <td>{{ inv.product?.name }}</td>
+          <td>{{ inv.stockQuantity }}</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <!-- Inventory -->
-    <h3 class="mt-4">My Inventory</h3>
-
-    <div *ngIf="inventories.length > 0; else noInventory" class="table-responsive">
-      <table class="table table-bordered">
-        <thead class="table-light">
-          <tr>
-            <th>Product</th>
-            <th>Stock Quantity</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let inv of inventories">
-            <td>{{ inv.product?.name }}</td>
-            <td>{{ inv.stockQuantity }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <ng-template #noInventory>
-      <p class="text-muted">You have not added inventory yet.</p>
-    </ng-template>
+    <p *ngIf="inventories.length === 0" class="text-muted">
+      No inventory added yet.
+    </p>
   </section>
 
+</div>
 </div>

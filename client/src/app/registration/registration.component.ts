@@ -22,21 +22,31 @@ export class RegistrationComponent implements OnInit {
     private router: Router
   ) {}
 
+  // ngOnInit(): void {
+  //   this.itemForm = this.fb.group({
+  //     username: ['', [Validators.required, Validators.minLength(4)]],
+  //     email: ['', [Validators.required, Validators.email]],
+  //     password: [
+  //       '',
+  //       [
+  //         Validators.required,
+  //         Validators.minLength(8),
+  //         Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/)
+  //       ]
+  //     ],
+  //     role: ['', Validators.required]
+  //   });
+  // }
+
   ngOnInit(): void {
-    this.itemForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(4)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(8),
-          Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/)
-        ]
-      ],
-      role: ['', Validators.required]
-    });
-  }
+  this.itemForm = this.fb.group({
+    username: ['', [Validators.required, Validators.minLength(3)]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    role: ['', Validators.required]
+  });
+}
+
 
   onSubmit(): void {
     if (this.itemForm.invalid) {

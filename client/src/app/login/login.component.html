@@ -1,13 +1,15 @@
 <div class="container d-flex justify-content-center align-items-center min-vh-100">
-  <div class="card login-card shadow-lg">
 
-    <!-- Icon -->
+  <div class="card login-card shadow-lg p-4"
+       style="max-width: 420px; width: 100%; border-radius: 16px;">
+
+    <!-- ✅ Icon Header -->
     <div class="text-center mb-3">
-      <img src="https://cdn-icons-png.flaticon.com/512/3064/3064197.png"
-           width="70" height="70">
+      <i class="bi bi-shield-lock-fill"
+         style="font-size: 48px; color: #0d6efd;"></i>
     </div>
 
-    <h3 class="text-center mb-4 fw-bold">Login</h3>
+    <h3 class="text-center mb-4 fw-bold">Login to Your Account</h3>
 
     <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
 
@@ -36,21 +38,30 @@
         {{ message }}
       </div>
 
-      <!-- Button -->
+      <!-- Submit -->
       <button
         class="btn btn-primary w-100"
         type="submit"
         [disabled]="itemForm.invalid || loading">
 
-        <span *ngIf="!loading">Login</span>
-        <span *ngIf="loading">Logging in…</span>
+        <span *ngIf="!loading">
+          <i class="bi bi-box-arrow-in-right me-1"></i>
+          Login
+        </span>
+
+        <span *ngIf="loading">
+          Logging in…
+        </span>
       </button>
 
     </form>
 
-    <p class="text-center mt-3">
+    <!-- Register Redirect -->
+    <p class="text-center mt-3 mb-0">
       Don’t have an account?
-      <a routerLink="/registration" class="fw-semibold">Register here</a>
+      <a routerLink="/registration" class="fw-semibold">
+        Register here
+      </a>
     </p>
 
   </div>

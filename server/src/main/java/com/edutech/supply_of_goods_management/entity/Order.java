@@ -26,8 +26,6 @@ public class Order {
     // private OrderStatus orderStatus;
 
     private String status;
-
-    
  
     
     @ManyToOne(fetch = FetchType.LAZY)

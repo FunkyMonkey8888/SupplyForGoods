@@ -1,12 +1,15 @@
 <div class="container d-flex justify-content-center align-items-center min-vh-100">
-  <div class="card registration-card shadow-lg">
 
+  <div class="card registration-card shadow-lg p-4"
+       style="max-width: 420px; width: 100%; border-radius: 16px;">
+
+    <!-- ✅ Icon Header -->
     <div class="text-center mb-3">
-      <img src="https://cdn-icons-png.flaticon.com/512/747/747376.png"
-           width="70" height="70" />
+      <i class="bi bi-person-plus-fill"
+         style="font-size: 48px; color: #0d6efd;"></i>
     </div>
 
-    <h3 class="text-center mb-4 fw-bold">User Registration</h3>
+    <h3 class="text-center mb-4 fw-bold">Create Your Account</h3>
 
     <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
 
@@ -20,7 +23,7 @@
         <small class="text-danger"
                *ngIf="itemForm.controls['username'].touched &&
                        itemForm.controls['username'].invalid">
-          Username must be at least 4 characters
+          Username must be at least 3 characters
         </small>
       </div>
 
@@ -48,7 +51,7 @@
         <small class="text-danger"
                *ngIf="itemForm.controls['password'].touched &&
                        itemForm.controls['password'].invalid">
-          Password must be at least 8 chars, include upper, lower, number & symbol
+          Password must be at least 6 characters
         </small>
       </div>
 
@@ -57,11 +60,13 @@
         <label class="form-label fw-semibold">Select Role</label>
         <select formControlName="role" class="form-select">
           <option value="" disabled>Select Role</option>
-          <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+          <option *ngFor="let r of roles" [value]="r">
+            {{ r }}
+          </option>
         </select>
       </div>
 
-      <!-- Error Message -->
+      <!-- Error -->
       <div *ngIf="message" class="alert alert-danger text-center">
         {{ message }}
       </div>
@@ -70,15 +75,23 @@
       <button class="btn btn-primary w-100"
               type="submit"
               [disabled]="itemForm.invalid || loading">
-        <span *ngIf="!loading">Register</span>
-        <span *ngIf="loading">Registering...</span>
+        <span *ngIf="!loading">
+          <i class="bi bi-person-check-fill me-1"></i>
+          Register
+        </span>
+        <span *ngIf="loading">
+          Registering...
+        </span>
       </button>
 
     </form>
 
-    <p class="text-center mt-3">
+    <!-- Login Link -->
+    <p class="text-center mt-3 mb-0">
       Already have an account?
-      <a routerLink="/login" class="fw-semibold">Login here</a>
+      <a routerLink="/login" class="fw-semibold">
+        Login here
+      </a>
     </p>
 
   </div>

@@ -47,8 +47,8 @@
             <strong>{{ selectedProduct.name }}</strong>
           </div>
 
-          <form [formGroup]="inventoryForm"
-                (ngSubmit)="addInventory()">
+          <form [formGroup]="itemForm"
+                (ngSubmit)="onSubmit()">
 
             <div class="mb-3">
               <label class="form-label fw-semibold">
@@ -60,8 +60,8 @@
                      placeholder="Enter quantity">
 
               <small class="text-danger"
-                     *ngIf="inventoryForm.get('stockQuantity')?.touched &&
-                            inventoryForm.get('stockQuantity')?.invalid">
+                     *ngIf="itemForm.get('stockQuantity')?.touched &&
+                            itemForm.get('stockQuantity')?.invalid">
                 Quantity must be greater than 0
               </small>
             </div>

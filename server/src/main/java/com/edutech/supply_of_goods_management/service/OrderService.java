@@ -1,7 +1,4 @@
-
 package com.edutech.supply_of_goods_management.service;
-
-import org.springframework.stereotype.Service;
 
 import com.edutech.supply_of_goods_management.entity.Inventory;
 import com.edutech.supply_of_goods_management.entity.Order;
@@ -11,9 +8,11 @@ import com.edutech.supply_of_goods_management.repository.InventoryRepository;
 import com.edutech.supply_of_goods_management.repository.OrderRepository;
 import com.edutech.supply_of_goods_management.repository.ProductRepository;
 import com.edutech.supply_of_goods_management.repository.UserRepository;
+import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -22,22 +21,21 @@ public class OrderService {
     private final ProductRepository productRepo;
     private final UserRepository userRepo;
     private final InventoryService inventoryService;
-    private final InventoryRepository inventoryRepo;
+    private final InventoryRepository inventoryRepository;
 
     public OrderService(OrderRepository orderRepo,
                         ProductRepository productRepo,
                         UserRepository userRepo,
-                        InventoryService inventoryService,
-                        InventoryRepository ir) {
+                        InventoryService inventoryService, 
+                    InventoryRepository ir) {
 
         this.orderRepo = orderRepo;
         this.productRepo = productRepo;
         this.userRepo = userRepo;
         this.inventoryService = inventoryService;
-        this.inventoryRepo = ir;
+        this.inventoryRepository = ir;
     }
 
-    /* ---------------- PLACE ORDER ---------------- */
 
     public Order placeOrder(Long productId, Long userId, Order order) {
 
@@ -50,27 +48,13 @@ public class OrderService {
         order.setProduct(product);
         order.setUser(user);
 
-        
         order.setStatus("PENDING");
-        
-        if (product.getStockQuantity() < order.getQuantity()) {
-            throw new IllegalArgumentException("Insufficient product stock");
-        }
-
-        // Inventory inventory = inventoryRepo
-        //             .findByProductAndWholesalerId(product, userId)
-        //             .orElseThrow(() -> new RuntimeException("Inventory not found"));
-
-        // if (inventory.getStockQuantity() < order.getQuantity()) {
-        //     throw new RuntimeException("Insufficient inventory stock");
-        // }
 
 
 
         return orderRepo.save(order);
     }
 
-    /* ---------------- UPDATE ORDER STATUS ---------------- */
 
     @Transactional
     public Order updateOrderStatus(Long orderId, String newStatus) {
@@ -86,11 +70,10 @@ public class OrderService {
 
         newStatus = newStatus.toUpperCase();
 
-        // ✅ Basic allowed transitions (aligned with tests)
         if (!isValidTransition(currentStatus, newStatus)) {
             throw new IllegalStateException(
-                    "Invalid order status transition from "
-                            + currentStatus + " to " + newStatus
+                    "Invalid order status transition from " +
+                            currentStatus + " to " + newStatus
             );
         }
 
@@ -107,26 +90,24 @@ public class OrderService {
         return orderRepo.save(order);
     }
 
-    
 
     public List<Order> getOrdersByUser(Long userId) {
         return orderRepo.findByUserId(userId);
     }
 
-    /* ---------------- TRANSITION RULES ---------------- */
+    public List<Order> getOrdersByManufacturer(Long manufacturerId) {
+        return orderRepo.findByProductManufacturerId(manufacturerId);
+    }
+
 
     private boolean isValidTransition(String current, String next) {
 
         switch (current) {
             case "PENDING":
-            case "PLACED":
-                return next.equals("CONFIRMED")
-                        || next.equals("SHIPPED")
-                        || next.equals("CANCELLED");
+                return next.equals("CONFIRMED") || next.equals("CANCELLED") || next.equals("SHIPPED");
 
             case "CONFIRMED":
-                return next.equals("SHIPPED")
-                        || next.equals("CANCELLED");
+                return next.equals("SHIPPED") || next.equals("CANCELLED");
 
             case "SHIPPED":
                 return next.equals("DELIVERED");
@@ -139,4 +120,24 @@ public class OrderService {
                 return false;
         }
     }
+
+    public List<Order> getConsumerOrdersForWholesaler(Long wholesalerId) {
+
+    // Step 1: get all inventories of the wholesaler
+    List<Inventory> inventories =
+            inventoryRepository.findByWholesalerId(wholesalerId);
+
+    // Step 2: extract product IDs
+    List<Long> productIds = inventories.stream()
+            .map(inv -> inv.getProduct().getId())
+            .distinct().collect(Collectors.toList());
+
+    if (productIds.isEmpty()) {
+        return List.of();
+    }
+
+    return orderRepo.findByProductIdInAndUserRole(
+            productIds, "CONSUMER"
+    );
+}
 }

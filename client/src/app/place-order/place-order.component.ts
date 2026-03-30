@@ -10,7 +10,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class PlaceOrderComponent implements OnInit {
 
-  orderForm!: FormGroup;
+  itemForm!: FormGroup;
 
   inventories: any[] = [];          // ✅ inventory is the source of truth
   selectedInventory: any = null;    // ✅ selected inventory, not product
@@ -34,7 +34,7 @@ export class PlaceOrderComponent implements OnInit {
   }
 
   private buildForm(): void {
-    this.orderForm = this.fb.group({
+    this.itemForm = this.fb.group({
       quantity: ['', [Validators.required, Validators.min(1)]],
       status: ['PENDING']
     });
@@ -65,19 +65,19 @@ export class PlaceOrderComponent implements OnInit {
   }
 
   /* ✅ PLACE ORDER WITH STOCK CHECK */
-  placeOrder(): void {
+  onSubmit(): void {
 
     if (!this.selectedInventory) {
       this.errorMessage = 'Please select an inventory item';
       return;
     }
 
-    if (this.orderForm.invalid) {
-      this.orderForm.markAllAsTouched();
+    if (this.itemForm.invalid) {
+      this.itemForm.markAllAsTouched();
       return;
     }
 
-    const qty = this.orderForm.value.quantity;
+    const qty = this.itemForm.value.quantity;
     const availableStock = this.selectedInventory.stockQuantity;
 
     // ✅ CRITICAL VALIDATION
@@ -101,7 +101,7 @@ export class PlaceOrderComponent implements OnInit {
       next: () => {
         this.successMessage = 'Order placed successfully';
         this.loading = false;
-        this.orderForm.reset({ status: 'PENDING' });
+        this.itemForm.reset({ status: 'PENDING' });
         this.selectedInventory = null;
       },
       error: () => {

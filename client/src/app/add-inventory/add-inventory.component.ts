@@ -10,7 +10,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class AddInventoryComponent implements OnInit {
 
-  inventoryForm!: FormGroup;
+  itemForm!: FormGroup;
 
   products: any[] = [];
   selectedProduct: any = null;
@@ -34,7 +34,8 @@ export class AddInventoryComponent implements OnInit {
   }
 
   private buildForm(): void {
-    this.inventoryForm = this.fb.group({
+    this.itemForm = this.fb.group({
+      productId: ['', Validators.required],
       stockQuantity: ['', [Validators.required, Validators.min(1)]]
     });
   }
@@ -48,36 +49,36 @@ export class AddInventoryComponent implements OnInit {
 
   selectProduct(product: any): void {
     this.selectedProduct = product;
+    this.itemForm.get('productId')?.setValue(product.id)
     this.successMessage = '';
     this.errorMessage = '';
   }
 
-  addInventory(): void {
+  onSubmit(): void {
 
     if (!this.selectedProduct) {
       this.errorMessage = 'Please select a product';
       return;
     }
 
-    if (this.inventoryForm.invalid) {
-      this.inventoryForm.markAllAsTouched();
+    if (this.itemForm.invalid) {
+      this.itemForm.markAllAsTouched();
       return;
     }
 
     this.loading = true;
 
     this.http.addInventory(
-      { stockQuantity: this.inventoryForm.value.stockQuantity ,
+      { stockQuantity: this.itemForm.value.stockQuantity ,
         wholesalerId: this.wholesalerId,
       },
       this.selectedProduct.id,
-      this.wholesalerId
     ).subscribe({
       next: () => {
         this.successMessage =
           `Inventory added for ${this.selectedProduct.name}`;
         this.loading = false;
-        this.inventoryForm.reset();
+        this.itemForm.reset();
         this.selectedProduct = null;
       },
       error: () => {

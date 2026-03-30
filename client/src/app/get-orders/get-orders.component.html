@@ -1,81 +1,78 @@
-<!-- 🌟 Modern UI for Wholesaler Orders -->
-<div class="container py-4"
-     style="max-width: 900px; font-family: 'Poppins', sans-serif;">
+<div class="container py-4" style="max-width: 900px; font-family: 'Poppins', sans-serif;">
 
-  <!-- Page Header with Icon -->
+  <!-- Header -->
   <div class="d-flex align-items-center mb-4">
-    <img src="https://cdn-icons-png.flaticon.com/512/3500/3500833.png" 
-         width="42" height="42" alt="orders-icon">
-    <h2 class="ms-2 mb-0" 
-        style="font-weight: 700; color: #2f3542;">
-      Wholesaler Orders
+    <i class="bi bi-receipt-cutoff" style="font-size: 32px;"></i>
+    <h2 class="ms-2 mb-0 fw-bold">
+      {{ role === 'MANUFACTURER' ? 'Incoming Orders' : 'Orders' }}
     </h2>
   </div>
 
-  <!-- Error message -->
-  <div *ngIf="message" 
-       class="alert alert-danger"
-       style="border-radius: 10px; font-size: 15px; font-weight: 500;">
+  <!-- Loading -->
+  <div *ngIf="loading" class="alert alert-info">
+    Loading orders...
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="message && !loading" class="alert alert-warning">
     {{ message }}
   </div>
 
-  <!-- ✅ Orders Table -->
-  <div *ngIf="orders.length > 0" 
-       class="card shadow-sm p-3"
-       style="
-         border-radius: 15px;
-         background: linear-gradient(135deg, #ffffff 0%, #f7fbff 100%);
-       ">
-
-    <table class="table align-middle"
-           style="border-radius: 12px; overflow: hidden;">
-      
-      <thead style="background: #2f3542; color: white;">
+  <!-- Orders Table -->
+  <div *ngIf="orders.length > 0 && !loading" class="card shadow-sm p-3">
+    <table class="table align-middle">
+      <thead class="table-dark">
         <tr>
           <th>Order ID</th>
+          <th>Product</th>
           <th>Quantity</th>
           <th>Status</th>
-          <th>Product ID</th>
-          <th>User ID</th>
+
+          <th *ngIf="role === 'MANUFACTURER' || role === 'WHOLESALER'">
+            Action
+          </th>
         </tr>
       </thead>
 
       <tbody>
-        <tr *ngFor="let o of orders"
-            style="transition: 0.2s;"
-            onmouseover="this.style.background='#f1f7ff'"
-            onmouseout="this.style.background='transparent'">
-
-          <td style="font-weight: 600;">{{ o.id }}</td>
+        <tr *ngFor="let o of orders">
+          <td>{{ o.id }}</td>
+          <td>{{ o.product?.name }}</td>
           <td>{{ o.quantity }}</td>
 
-          <!-- ✅ Status Color Badges -->
           <td>
             <span class="badge"
-                  [ngClass]="{
-                    'bg-success': o.status === 'CONFIRMED',
-                    'bg-warning text-dark': o.status === 'PENDING' || o.status === 'PLACED',
-                    'bg-primary': o.status === 'SHIPPED',
-                    'bg-danger': o.status === 'CANCELLED'
-                  }"
-                  style="padding: 6px 10px; font-size: 13px;">
-              {{ o.status || o.orderStatus }}
+              [ngClass]="{
+                'bg-success': o.status === 'CONFIRMED',
+                'bg-warning text-dark': o.status === 'PENDING',
+                'bg-primary': o.status === 'SHIPPED',
+                'bg-danger': o.status === 'CANCELLED'
+              }">
+              {{ o.status }}
             </span>
           </td>
 
-          <td>{{ o.product?.id }}</td>
-          <td>{{ o.user?.id }}</td>
+          <td *ngIf="role === 'MANUFACTURER' || role === 'WHOLESALER'">
+            <button class="btn btn-sm btn-success me-2"
+              (click)="updateStatus(o.id, 'CONFIRMED')"
+              [disabled]="o.status !== 'PENDING'">
+              Approve
+            </button>
+
+            <button class="btn btn-sm btn-danger"
+              (click)="updateStatus(o.id, 'CANCELLED')"
+              [disabled]="o.status !== 'PENDING'">
+              Reject
+            </button>
+          </td>
+
         </tr>
       </tbody>
     </table>
-
   </div>
 
-  <!-- When no orders exist -->
-  <p *ngIf="orders.length === 0 && !message"
-     class="text-muted text-center mt-3"
-     style="font-style: italic; font-size: 16px;">
+  <p *ngIf="orders.length === 0 && !loading && !message"
+     class="text-muted text-center mt-4">
     No orders found.
   </p>
-
 </div>

@@ -41,7 +41,7 @@ export class CreateProductsComponent implements OnInit {
       description: this.itemForm.value.description,
       price: this.itemForm.value.price,
       stockQuantity: this.itemForm.value.stockQuantity,
-      manufacturerId: localStorage.getItem('userId')
+      manufacturerId: this.auth.getUserId()
     };
 
     this.http.createProduct(details).subscribe({
