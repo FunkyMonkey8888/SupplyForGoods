@@ -1,12 +1,6 @@
 package com.edutech.supply_of_goods_management.service;
 
-<<<<<<< HEAD
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Service;
-
-=======
 import com.edutech.supply_of_goods_management.entity.Inventory;
->>>>>>> feature/updated-frontend
 import com.edutech.supply_of_goods_management.entity.Order;
 import com.edutech.supply_of_goods_management.entity.Product;
 import com.edutech.supply_of_goods_management.entity.User;
@@ -100,13 +94,10 @@ public class OrderService {
         return orderRepo.findByUserId(userId);
     }
 
-<<<<<<< HEAD
-=======
     public List<Order> getOrdersByManufacturer(Long manufacturerId) {
         return orderRepo.findByProductManufacturerId(manufacturerId);
     }
 
->>>>>>> feature/updated-frontend
 
     private boolean isValidTransition(String current, String next) {
 
@@ -129,28 +120,6 @@ public class OrderService {
         }
     }
 
-<<<<<<< HEAD
-
-
-@Transactional
-@PreAuthorize("hasAnyAuthority('WHOLESALER', 'MANUFACTURER')")
-public void deleteOrder(Long orderId) {
-
-    Order order = orderRepo.findById(orderId)
-            .orElseThrow(() -> new RuntimeException("Order not found"));
-
-    String status = order.getStatus();
-
-    
-    if ("CONFIRMED".equals(status)) {
-        inventoryService.releaseInventory(order);
-    }
-
-    orderRepo.delete(order);
-}
-
-
-=======
     public List<Order> getConsumerOrdersForWholesaler(Long wholesalerId) {
 
     // Step 1: get all inventories of the wholesaler
@@ -170,5 +139,4 @@ public void deleteOrder(Long orderId) {
             productIds, "CONSUMER"
     );
 }
->>>>>>> feature/updated-frontend
 }

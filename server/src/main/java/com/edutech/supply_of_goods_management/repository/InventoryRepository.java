@@ -26,7 +26,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
             Long wholesalerId
     );
 
-    Optional<Product> findByProduct(Product product);
+
 
     Optional<Inventory> findFirstByProduct(Product product);
 

@@ -41,22 +41,7 @@ public class ProductService {
         return repo.findAll();
     }
 
-<<<<<<< HEAD
-    
-public void deleteProduct(Long productId) {
-
-        Product product = repo.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-
-        List<Inventory> inventories = inventoryRepo.findByProduct(product);
-        inventoryRepo.deleteAll(inventories);
-
-        repo.delete(product);
-    }
-
-=======
     public void deleteProduct(Long id){
         repo.deleteById(id);
     }
->>>>>>> feature/updated-frontend
 }
