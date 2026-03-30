@@ -33,12 +33,9 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    /* -------------------------------------------------
-       USER REGISTRATION HELPER (OPTIONAL)
-       ------------------------------------------------- */
+
 
     public User registerUser(User user) {
-        // Encode password before saving
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return repo.save(user);
     }
