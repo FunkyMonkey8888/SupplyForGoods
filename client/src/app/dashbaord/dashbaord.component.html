@@ -1,134 +1,97 @@
-<!-- 🌟 Full Dashboard UI -->
-<div class="container mt-5"
-     style="max-width: 800px; font-family: 'Poppins', sans-serif;">
+<div class="dashboard-hero">
 
-  <div class="card shadow-lg p-4"
-       style="
-         border-radius: 20px;
-         background: linear-gradient(135deg, #ffffff 0%, #f1f7ff 100%);
-         box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
-       ">
+  <div class="dashboard-overlay"></div>
 
-    <!-- Page Icon -->
-    <div class="text-center mb-4">
-      https://cdn-icons-png.flaticon.com/512/854/854878.png
+  <div class="dashboard-content">
+
+    <!-- LEFT: HERO TEXT (UNCHANGED) -->
+    <div class="dashboard-text">
+
+      <h1 class="hero-heading">
+        WELCOME TO<br />
+        SUPPLY‑OF‑GOODS
+      </h1>
+
+      <p class="hero-description">
+        Logistics today is complex and demanding.
+        Our platform empowers seamless supply‑chain
+        operations with speed and reliability.
+      </p>
+
+      <!-- <div class="hero-meta">
+        Logged in as
+        <span class="role-pill">{{ role }}</span>
+      </div> -->
+
+      <div class="hero-hint">
+        Use the navigation bar above to manage your operations ↑
+      </div>
+
     </div>
 
-    <!-- Title -->
-    <h2 class="text-center mb-2"
-        style="font-weight: 700; color: #2f3542;">
-      Welcome to the Supply‑of‑Goods Platform
-    </h2>
+    <!-- RIGHT: FLIP ROLE CARDS -->
+    <div class="dashboard-cards">
 
-    <p class="text-center text-muted mb-4"
-       style="font-size: 15px;">
-      Logged in as <b style="color:#2f80ed;">{{ role }}</b>
-    </p>
+      <!-- Manufacturer -->
+      <div class="flip-card">
+        <div class="flip-card-inner">
 
-    <hr style="opacity: 0.2;">
+          <div class="flip-card-front">
+            <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d" />
+            <div class="role-label">Manufacturer</div>
+          </div>
 
-    <!-- ✅ MANUFACTURER SECTION -->
-    <div *ngIf="role === 'MANUFACTURER'" class="mt-4">
+          <div class="flip-card-back">
+            <h3>Manufacturer</h3>
+            <p>
+              Create products, manage production workflows,
+              monitor supply levels, and fulfill orders efficiently.
+            </p>
+          </div>
 
-      <h4 style="font-weight: 600; color: #1e293b;">
-        Manufacturer Options
-      </h4>
+        </div>
+      </div>
 
-      <ul class="list-group my-3"
-          style="border-radius: 14px; overflow: hidden;">
+      <!-- Wholesaler -->
+      <div class="flip-card">
+        <div class="flip-card-inner">
 
-        <li class="list-group-item"
-            style="cursor: pointer; transition: 0.2s;"
-            onmouseover="this.style.background='#f1f7ff'"
-            onmouseout="this.style.background='white'">
-          <a routerLink="/create-product" class="text-decoration-none"
-             style="color: #1e90ff; font-weight: 500;">
-            ➤ Create Products
-          </a>
-        </li>
+          <div class="flip-card-front">
+            <img src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7" />
+            <div class="role-label">Wholesaler</div>
+          </div>
 
-      </ul>
-    </div>
+          <div class="flip-card-back">
+            <h3>Wholesaler</h3>
+            <p>
+              Place bulk orders, manage inventory and 
+              coordinate distribution.
+            </p>
+          </div>
 
-    <!-- ✅ WHOLESALER SECTION -->
-    <div *ngIf="role === 'WHOLESALER'" class="mt-4">
+        </div>
+      </div>
 
-      <h4 style="font-weight: 600; color: #1e293b;">
-        Wholesaler Options
-      </h4>
+      <!-- Consumer -->
+      <div class="flip-card">
+        <div class="flip-card-inner">
 
-      <ul class="list-group my-3"
-          style="border-radius: 14px; overflow: hidden;">
+          <div class="flip-card-front">
+            <img src="https://images.unsplash.com/photo-1607082349566-187342175e2f" />
+            <div class="role-label">Consumer</div>
+          </div>
 
-        <li class="list-group-item"
-            style="cursor: pointer; transition: 0.2s;"
-            onmouseover="this.style.background='#eaf4ff'"
-            onmouseout="this.style.background='white'">
-          <a routerLink="/get-orders"
-             class="text-decoration-none"
-             style="color: #1e90ff; font-weight: 500;">
-            ➤ View Orders
-          </a>
-        </li>
+          <div class="flip-card-back consumer">
+            <h3>Consumer</h3>
+            <p>
+              Browse products, place orders,
+              and track purchases.
+            </p>
+          </div>
 
-        <li class="list-group-item"
-            style="cursor: pointer; transition: 0.2s;"
-            onmouseover="this.style.background='#eaf4ff'"
-            onmouseout="this.style.background='white'">
-          <a routerLink="/place-product"
-             class="text-decoration-none"
-             style="color: #1e90ff; font-weight: 500;">
-            ➤ Place Order
-          </a>
-        </li>
+        </div>
+      </div>
 
-        <li class="list-group-item"
-            style="cursor: pointer; transition: 0.2s;"
-            onmouseover="this.style.background='#eaf4ff'"
-            onmouseout="this.style.background='white'">
-          <a routerLink="/add-inventory"
-             class="text-decoration-none"
-             style="color: #1e90ff; font-weight: 500;">
-            ➤ Add Inventory
-          </a>
-        </li>
-
-      </ul>
-    </div>
-
-    <!-- ✅ CONSUMER SECTION -->
-    <div *ngIf="role === 'CONSUMER'" class="mt-4">
-
-      <h4 style="font-weight: 600; color: #1e293b;">
-        Consumer Options
-      </h4>
-
-      <ul class="list-group my-3"
-          style="border-radius: 14px; overflow: hidden;">
-
-        <li class="list-group-item"
-            style="cursor: pointer; transition: 0.2s;"
-            onmouseover="this.style.background='#fff3e8'"
-            onmouseout="this.style.background='white'">
-          <a routerLink="/consumer-place-order"
-             class="text-decoration-none"
-             style="color: #ff7f3f; font-weight: 500;">
-            ➤ Place Order
-          </a>
-        </li>
-
-        <li class="list-group-item"
-            style="cursor: pointer; transition: 0.2s;"
-            onmouseover="this.style.background='#fff3e8'"
-            onmouseout="this.style.background='white'">
-          <a routerLink="/consumer-get-orders"
-             class="text-decoration-none"
-             style="color: #ff7f3f; font-weight: 500;">
-            ➤ View My Orders
-          </a>
-        </li>
-
-      </ul>
     </div>
 
   </div>

@@ -1,68 +1,87 @@
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
-  <a class="navbar-brand" href="#">Supply-of-Goods M&DP</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+<nav class="navbar navbar-expand-lg app-navbar app-navbar-lg px-4">
+<nav class="navbar navbar-expand-lg app-navbar px-4">
+
+  <!-- Brand -->
+  <a class="navbar-brand app-brand" href="#">
+    Supply‑of‑Goods
+  </a>
+
+  <!-- Mobile Toggle -->
+  <button
+    class="navbar-toggler"
+    type="button"
+    data-toggle="collapse"
+    data-target="#navbarNav"
+  >
     <span class="navbar-toggler-icon"></span>
   </button>
+
+  <!-- Links -->
   <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" *ngIf="roleName === 'MANUFACTURER'" [routerLink]="['/create-product']">Create Products</a>
 
-      </li>
-      <!-- <li class="nav-item">
-        <a class="nav-link" *ngIf="roleName === 'MANUFACTURER'" [routerLink]="['/get-orders']">Get Orders</a>
-      </li>
-    
-      <li class="nav-item">
-        <a class="nav-link" *ngIf="roleName === 'MANUFACTURER'" [routerLink]="['/product-allocation']">Products Allocate</a>
+    <ul class="navbar-nav me-auto app-nav-links">
 
-      </li> -->
-      <!-- <li class="nav-item">
-        <a class="nav-link" *ngIf="roleName === 'WHOLESALER'" [routerLink]="['/create-product']">Create Products</a>
-
-      </li> -->
-      <li class="nav-item">
-        <a class="nav-link" *ngIf="roleName === 'WHOLESALER'" [routerLink]="['/get-orders']">Get Orders</a>
-      </li>
-    
-      
-      
-      <li class="nav-item">
-        <a class="nav-link" *ngIf="roleName === 'WHOLESALER'" [routerLink]="['/place-product']">Place Order</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" *ngIf="roleName === 'WHOLESALER'" [routerLink]="['/add-inventory']">Add Inventory</a>
+      <!-- MANUFACTURER -->
+      <li class="nav-item" *ngIf="roleName === 'MANUFACTURER'">
+        <a class="nav-link" [routerLink]="['/create-product']">
+          Create Products
+        </a>
       </li>
 
-    
+      <!-- WHOLESALER -->
+      <li class="nav-item" *ngIf="roleName === 'WHOLESALER'">
+        <a class="nav-link" [routerLink]="['/get-orders']">
+          Get Orders
+        </a>
+      </li>
 
-      <li class="nav-item">
-        <a class="nav-link" *ngIf="roleName === 'CONSUMER'" [routerLink]="['/consumer-place-order']">Place Order</a>
+      <li class="nav-item" *ngIf="roleName === 'WHOLESALER'">
+        <a class="nav-link" [routerLink]="['/place-product']">
+          Place Order
+        </a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" *ngIf="roleName === 'CONSUMER'" [routerLink]="['/consumer-get-orders']">Orders</a>
+
+      <li class="nav-item" *ngIf="roleName === 'WHOLESALER'">
+        <a class="nav-link" [routerLink]="['/add-inventory']">
+          Add Inventory
+        </a>
       </li>
-     
+
+      <!-- CONSUMER -->
+      <li class="nav-item" *ngIf="roleName === 'CONSUMER'">
+        <a class="nav-link" [routerLink]="['/consumer-place-order']">
+          Place Order
+        </a>
+      </li>
+
+      <li class="nav-item" *ngIf="roleName === 'CONSUMER'">
+        <a class="nav-link" [routerLink]="['/consumer-get-orders']">
+          Orders
+        </a>
+      </li>
+
     </ul>
- 
-    <!-- Login/Logout buttons -->
-    <ul class="navbar-nav">
+
+    <!-- RIGHT SIDE AUTH -->
+    <ul class="navbar-nav app-nav-auth">
       <li *ngIf="!IsLoggin" class="nav-item">
-        <a class="nav-link" [routerLink]="['/login']">Login</a>
+        <a class="nav-link auth-btn" [routerLink]="['/login']">
+          Login
+        </a>
       </li>
       <li *ngIf="IsLoggin" class="nav-item">
-        <a class="nav-link" (click)="logout()" [routerLink]="['/login']">Logout</a>
+        <a class="nav-link auth-btn logout"
+           (click)="logout()"
+           [routerLink]="['/login']">
+          Logout
+        </a>
       </li>
     </ul>
+
   </div>
 </nav>
+</nav>
 
-<body  >
-  <div class="container mt-4 mx-5">
-    <router-outlet>    
-    </router-outlet>
-  </div>
-
-</body>
-
+<!-- Router -->
+<router-outlet></router-outlet>

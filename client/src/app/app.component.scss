@@ -1,0 +1,196 @@
+/* ===== MODERN APP NAVBAR ===== */
+.app-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  z-index: 1000;
+
+  background: rgba(10, 20, 40, 0.5);
+  backdrop-filter: blur(14px);
+
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Brand */
+.app-brand {
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.6px;
+  color: #ffffff !important;
+}
+
+/* Nav links */
+.app-nav-links .nav-link {
+  position: relative;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.9) !important;
+  margin-right: 18px;
+  transition: color 0.25s ease;
+}
+
+/* Underline hover */
+.app-nav-links .nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #60a5fa, #6366f1);
+  transition: width 0.25s ease;
+}
+
+.app-nav-links .nav-link:hover {
+  color: #ffffff !important;
+}
+
+.app-nav-links .nav-link:hover::after {
+  width: 100%;
+}
+
+/* Auth buttons */
+.app-nav-auth .auth-btn {
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff !important;
+
+  background: linear-gradient(90deg, #2563eb, #6366f1);
+  box-shadow: 0 6px 18px rgba(99,102,241,0.45);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.app-nav-auth .auth-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(99,102,241,0.6);
+}
+
+/* Logout variant */
+.app-nav-auth .logout {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+/* Mobile toggler */
+.navbar-toggler {
+  border: none;
+}
+
+.navbar-toggler-icon {
+  filter: invert(1);
+}
+/* ===============================
+   LARGE MODERN NAVBAR
+================================ */
+.app-navbar-lg {
+  height: 80px;             /* ⬆ taller */
+  padding: 0 48px;
+}
+
+/* Make navbar appear with hero */
+.app-navbar {
+  animation: navFadeDown 0.9s ease-out forwards;
+}
+
+/* Subtle entrance */
+@keyframes navFadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px); /* was -12px */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* Brand enhancement */
+.app-navbar .navbar-brand {
+  font-size: 22px;          /* ⬆ bigger */
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  position: relative;
+}
+
+/* Accent underline for brand */
+.app-navbar .navbar-brand::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(90deg, #60a5fa, #6366f1);
+  border-radius: 2px;
+}
+
+/* ===============================
+   NAV LINKS – MORE PRESENCE
+================================ */
+.app-nav-links .nav-link {
+  font-size: 15px;          /* ⬆ from 14px */
+  padding: 10px 6px;
+  margin-right: 22px;
+}
+
+/* Softer hover glow */
+.app-nav-links .nav-link:hover {
+  text-shadow: 0 0 8px rgba(99,102,241,0.35);
+}
+
+/* Underline animation – smoother */
+.app-nav-links .nav-link::after {
+  height: 2.5px;
+  border-radius: 2px;
+}
+
+/* ===============================
+   LOGIN / LOGOUT CTA – STRONGER
+================================ */
+.app-nav-auth .auth-btn {
+  padding: 10px 24px;       /* ⬆ bigger button */
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  border-radius: 999px;
+}
+
+/* Glow on hover */
+.app-nav-auth .auth-btn:hover {
+  box-shadow:
+    0 0 0 4px rgba(99,102,241,0.15),
+    0 12px 28px rgba(99,102,241,0.6);
+}
+
+/* ===============================
+   SUBTLE BOTTOM GLOW LINE
+================================ */
+.app-navbar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(99,102,241,0.6),
+      transparent
+    );
+}
+/* Faster navbar entrance */
+.app-navbar {
+  animation: navFadeDown 0.45s ease-out forwards; /* was ~0.9s */
+}
+.app-nav-links .nav-link,
+.app-nav-auth .auth-btn {
+  transition: all 0.18s ease; /* faster hover response */
+}
+

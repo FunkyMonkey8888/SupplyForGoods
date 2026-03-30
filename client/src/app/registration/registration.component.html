@@ -1,142 +1,77 @@
-<div class="container d-flex justify-content-center align-items-center mt-5"
-     style="min-height: 75vh; font-family: 'Poppins', sans-serif;">
+<div class="registration-page d-flex justify-content-center align-items-center">
 
-  <div class="card shadow-lg p-4"
-       style="
-         width: 100%;
-         max-width: 500px;
-         border-radius: 20px;
-         background: linear-gradient(135deg, #ffffff 0%, #f4f9ff 100%);
-         box-shadow: 0 10px 35px rgba(0,0,0,0.12);
-       ">
+  <div class="card registration-card shadow-lg p-4">
 
-    <!-- Registration Icon -->
-    <div class="text-center mb-3">
-      https://cdn-icons-png.flaticon.com/512/747/747376.png
+    <!-- ✅ ONE icon wrapper only -->
+    <div class="registration-icon-wrapper">
+      <img
+        src="https://cdn-icons-png.flaticon.com/512/747/747376.png"
+        alt="User Registration Icon"
+        class="registration-icon"
+      />
     </div>
 
-    <h3 class="text-center mb-4"
-        style="font-weight: 700; color: #2f3542;">
+    <h3 class="text-center registration-title mt-5 mb-4">
       User Registration
     </h3>
 
     <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
 
-      <!-- ✅ Username -->
+      <!-- Username -->
       <div class="mb-3">
-        <label class="form-label" style="font-weight: 600;">Username</label>
-        <input type="text" formControlName="username"
-               class="form-control"
-               placeholder="Enter username"
-               style="
-                 height: 44px;
-                 border-radius: 10px;
-                 padding: 10px;
-                 border: 1px solid #ccc;
-                 transition: 0.25s;
-               "
-               onfocus="this.style.borderColor='#4e8cff'">
-
-        <small *ngIf="itemForm.controls['username'].touched && itemForm.controls['username'].invalid"
-               style="color: red; font-size: 13px;">
-          Username must be at least 8 characters.
-        </small>
+        <label class="form-label">Username</label>
+        <input
+          type="text"
+          formControlName="username"
+          class="form-control custom-input"
+          placeholder="Enter username"
+        />
       </div>
 
-      <!-- ✅ Email -->
+      <!-- Email -->
       <div class="mb-3">
-        <label class="form-label" style="font-weight: 600;">Email</label>
-        <input type="email" formControlName="email"
-               class="form-control"
-               placeholder="Enter email"
-               style="
-                 height: 44px;
-                 border-radius: 10px;
-                 padding: 10px;
-                 border: 1px solid #ccc;
-               "
-               onfocus="this.style.borderColor='#4e8cff'">
-
-        <small *ngIf="itemForm.controls['email'].touched && itemForm.controls['email'].invalid"
-               style="color: red; font-size: 13px;">
-          Enter a valid email address.
-        </small>
+        <label class="form-label">Email</label>
+        <input
+          type="email"
+          formControlName="email"
+          class="form-control custom-input"
+          placeholder="Enter email"
+        />
       </div>
 
-      <!-- ✅ Password -->
+      <!-- Password -->
       <div class="mb-3">
-        <label class="form-label" style="font-weight: 600;">Password</label>
-        <input type="password" formControlName="password"
-               class="form-control"
-               placeholder="Enter password"
-               style="
-                 height: 44px;
-                 border-radius: 10px;
-                 padding: 10px;
-                 border: 1px solid #ccc;
-               "
-               onfocus="this.style.borderColor='#4e8cff'">
-
-        <small *ngIf="itemForm.controls['password'].touched && itemForm.controls['password'].invalid"
-               style="color: red; font-size: 13px;">
-          Password must have:
-          <br>• Minimum 8 characters
-          <br>• 1 uppercase, 1 lowercase
-          <br>• 1 number
-          <br>• 1 special character
-        </small>
+        <label class="form-label">Password</label>
+        <input
+          type="password"
+          formControlName="password"
+          class="form-control custom-input"
+          placeholder="Enter password"
+        />
       </div>
 
-      <!-- ✅ Role -->
+      <!-- Role -->
       <div class="mb-3">
-        <label class="form-label" style="font-weight: 600;">Role</label>
-        <select formControlName="role" class="form-select"
-                style="
-                  height: 44px;
-                  border-radius: 10px;
-                  padding: 10px;
-                ">
-          <option value="" disabled selected>Select Role</option>
+        <label class="form-label">Role</label>
+        <select formControlName="role" class="form-select custom-input">
+          <option value="" disabled>Select role</option>
           <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
         </select>
       </div>
 
-      <!-- ❌ Error Message -->
-      <div *ngIf="message"
-           class="alert alert-danger text-center"
-           style="border-radius: 10px; font-weight: 500;">
-        {{ message }}
-      </div>
-
-      <!-- ✅ Submit Button -->
-      <button class="btn w-100"
-              type="submit"
-              [disabled]="itemForm.invalid"
-              style="
-                background: linear-gradient(90deg, #2f80ed, #56ccf2);
-                border: none;
-                padding: 12px;
-                border-radius: 12px;
-                font-size: 17px;
-                font-weight: 600;
-                color: white;
-                transition: 0.25s;
-              "
-              onmouseover="this.style.transform='scale(1.03)'"
-              onmouseout="this.style.transform='scale(1)'">
+      <button
+        class="btn w-100 register-btn"
+        type="submit"
+        [disabled]="itemForm.invalid"
+      >
         Register
       </button>
 
     </form>
 
-    <!-- ✅ Already have account -->
-    <p class="text-center mt-3"
-       style="font-size: 14px;">
+    <p class="text-center mt-3 login-text">
       Already have an account?
-      <a routerLink="/login"
-         style="font-weight: 600; color: #1e90ff;">
-        Login here
-      </a>
+      <a routerLink="/login">Login here</a>
     </p>
 
   </div>
