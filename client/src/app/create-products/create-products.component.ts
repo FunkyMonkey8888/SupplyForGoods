@@ -41,7 +41,7 @@ export class CreateProductsComponent implements OnInit {
       description: this.itemForm.value.description,
       price: this.itemForm.value.price,
       stockQuantity: this.itemForm.value.stockQuantity,
-      manufacturerId: localStorage.getItem('userId')
+      manufacturerId: this.auth.getUserId()
     };
 
     this.http.createProduct(details).subscribe({
@@ -49,8 +49,8 @@ export class CreateProductsComponent implements OnInit {
         this.message = "";
         this.router.navigate(['/dashboard']);
       },
-      error: () => {
-        this.message = "Failed to create product.";
+      error: (error) => {
+        this.message = "Failed to create product."; 
       }
     });
   }

@@ -1,18 +1,24 @@
-
 package com.edutech.supply_of_goods_management.service;
 
+<<<<<<< HEAD
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+=======
+import com.edutech.supply_of_goods_management.entity.Inventory;
+>>>>>>> feature/updated-frontend
 import com.edutech.supply_of_goods_management.entity.Order;
 import com.edutech.supply_of_goods_management.entity.Product;
 import com.edutech.supply_of_goods_management.entity.User;
+import com.edutech.supply_of_goods_management.repository.InventoryRepository;
 import com.edutech.supply_of_goods_management.repository.OrderRepository;
 import com.edutech.supply_of_goods_management.repository.ProductRepository;
 import com.edutech.supply_of_goods_management.repository.UserRepository;
+import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -21,16 +27,19 @@ public class OrderService {
     private final ProductRepository productRepo;
     private final UserRepository userRepo;
     private final InventoryService inventoryService;
+    private final InventoryRepository inventoryRepository;
 
     public OrderService(OrderRepository orderRepo,
                         ProductRepository productRepo,
                         UserRepository userRepo,
-                        InventoryService inventoryService) {
+                        InventoryService inventoryService, 
+                    InventoryRepository ir) {
 
         this.orderRepo = orderRepo;
         this.productRepo = productRepo;
         this.userRepo = userRepo;
         this.inventoryService = inventoryService;
+        this.inventoryRepository = ir;
     }
 
 
@@ -46,6 +55,8 @@ public class OrderService {
         order.setUser(user);
 
         order.setStatus("PENDING");
+
+
 
         return orderRepo.save(order);
     }
@@ -67,8 +78,8 @@ public class OrderService {
 
         if (!isValidTransition(currentStatus, newStatus)) {
             throw new IllegalStateException(
-                    "Invalid order status transition from "
-                            + currentStatus + " to " + newStatus
+                    "Invalid order status transition from " +
+                            currentStatus + " to " + newStatus
             );
         }
 
@@ -84,25 +95,27 @@ public class OrderService {
         return orderRepo.save(order);
     }
 
-    
 
     public List<Order> getOrdersByUser(Long userId) {
         return orderRepo.findByUserId(userId);
     }
 
+<<<<<<< HEAD
+=======
+    public List<Order> getOrdersByManufacturer(Long manufacturerId) {
+        return orderRepo.findByProductManufacturerId(manufacturerId);
+    }
+
+>>>>>>> feature/updated-frontend
 
     private boolean isValidTransition(String current, String next) {
 
         switch (current) {
             case "PENDING":
-            case "PLACED":
-                return next.equals("CONFIRMED")
-                        || next.equals("SHIPPED")
-                        || next.equals("CANCELLED");
+                return next.equals("CONFIRMED") || next.equals("CANCELLED") || next.equals("SHIPPED");
 
             case "CONFIRMED":
-                return next.equals("SHIPPED")
-                        || next.equals("CANCELLED");
+                return next.equals("SHIPPED") || next.equals("CANCELLED");
 
             case "SHIPPED":
                 return next.equals("DELIVERED");
@@ -116,6 +129,7 @@ public class OrderService {
         }
     }
 
+<<<<<<< HEAD
 
 
 @Transactional
@@ -136,4 +150,25 @@ public void deleteOrder(Long orderId) {
 }
 
 
+=======
+    public List<Order> getConsumerOrdersForWholesaler(Long wholesalerId) {
+
+    // Step 1: get all inventories of the wholesaler
+    List<Inventory> inventories =
+            inventoryRepository.findByWholesalerId(wholesalerId);
+
+    // Step 2: extract product IDs
+    List<Long> productIds = inventories.stream()
+            .map(inv -> inv.getProduct().getId())
+            .distinct().collect(Collectors.toList());
+
+    if (productIds.isEmpty()) {
+        return List.of();
+    }
+
+    return orderRepo.findByProductIdInAndUserRole(
+            productIds, "CONSUMER"
+    );
+}
+>>>>>>> feature/updated-frontend
 }

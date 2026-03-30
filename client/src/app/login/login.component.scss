@@ -1,7 +1,84 @@
-.card {
-  border-radius: 8px;
+/* Page background */
+:host {
+  display: block;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #eef4ff, #f8fbff);
+  font-family: 'Poppins', sans-serif;
 }
 
-input.ng-invalid.ng-touched {
-  border-color: red;
+/* Card container */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 28px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #ffffff, #f2f7ff);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Title */
+.login-card h3 {
+  font-weight: 700;
+  color: #2f3542;
+}
+
+/* Inputs */
+.form-control {
+  height: 44px;
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: #4e8cff;
+  box-shadow: 0 0 0 0.2rem rgba(78, 140, 255, 0.25);
+}
+
+/* Login button */
+.btn-primary {
+  background: linear-gradient(90deg, #4e8cff, #77b5ff);
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(78, 140, 255, 0.4);
+}
+
+/* Disabled button */
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Error message */
+.alert-danger {
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+/* Register link */
+a {
+  color: #1e90ff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Mobile adjustments */
+@media (max-width: 576px) {
+  .login-card {
+    padding: 22px;
+  }
 }

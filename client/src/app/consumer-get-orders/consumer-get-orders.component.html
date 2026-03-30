@@ -1,76 +1,96 @@
-<!-- 🌟 Modern Orders Page Container -->
-<div class="container py-4" 
-     style="max-width: 900px; font-family: 'Poppins', sans-serif;">
+<div class="container py-4">
 
-  <!-- 🔥 Title Area with Icon -->
-  <div class="d-flex align-items-center mb-4">
-   https://cdn-icons-png.flaticon.com/512/3500/3500833.png
-    <h2 class="ms-2 mb-0" 
-        style="font-weight: 700; color: #2f3542;">
-      Your Orders
-    </h2>
-  </div>
+  <h2 class="fw-bold mb-4">Your Orders</h2>
 
-  <!-- ❌ Error Message -->
-  <div *ngIf="message" 
-       class="alert alert-danger" 
-       style="border-radius: 10px; font-size: 15px; font-weight: 500;">
-    {{ message }}
-  </div>
+  <table class="table table-bordered">
+    <thead class="table-dark">
+      <tr>
+        <th>Order ID</th>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Status</th>
+        <th>Feedback</th>
+      </tr>
+    </thead>
 
-  <!-- ✅ Orders Table -->
-  <div *ngIf="orders.length > 0" 
-       class="card shadow-sm p-3"
-       style="
-          border-radius: 14px;
-          background: linear-gradient(135deg, #ffffff 0%, #f7faff 100%);
-       ">
-    
-    <table class="table align-middle"
-           style="border-radius: 14px; overflow: hidden;">
-      
-      <thead style="background: #2f3542; color: white;">
+    <tbody>
+      <ng-container *ngFor="let o of orders">
+
+        <!-- Order Row -->
         <tr>
-          <th>Order ID</th>
-          <th>Quantity</th>
-          <th>Status</th>
-          <th>Product ID</th>
-          <th>Placed Date</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr *ngFor="let o of orders"
-            style="transition: 0.2s;"
-            onmouseover="this.style.background='#f1f7ff'"
-            onmouseout="this.style.background='transparent'">
-          
-          <td style="font-weight: 600;">{{ o.id }}</td>
+          <td>{{ o.id }}</td>
+          <td>{{ o.product?.name }}</td>
           <td>{{ o.quantity }}</td>
+
           <td>
-            <span class="badge"
-                  [ngClass]="{
-                    'bg-success': o.status === 'CONFIRMED',
-                    'bg-warning text-dark': o.status === 'PENDING' || o.status === 'PLACED',
-                    'bg-primary': o.status === 'SHIPPED',
-                    'bg-danger': o.status === 'CANCELLED'
-                  }"
-                  style="padding: 6px 10px; font-size: 13px;">
-              {{ o.status || o.orderStatus }}
+            <span class="badge bg-success" *ngIf="o.status === 'CONFIRMED'">
+              CONFIRMED
+            </span>
+            <span class="badge bg-warning text-dark" *ngIf="o.status !== 'CONFIRMED'">
+              {{ o.status }}
             </span>
           </td>
-          <td>{{ o.product?.id }}</td>
-          <td>{{ formatDate(o.timestamp) }}</td>
+
+          <!-- Feedback column -->
+          <td>
+
+            <!-- ✅ If feedback already submitted → VIEW -->
+            <div *ngIf="submittedFeedback[o.id]">
+
+              <div class="mb-1">
+                <i class="bi bi-star-fill me-1"
+                   *ngFor="let s of [1,2,3,4,5]"
+                   [class.text-warning]="submittedFeedback[o.id].rating >= s"
+                   [class.text-muted]="submittedFeedback[o.id].rating < s">
+                </i>
+              </div>
+
+              <small class="text-muted fst-italic">
+                "{{ submittedFeedback[o.id].comment }}"
+              </small>
+            </div>
+
+            <!-- ✅ Else → Give Feedback -->
+            <button *ngIf="
+                o.status === 'CONFIRMED' &&
+                !submittedFeedback[o.id]
+              "
+              class="btn btn-sm btn-warning"
+              (click)="openFeedback(o.id)">
+              Give Feedback
+            </button>
+          </td>
         </tr>
-      </tbody>
-    </table>
-  </div>
 
-  <!-- ℹ️ No Orders -->
-  <p *ngIf="orders.length === 0 && !message"
-     class="text-muted text-center mt-3"
-     style="font-style: italic; font-size: 16px;">
-    No orders found.
-  </p>
+        <!-- Feedback Form -->
+        <tr *ngIf="activeOrderId === o.id">
+          <td colspan="5">
 
+            <div class="mb-2">
+              <i class="bi bi-star-fill me-1"
+                 *ngFor="let s of [1,2,3,4,5]"
+                 (click)="setRating(o.id, s)"
+                 [class.text-warning]="ratings[o.id] >= s"
+                 [class.text-muted]="ratings[o.id] < s"
+                 style="cursor:pointer;">
+              </i>
+            </div>
+
+            <textarea class="form-control mb-2"
+              rows="2"
+              placeholder="Write your review..."
+              [(ngModel)]="comments[o.id]"></textarea>
+
+            <button class="btn btn-success btn-sm"
+              (click)="submitFeedback(o.id)">
+              Submit Feedback
+            </button>
+
+          </td>
+        </tr>
+
+      </ng-container>
+    </tbody>
+
+  </table>
 </div>

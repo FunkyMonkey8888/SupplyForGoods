@@ -1,6 +1,7 @@
 package com.edutech.supply_of_goods_management.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.edutech.supply_of_goods_management.entity.Inventory;
@@ -75,4 +76,15 @@ public class WholesalerController {
     public ResponseEntity<List<Inventory>> getAllInventories(@RequestParam Long wholesalerId) {
         return ResponseEntity.ok(inventoryService.getInventoriesByWholesaler(wholesalerId));
     }
+
+
+    @GetMapping("/consumer-orders")
+    @PreAuthorize("hasAuthority('WHOLESALER')")
+public ResponseEntity<List<Order>> getConsumerOrdersForWholesaler(
+        @RequestParam Long wholesalerId) {
+
+    return ResponseEntity.ok(
+            orderService.getConsumerOrdersForWholesaler(wholesalerId)
+    );
+}
 }

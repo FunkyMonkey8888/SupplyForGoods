@@ -1,98 +1,68 @@
-<div class="container d-flex justify-content-center align-items-center mt-5"
-     style="min-height: 75vh; font-family: 'Poppins', sans-serif;">
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
 
-  <div class="card shadow-lg p-4"
-       style="
-         max-width: 450px;
-         width: 100%;
-         border-radius: 18px;
-         background: linear-gradient(135deg, #ffffff 0%, #f2f7ff 100%);
-         box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-       ">
-       
-    <!-- 🔐 Stylish Login Icon -->
+  <div class="card login-card shadow-lg p-4"
+       style="max-width: 420px; width: 100%; border-radius: 16px;">
+
+    <!-- ✅ Icon Header -->
     <div class="text-center mb-3">
-      <img src="https://cdn-icons-png.flaticon.com/512/3064/3064197.png"
-           width="70" height="70">
+      <i class="bi bi-shield-lock-fill"
+         style="font-size: 48px; color: #0d6efd;"></i>
     </div>
 
-    <h3 class="text-center mb-4"
-        style="font-weight: 700; color: #2f3542;">
-      Login
-    </h3>
+    <h3 class="text-center mb-4 fw-bold">Login to Your Account</h3>
 
     <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
 
-      <!-- ✅ Username -->
+      <!-- Username -->
       <div class="mb-3">
-        <label class="form-label" style="font-weight: 600;">Username</label>
-        <input class="form-control"
-               type="text"
-               formControlName="username"
-               placeholder="Enter username"
-               style="
-                 height: 44px;
-                 padding: 10px;
-                 border-radius: 10px;
-                 border: 1px solid #ccc;
-                 transition: 0.25s;
-               "
-               onfocus="this.style.borderColor='#4e8cff'">
+        <label class="form-label fw-semibold">Username</label>
+        <input
+          class="form-control"
+          type="text"
+          formControlName="username"
+          placeholder="Enter username">
       </div>
 
-      <!-- ✅ Password -->
+      <!-- Password -->
       <div class="mb-3">
-        <label class="form-label" style="font-weight: 600;">Password</label>
-        <input class="form-control"
-               type="password"
-               formControlName="password"
-               placeholder="Enter password"
-               style="
-                 height: 44px;
-                 padding: 10px;
-                 border-radius: 10px;
-                 border: 1px solid #ccc;
-               "
-               onfocus="this.style.borderColor='#4e8cff'">
+        <label class="form-label fw-semibold">Password</label>
+        <input
+          class="form-control"
+          type="password"
+          formControlName="password"
+          placeholder="Enter password">
       </div>
 
-      <!-- ❌ Error Message -->
-      <div *ngIf="message"
-           class="alert alert-danger text-center"
-           style="border-radius: 10px; font-weight: 500;">
+      <!-- Error -->
+      <div *ngIf="message" class="alert alert-danger text-center">
         {{ message }}
       </div>
 
-      <!-- ✅ Modern Submit Button -->
-      <button 
-        class="btn w-100"
+      <!-- Submit -->
+      <button
+        class="btn btn-primary w-100"
         type="submit"
-        [disabled]="itemForm.invalid"
-        style="
-          background: linear-gradient(90deg, #4e8cff, #77b5ff);
-          border: none;
-          padding: 12px;
-          border-radius: 10px;
-          color: white;
-          font-size: 17px;
-          font-weight: 600;
-          transition: 0.25s;
-        "
-        onmouseover="this.style.transform='scale(1.03)'"
-        onmouseout="this.style.transform='scale(1)'">
-        Login
+        [disabled]="itemForm.invalid || loading">
+
+        <span *ngIf="!loading">
+          <i class="bi bi-box-arrow-in-right me-1"></i>
+          Login
+        </span>
+
+        <span *ngIf="loading">
+          Logging in…
+        </span>
       </button>
 
     </form>
 
-    <p class="text-center mt-3"
-       style="font-size: 14px;">
-      Don't have an account? 
-      <a routerLink="/registration" style="font-weight: 600; color: #1e90ff;">
+    <!-- Register Redirect -->
+    <p class="text-center mt-3 mb-0">
+      Don’t have an account?
+      <a routerLink="/registration" class="fw-semibold">
         Register here
       </a>
     </p>
 
   </div>
-
 </div>
