@@ -95,4 +95,10 @@ public class InventoryService {
 
         repo.save(inventory);
     }
+
+    @Transactional
+    public void deleteInventory(Long id){
+        Inventory inventory = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Inventory not found"));
+        repo.delete(inventory);
+    }
 }

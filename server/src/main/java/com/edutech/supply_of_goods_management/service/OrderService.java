@@ -1,6 +1,7 @@
 
 package com.edutech.supply_of_goods_management.service;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.edutech.supply_of_goods_management.entity.Order;
@@ -32,7 +33,6 @@ public class OrderService {
         this.inventoryService = inventoryService;
     }
 
-    /* ---------------- PLACE ORDER ---------------- */
 
     public Order placeOrder(Long productId, Long userId, Order order) {
 
@@ -45,13 +45,11 @@ public class OrderService {
         order.setProduct(product);
         order.setUser(user);
 
-        // ✅ Tests expect initial status as STRING
         order.setStatus("PENDING");
 
         return orderRepo.save(order);
     }
 
-    /* ---------------- UPDATE ORDER STATUS ---------------- */
 
     @Transactional
     public Order updateOrderStatus(Long orderId, String newStatus) {
@@ -67,7 +65,6 @@ public class OrderService {
 
         newStatus = newStatus.toUpperCase();
 
-        // ✅ Basic allowed transitions (aligned with tests)
         if (!isValidTransition(currentStatus, newStatus)) {
             throw new IllegalStateException(
                     "Invalid order status transition from "
@@ -75,7 +72,6 @@ public class OrderService {
             );
         }
 
-        // ✅ Inventory hooks
         if ("CONFIRMED".equals(newStatus)) {
             inventoryService.reserveInventory(order);
         }
@@ -94,7 +90,6 @@ public class OrderService {
         return orderRepo.findByUserId(userId);
     }
 
-    /* ---------------- TRANSITION RULES ---------------- */
 
     private boolean isValidTransition(String current, String next) {
 
@@ -120,4 +115,25 @@ public class OrderService {
                 return false;
         }
     }
+
+
+
+@Transactional
+@PreAuthorize("hasAnyAuthority('WHOLESALER', 'MANUFACTURER')")
+public void deleteOrder(Long orderId) {
+
+    Order order = orderRepo.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("Order not found"));
+
+    String status = order.getStatus();
+
+    
+    if ("CONFIRMED".equals(status)) {
+        inventoryService.releaseInventory(order);
+    }
+
+    orderRepo.delete(order);
+}
+
+
 }

@@ -37,7 +37,7 @@ export class AddInventoryComponent implements OnInit {
     const productId = this.itemForm.value.productId;
 
     const payload = {
-      stockQuantity: this.itemForm.value.stockQuantity
+      stockQuantity: this.itemForm.value.stockQuantity,
     };
 
     this.http.addInventory(payload, productId).subscribe({
