@@ -1,70 +1,68 @@
-<div class="container py-4 consumer-place-order">
+<div class="container py-4 consumer-place-order" style="max-width: 1000px;">
 
   <!-- Header -->
-  <div class="text-center mb-4">
-    <h2 class="fw-bold">Place Order</h2>
+  <div class="text-center mb-5">
+    <h2 class="fw-bold">Place Your Order</h2>
     <p class="text-muted">
-      Select a product and place your order
+      Step 1: Choose a product • Step 2: Enter quantity • Step 3: Confirm
     </p>
   </div>
 
-  <!-- ================= PRODUCT LIST ================= -->
-  <div class="row mb-4">
+  <!-- ================= STEP 1: PRODUCT SELECTION ================= -->
+  <h5 class="mb-3">📦 Step 1: Choose a Product</h5>
 
-    <div class="col-12">
-      <h5 class="mb-3">Available Products</h5>
-    </div>
-
-    <div class="col-md-4 mb-3"
+  <div class="row g-3 mb-5">
+    <div class="col-md-4"
          *ngFor="let product of products">
 
-      <div class="card product-card h-100"
-           [class.selected]="selectedProduct?.id === product.id"
+      <div class="card h-100 product-card cursor-pointer"
+           [class.border-primary]="selectedProduct?.id === product.id"
            (click)="selectProduct(product)">
 
         <div class="card-body">
 
-          <h6 class="fw-semibold mb-1">
-            {{ product.name }}
-          </h6>
+          <h6 class="fw-semibold mb-1">{{ product.name }}</h6>
 
           <p class="text-muted small mb-2">
-            {{ product.description || 'No description' }}
+            {{ product.description || 'No description available' }}
           </p>
 
           <div class="d-flex justify-content-between align-items-center">
-            <span class="fw-bold">
-              ₹{{ product.price }}
-            </span>
+            <span class="fw-bold text-success">₹{{ product.price }}</span>
 
-            <span class="badge bg-info">
-              Available
+            <span class="badge bg-light text-dark">
+              Click to select
             </span>
           </div>
 
         </div>
+
       </div>
     </div>
-
   </div>
 
-  <!-- ================= ORDER FORM ================= -->
-  <div class="row justify-content-center">
+  <!-- ================= STEP 2: ORDER DETAILS ================= -->
+  <div *ngIf="selectedProduct" class="row justify-content-center">
+
     <div class="col-md-6">
 
       <div class="card shadow-sm">
+
         <div class="card-body">
 
-          <h5 class="mb-3">Order Details</h5>
+          <h5 class="mb-3">📝 Step 2: Order Details</h5>
 
-          <div *ngIf="selectedProduct" class="alert alert-info">
-            Ordering:
-            <strong>{{ selectedProduct.name }}</strong>
+          <!-- Selected product summary -->
+          <div class="alert alert-primary">
+            You are ordering:
+            <strong>{{ selectedProduct.name }}</strong><br>
+            Price per unit: ₹{{ selectedProduct.price }}
           </div>
 
           <form [formGroup]="orderForm"
                 (ngSubmit)="placeOrder()">
 
+            <!-- Quantity -->
             <div class="mb-3">
               <label class="form-label fw-semibold">
                 Quantity
@@ -72,40 +70,43 @@
 
               <input type="number"
                      class="form-control"
+                     placeholder="Enter quantity"
+                     min="1"
                      formControlName="quantity">
 
               <small class="text-danger"
                      *ngIf="orderForm.get('quantity')?.touched &&
                             orderForm.get('quantity')?.invalid">
-                Quantity must be at least 1
+                Please enter a valid quantity (minimum 1)
               </small>
             </div>
 
-            <div class="mb-3">
-              <label class="form-label fw-semibold">
-                Status
-              </label>
-
-              <input type="text"
-                     class="form-control"
-                     formControlName="status"
-                     readonly>
+            <!-- Confirmation summary -->
+            <div *ngIf="orderForm.valid" class="alert alert-light border">
+              <strong>Order Summary</strong><br>
+              Product: {{ selectedProduct.name }}<br>
+              Quantity: {{ orderForm.value.quantity }}<br>
+              Total Price:
+              ₹{{ selectedProduct.price * orderForm.value.quantity }}
             </div>
 
+            <!-- Success / Error -->
             <div *ngIf="successMessage"
-                 class="alert alert-success">
-              {{ successMessage }}
+                 class="alert alert-success text-center">
+              ✅ {{ successMessage }}
             </div>
 
             <div *ngIf="errorMessage"
-                 class="alert alert-danger">
-              {{ errorMessage }}
+                 class="alert alert-danger text-center">
+              ❌ {{ errorMessage }}
             </div>
 
+            <!-- Submit -->
             <button type="submit"
                     class="btn btn-primary w-100"
-                    [disabled]="loading || !selectedProduct">
-              {{ loading ? 'Placing Order…' : 'Place Order' }}
+                    [disabled]="loading">
+
+              {{ loading ? 'Placing your order…' : 'Confirm Order' }}
             </button>
 
           </form>
