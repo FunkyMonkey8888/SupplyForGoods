@@ -1,0 +1,32 @@
+<div class="container py-4" style="max-width: 500px">
+
+  <h2 class="fw-bold mb-2">Admin Invite Generator</h2>
+  <p class="text-muted">
+    Generate one‑time invite codes for privileged roles.
+  </p>
+
+  <label class="form-label fw-semibold">Select Role</label>
+<select class="form-select mb-3" [(ngModel)]="selectedRole">
+  <option [ngValue]="'MANUFACTURER'">Manufacturer</option>
+  <option [ngValue]="'WHOLESALER'">Wholesaler</option>
+</select>
+
+  <button class="btn btn-primary w-100" (click)="generateInvite()">
+    Generate Invite Code
+  </button>
+
+  <div *ngIf="generatedCode" class="alert alert-success mt-4">
+    <strong>Invite Code</strong>
+    <div class="p-2 bg-light border rounded text-center fw-bold mt-2">
+      {{ generatedCode }}
+    </div>
+    <small class="text-muted">
+      Share securely. This code works only once.
+    </small>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+    {{ errorMessage }}
+  </div>
+
+</div>

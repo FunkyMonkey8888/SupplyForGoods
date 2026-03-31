@@ -1,7 +1,9 @@
-
 package com.edutech.supply_of_goods_management.service;
 
+import com.edutech.supply_of_goods_management.dto.RegisterRequest;
+import com.edutech.supply_of_goods_management.entity.InviteCode;
 import com.edutech.supply_of_goods_management.entity.User;
+import com.edutech.supply_of_goods_management.repository.InviteCodeRepository;
 import com.edutech.supply_of_goods_management.repository.UserRepository;
 
 import org.springframework.context.annotation.Lazy;
@@ -9,57 +11,85 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 
 @Service
 public class UserService implements UserDetailsService {
 
-    private final UserRepository repo;
+    private final UserRepository userRepository;
+    private final InviteCodeRepository inviteRepo;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repo, 
+    public UserService(UserRepository userRepository,
+                       InviteCodeRepository inviteRepo,
                        @Lazy PasswordEncoder passwordEncoder) {
-        this.repo = repo;
+        this.userRepository = userRepository;
+        this.inviteRepo = inviteRepo;
         this.passwordEncoder = passwordEncoder;
     }
 
-
+    /* ===================== BASIC QUERIES ===================== */
 
     public User getByUsername(String username) {
-        return repo.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return userRepository.findByUsername(username)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found"));
     }
 
+    /* ===================== REGISTRATION WITH INVITE ===================== */
 
+    public User registerUser(RegisterRequest req) {
 
-    public User registerUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return repo.save(user);
+        // ✅ Enforce invite code for privileged roles
+        if (!"CONSUMER".equalsIgnoreCase(req.getRole()) || "ADMIN".equalsIgnoreCase(req.getRole())) {
+
+            InviteCode invite = inviteRepo
+                    .findByRoleAndUsedFalse(req.getRole().toUpperCase())
+                    .orElseThrow(() ->
+                            new RuntimeException("Invite code required for role"));
+
+            if (invite.getExpiresAt().isBefore(LocalDateTime.now())) {
+                throw new RuntimeException("Invite code expired");
+            }
+
+            if (!passwordEncoder.matches(req.getInviteCode(), invite.getCodeHash())) {
+                throw new RuntimeException("Invalid invite code");
+            }
+
+            // ✅ One‑time use enforcement
+            invite.setUsed(true);
+            inviteRepo.save(invite);
+        }
+
+        User user = new User();
+        user.setUsername(req.getUsername());
+        user.setEmail(req.getEmail());
+        user.setPassword(passwordEncoder.encode(req.getPassword()));
+        user.setRole(req.getRole().toUpperCase());
+
+        return userRepository.save(user);
     }
 
+    /* ===================== SPRING SECURITY LOGIN ===================== */
 
     @Override
     public UserDetails loadUserByUsername(String username)
             throws UsernameNotFoundException {
 
-        User user = repo.findByUsername(username)
-                .orElseThrow(() -> 
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() ->
                         new UsernameNotFoundException("Username not found: " + username));
 
-
-        String roleFromDb = user.getRole() == null 
-                ? "ROLE_CONSUMER"
-                : user.getRole().trim().toUpperCase();
-
-        String authority = roleFromDb;
+        String authority = user.getRole();
 
         return org.springframework.security.core.userdetails.User
                 .builder()
                 .username(user.getUsername())
-                .password(user.getPassword())  
+                .password(user.getPassword())  // already BCrypt‑encoded
                 .authorities(Collections.singleton(
                         new SimpleGrantedAuthority(authority)
                 ))
@@ -70,65 +100,3 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 }
-
-// // UserService.java
-// package com.edutech.supply_of_goods_management.service;
-
-// import com.edutech.supply_of_goods_management.entity.User;
-// import com.edutech.supply_of_goods_management.repository.UserRepository;
-
-// import org.springframework.security.core.userdetails.UserDetailsService;
-// import org.springframework.context.annotation.Lazy;
-// import org.springframework.security.core.userdetails.UserDetails;
-// import org.springframework.security.core.userdetails.UsernameNotFoundException;
-// import org.springframework.security.crypto.password.PasswordEncoder;
-// import org.springframework.stereotype.Service;
-
-// import java.net.PasswordAuthentication;
-// import java.util.Collections;
-
-// @Service
-// public class UserService implements UserDetailsService {
-
-//     private final UserRepository repo;
-
-//     private final PasswordEncoder passwordEncoder;
-//     public UserService(UserRepository repo, @Lazy PasswordEncoder ps) {
-//         this.repo = repo;
-//         this.passwordEncoder = ps;
-//     }
-
-//     public User getByUsername(String username) {
-//         return repo.findByUsername(username).orElse(null);
-//     }
-
-//     // @Override
-//     // public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
-//     //     User user = repo.findByUsername(username)
-//     //             .orElseThrow(() -> new UsernameNotFoundException("Not found"));
-
-//     //     return new org.springframework.security.core.userdetails.User(
-//     //             user.getUsername(),
-//     //             user.getPassword(),
-//     //             Collections.singleton(() -> user.getRole())
-//     //     );
-//     // }
-
-//     @Override
-//     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
-//     User s = repo.findByUsername(username)
-//         .orElseThrow(() -> new UsernameNotFoundException("username not found"));
-
-//     String dbRole = (s.getRole() == null ? "CONSUMER" : s.getRole().trim().toUpperCase());
-//     String authority = dbRole.startsWith("ROLE_") ? dbRole : "ROLE_" + dbRole;
-
-//     return org.springframework.security.core.userdetails.User.builder()
-//         .username(s.getUsername())
-//         .password(s.getPassword())
-//         .authorities(new org.springframework.security.core.authority.SimpleGrantedAuthority(authority))
-//         .accountLocked(false).accountExpired(false).credentialsExpired(false).disabled(false)
-//         .build();
-//     }
-// }

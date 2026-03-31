@@ -3,6 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { RegistrationComponent } from './registration/registration.component';
 import { AppComponent } from './app.component';
+import { AdminInviteComponent } from './admin-invite/admin-invite.component';
+
 import { DashbaordComponent } from './dashbaord/dashbaord.component';
 import { CreateProductsComponent } from './create-products/create-products.component';
 
@@ -14,6 +16,7 @@ import { GetOrdersComponent } from './get-orders/get-orders.component';
 import { AddInventoryComponent } from './add-inventory/add-inventory.component';
 import { ConsumerPlaceOrderComponent } from './consumer-place-order/consumer-place-order.component';
 import { ConsumerGetOrdersComponent } from './consumer-get-orders/consumer-get-orders.component';
+import { AdminGuard } from './admin.guard';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -25,6 +28,13 @@ const routes: Routes = [
   { path: 'get-orders', component: GetOrdersComponent }, 
  { path: 'consumer-place-order', component: ConsumerPlaceOrderComponent }, 
  { path: 'consumer-get-orders', component: ConsumerGetOrdersComponent }, 
+ 
+  {
+    path: 'admin/invite',
+    component: AdminInviteComponent,
+    canActivate: [AdminGuard]
+  },
+
  
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
 

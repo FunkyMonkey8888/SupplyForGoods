@@ -22,31 +22,30 @@ export class RegistrationComponent implements OnInit {
     private router: Router
   ) {}
 
-  // ngOnInit(): void {
-  //   this.itemForm = this.fb.group({
-  //     username: ['', [Validators.required, Validators.minLength(4)]],
-  //     email: ['', [Validators.required, Validators.email]],
-  //     password: [
-  //       '',
-  //       [
-  //         Validators.required,
-  //         Validators.minLength(8),
-  //         Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/)
-  //       ]
-  //     ],
-  //     role: ['', Validators.required]
-  //   });
-  // }
-
   ngOnInit(): void {
-  this.itemForm = this.fb.group({
-    username: ['', [Validators.required, Validators.minLength(3)]],
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
-    role: ['', Validators.required]
-  });
-}
+    this.itemForm = this.fb.group({
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      role: ['', Validators.required],
+      inviteCode: [''] // ✅ NEW
+    });
+  }
 
+  /** ✅ Dynamically enforce invite code */
+  onRoleChange(): void {
+    const role = this.itemForm.get('role')?.value;
+    const inviteCtrl = this.itemForm.get('inviteCode');
+
+    if (role !== 'CONSUMER') {
+      inviteCtrl?.setValidators([Validators.required]);
+    } else {
+      inviteCtrl?.clearValidators();
+      inviteCtrl?.setValue('');
+    }
+
+    inviteCtrl?.updateValueAndValidity();
+  }
 
   onSubmit(): void {
     if (this.itemForm.invalid) {
@@ -61,9 +60,9 @@ export class RegistrationComponent implements OnInit {
       next: () => {
         this.router.navigate(['/login']);
       },
-      error: () => {
+      error: (err) => {
         this.loading = false;
-        this.message = 'Registration failed. Try again.';
+        this.message = err?.error || 'Registration failed. Try again.';
       }
     });
   }

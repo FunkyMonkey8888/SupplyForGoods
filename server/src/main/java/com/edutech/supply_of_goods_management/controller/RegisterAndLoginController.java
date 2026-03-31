@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.edutech.supply_of_goods_management.dto.LoginRequest;
 import com.edutech.supply_of_goods_management.dto.LoginResponse;
+import com.edutech.supply_of_goods_management.dto.RegisterRequest;
 import com.edutech.supply_of_goods_management.entity.User;
 import com.edutech.supply_of_goods_management.jwt.JwtUtil;
 import com.edutech.supply_of_goods_management.repository.UserRepository;
@@ -34,23 +35,30 @@ public class RegisterAndLoginController {
         this.userService = userService;
     }
 
-    // ✅ REGISTER USER (FIXED)
+    // ✅ REGISTER USER WITH INVITE CODE VALIDATION
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@RequestBody User user) {
+    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest request) {
 
-        if (userRepository.existsByUsername(user.getUsername()))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (userRepository.existsByUsername(request.getUsername())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Username already exists");
+        }
 
-        if (userRepository.existsByEmail(user.getEmail()))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (userRepository.existsByEmail(request.getEmail())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Email already exists");
+        }
 
-        // ✅ Use service (password is encoded here)
-        User saved = userService.registerUser(user);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        try {
+            User savedUser = userService.registerUser(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ex.getMessage());
+        }
     }
 
-    // ✅ LOGIN USER (CORRECT)
+    // ✅ LOGIN USER (UNCHANGED)
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> loginUser(@RequestBody LoginRequest loginRequest) {
 
@@ -71,7 +79,7 @@ public class RegisterAndLoginController {
 
         UserDetails userDetails = org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
-                .password(user.getPassword()) // BCrypt encoded
+                .password(user.getPassword())
                 .authorities("ROLE_" + user.getRole())
                 .build();
 

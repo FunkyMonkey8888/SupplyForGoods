@@ -214,4 +214,12 @@ export class HttpService {
       this.getHeaders()
     );
   }
+
+  generateInviteCode(role: string) {
+  return this.http.post<any>(
+    `${this.serverName}/api/admin/generate-invite?role=${role}`,
+    {},
+    this.getHeaders()
+  );
+}
 }
