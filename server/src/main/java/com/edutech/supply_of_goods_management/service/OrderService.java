@@ -120,7 +120,7 @@ public Order updateOrderStatus(Long orderId, String status) {
     }
 
     public List<Order> getOrdersByManufacturer(Long manufacturerId) {
-        return orderRepo.findByProductManufacturerId(manufacturerId);
+        return orderRepo.findByProductManufacturerIdAndUserRole(manufacturerId, "WHOLESALER");
     }
 
 

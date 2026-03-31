@@ -1,43 +1,72 @@
-<div class="container py-4" style="max-width: 900px; font-family: 'Poppins', sans-serif;">
+<div class="container py-4" style="max-width: 1000px; font-family: 'Poppins', sans-serif;">
 
-  <!-- Header -->
-  <div class="d-flex align-items-center mb-4">
-    <i class="bi bi-receipt-cutoff" style="font-size: 32px;"></i>
-    <h2 class="ms-2 mb-0 fw-bold">
-      {{ role === 'MANUFACTURER' ? 'Incoming Orders' : 'Orders' }}
+  <!-- ================= HEADER ================= -->
+  <div class="mb-4">
+    <h2 class="fw-bold mb-1" *ngIf="role === 'MANUFACTURER'">
+      Orders from Wholesalers
     </h2>
+
+    <h2 class="fw-bold mb-1" *ngIf="role === 'WHOLESALER'">
+      Consumer Orders to Fulfill
+    </h2>
+
+    <p class="text-muted" *ngIf="role === 'MANUFACTURER'">
+      Wholesalers requesting products you manufacture
+    </p>
+
+    <p class="text-muted" *ngIf="role === 'WHOLESALER'">
+      Orders placed by consumers for products you supply
+    </p>
   </div>
 
-  <!-- Loading -->
+  <!-- ================= LOADING ================= -->
   <div *ngIf="loading" class="alert alert-info">
     Loading orders...
   </div>
 
-  <!-- Error -->
+  <!-- ================= ERROR ================= -->
   <div *ngIf="message && !loading" class="alert alert-warning">
     {{ message }}
   </div>
 
-  <!-- Orders Table -->
+  <!-- ================= ORDERS TABLE ================= -->
   <div *ngIf="orders.length > 0 && !loading" class="card shadow-sm p-3">
+
     <table class="table align-middle">
       <thead class="table-dark">
         <tr>
           <th>Order ID</th>
           <th>Product</th>
+
+          <!-- ✅ Context column -->
+          <th *ngIf="role === 'MANUFACTURER'">Requested By</th>
+          <th *ngIf="role === 'WHOLESALER'">Ordered By</th>
+
           <th>Quantity</th>
           <th>Status</th>
 
-          <th *ngIf="role === 'MANUFACTURER' || role === 'WHOLESALER'">
-            Action
-          </th>
+          <th>Action</th>
         </tr>
       </thead>
 
       <tbody>
         <tr *ngFor="let o of orders">
+
           <td>{{ o.id }}</td>
-          <td>{{ o.product?.name }}</td>
+
+          <td>
+            <strong>{{ o.product?.name }}</strong>
+          </td>
+
+          <!-- ✅ Who placed the order -->
+          <td *ngIf="role === 'MANUFACTURER'">
+            {{ o.user?.username }}
+          </td>
+
+          <td *ngIf="role === 'WHOLESALER'">
+            Consumer #{{ o.user?.id }}
+          </td>
+
           <td>{{ o.quantity }}</td>
 
           <td>
@@ -45,25 +74,32 @@
               [ngClass]="{
                 'bg-success': o.status === 'CONFIRMED',
                 'bg-warning text-dark': o.status === 'PENDING',
-                'bg-primary': o.status === 'SHIPPED',
                 'bg-danger': o.status === 'CANCELLED'
               }">
               {{ o.status }}
             </span>
           </td>
 
-          <td *ngIf="role === 'MANUFACTURER' || role === 'WHOLESALER'">
+          <td>
             <button class="btn btn-sm btn-success me-2"
-              (click)="updateStatus(o.id, 'CONFIRMED')"
-              [disabled]="o.status !== 'PENDING'">
+                    (click)="updateStatus(o.id, 'CONFIRMED')"
+                    [disabled]="o.status !== 'PENDING'">
               Approve
             </button>
 
             <button class="btn btn-sm btn-danger"
-              (click)="updateStatus(o.id, 'CANCELLED')"
-              [disabled]="o.status !== 'PENDING'">
+                    (click)="updateStatus(o.id, 'CANCELLED')"
+                    [disabled]="o.status !== 'PENDING'">
               Reject
             </button>
+
+            <div class="small text-muted mt-1" *ngIf="role === 'MANUFACTURER'">
+              Approve = Accept wholesaler request
+            </div>
+
+            <div class="small text-muted mt-1" *ngIf="role === 'WHOLESALER'">
+              Approve = Fulfill consumer order
+            </div>
           </td>
 
         </tr>
@@ -71,6 +107,7 @@
     </table>
   </div>
 
+  <!-- ================= EMPTY STATE ================= -->
   <p *ngIf="orders.length === 0 && !loading && !message"
      class="text-muted text-center mt-4">
     No orders found.
