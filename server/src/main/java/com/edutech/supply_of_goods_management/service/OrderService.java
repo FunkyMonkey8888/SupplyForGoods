@@ -1,17 +1,18 @@
-
 package com.edutech.supply_of_goods_management.service;
 
-import org.springframework.stereotype.Service;
-
+import com.edutech.supply_of_goods_management.entity.Inventory;
 import com.edutech.supply_of_goods_management.entity.Order;
 import com.edutech.supply_of_goods_management.entity.Product;
 import com.edutech.supply_of_goods_management.entity.User;
+import com.edutech.supply_of_goods_management.repository.InventoryRepository;
 import com.edutech.supply_of_goods_management.repository.OrderRepository;
 import com.edutech.supply_of_goods_management.repository.ProductRepository;
 import com.edutech.supply_of_goods_management.repository.UserRepository;
+import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -20,19 +21,21 @@ public class OrderService {
     private final ProductRepository productRepo;
     private final UserRepository userRepo;
     private final InventoryService inventoryService;
+    private final InventoryRepository inventoryRepository;
 
     public OrderService(OrderRepository orderRepo,
                         ProductRepository productRepo,
                         UserRepository userRepo,
-                        InventoryService inventoryService) {
+                        InventoryService inventoryService, 
+                    InventoryRepository ir) {
 
         this.orderRepo = orderRepo;
         this.productRepo = productRepo;
         this.userRepo = userRepo;
         this.inventoryService = inventoryService;
+        this.inventoryRepository = ir;
     }
 
-    /* ---------------- PLACE ORDER ---------------- */
 
     public Order placeOrder(Long productId, Long userId, Order order) {
 
@@ -45,69 +48,90 @@ public class OrderService {
         order.setProduct(product);
         order.setUser(user);
 
-        // ✅ Tests expect initial status as STRING
         order.setStatus("PENDING");
 
+
+
         return orderRepo.save(order);
     }
 
-    /* ---------------- UPDATE ORDER STATUS ---------------- */
 
+    // @Transactional
+    // public Order updateOrderStatus(Long orderId, String newStatus) {
+
+    //     Order order = orderRepo.findById(orderId)
+    //             .orElseThrow(() -> new RuntimeException("Order not found"));
+
+    //     String currentStatus = order.getStatus();
+
+    //     if (currentStatus == null || currentStatus.isBlank()) {
+    //         throw new IllegalStateException("Order status is not initialized");
+    //     }
+
+    //     newStatus = newStatus.toUpperCase();
+
+    //     if (!isValidTransition(currentStatus, newStatus)) {
+    //         throw new IllegalStateException(
+    //                 "Invalid order status transition from " +
+    //                         currentStatus + " to " + newStatus
+    //         );
+    //     }
+
+    //     // ✅ Inventory hooks
+    //     if ("CONFIRMED".equals(newStatus)) {
+    //         inventoryService.reserveInventory(order);
+    //     }
+
+    //     if ("CANCELLED".equals(newStatus)) {
+    //         inventoryService.releaseInventory(order);
+    //     }
+
+    //     order.setStatus(newStatus);
+    //     return orderRepo.save(order);
+    // }
     @Transactional
-    public Order updateOrderStatus(Long orderId, String newStatus) {
+public Order updateOrderStatus(Long orderId, String status) {
 
-        Order order = orderRepo.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+    Order order = orderRepo.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        String currentStatus = order.getStatus();
+    if ("CONFIRMED".equals(status)) {
+        try {
+            inventoryService.reserveInventory(order);
+        } catch (RuntimeException ex) {
 
-        if (currentStatus == null || currentStatus.isBlank()) {
-            throw new IllegalStateException("Order status is not initialized");
-        }
+            // ✅ Inventory issue → delete product
+            Product product = order.getProduct();
+            productRepo.deleteById(product.getId());
 
-        newStatus = newStatus.toUpperCase();
-
-        // ✅ Basic allowed transitions (aligned with tests)
-        if (!isValidTransition(currentStatus, newStatus)) {
-            throw new IllegalStateException(
-                    "Invalid order status transition from "
-                            + currentStatus + " to " + newStatus
+            throw new RuntimeException(
+                "Inventory unavailable. Product has been removed."
             );
         }
-
-        // ✅ Inventory hooks
-        if ("CONFIRMED".equals(newStatus)) {
-            inventoryService.reserveInventory(order);
-        }
-
-        if ("CANCELLED".equals(newStatus)) {
-            inventoryService.releaseInventory(order);
-        }
-
-        order.setStatus(newStatus);
-        return orderRepo.save(order);
     }
 
-    
+    order.setStatus(status);
+    return orderRepo.save(order);
+}
+
 
     public List<Order> getOrdersByUser(Long userId) {
         return orderRepo.findByUserId(userId);
     }
 
-    /* ---------------- TRANSITION RULES ---------------- */
+    public List<Order> getOrdersByManufacturer(Long manufacturerId) {
+        return orderRepo.findByProductManufacturerId(manufacturerId);
+    }
+
 
     private boolean isValidTransition(String current, String next) {
 
         switch (current) {
             case "PENDING":
-            case "PLACED":
-                return next.equals("CONFIRMED")
-                        || next.equals("SHIPPED")
-                        || next.equals("CANCELLED");
+                return next.equals("CONFIRMED") || next.equals("CANCELLED") || next.equals("SHIPPED");
 
             case "CONFIRMED":
-                return next.equals("SHIPPED")
-                        || next.equals("CANCELLED");
+                return next.equals("SHIPPED") || next.equals("CANCELLED");
 
             case "SHIPPED":
                 return next.equals("DELIVERED");
@@ -120,4 +144,24 @@ public class OrderService {
                 return false;
         }
     }
+
+    public List<Order> getConsumerOrdersForWholesaler(Long wholesalerId) {
+
+    // Step 1: get all inventories of the wholesaler
+    List<Inventory> inventories =
+            inventoryRepository.findByWholesalerId(wholesalerId);
+
+    // Step 2: extract product IDs
+    List<Long> productIds = inventories.stream()
+            .map(inv -> inv.getProduct().getId())
+            .distinct().collect(Collectors.toList());
+
+    if (productIds.isEmpty()) {
+        return List.of();
+    }
+
+    return orderRepo.findByProductIdInAndUserRole(
+            productIds, "CONSUMER"
+    );
+}
 }

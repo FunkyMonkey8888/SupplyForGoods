@@ -11,7 +11,9 @@ import { HttpService } from '../../services/http.service';
 export class RegistrationComponent implements OnInit {
 
   itemForm!: FormGroup;
-  message: string = '';
+  message = '';
+  loading = false;
+
   roles = ['CONSUMER', 'WHOLESALER', 'MANUFACTURER'];
 
   constructor(
@@ -20,28 +22,48 @@ export class RegistrationComponent implements OnInit {
     private router: Router
   ) {}
 
+  // ngOnInit(): void {
+  //   this.itemForm = this.fb.group({
+  //     username: ['', [Validators.required, Validators.minLength(4)]],
+  //     email: ['', [Validators.required, Validators.email]],
+  //     password: [
+  //       '',
+  //       [
+  //         Validators.required,
+  //         Validators.minLength(8),
+  //         Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/)
+  //       ]
+  //     ],
+  //     role: ['', Validators.required]
+  //   });
+  // }
+
   ngOnInit(): void {
-    this.itemForm = this.fb.group({
-      username: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
-      role: ['', Validators.required]
-    });
-  }
+  this.itemForm = this.fb.group({
+    username: ['', [Validators.required, Validators.minLength(3)]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    role: ['', Validators.required]
+  });
+}
+
 
   onSubmit(): void {
     if (this.itemForm.invalid) {
-      this.message = "Please fill all fields correctly.";
+      this.message = 'Please fill all fields correctly.';
       return;
     }
 
+    this.loading = true;
+    this.message = '';
+
     this.http.registerUser(this.itemForm.value).subscribe({
       next: () => {
-        this.message = "";
         this.router.navigate(['/login']);
       },
       error: () => {
-        this.message = "Registration failed. Try again.";
+        this.loading = false;
+        this.message = 'Registration failed. Try again.';
       }
     });
   }

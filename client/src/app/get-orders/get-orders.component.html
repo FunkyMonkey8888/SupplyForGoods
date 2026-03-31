@@ -1,81 +1,108 @@
-<!-- 🌟 Modern UI for Wholesaler Orders -->
-<div class="container py-4"
-     style="max-width: 900px; font-family: 'Poppins', sans-serif;">
+<div class="orders-hero">
 
-  <!-- Page Header with Icon -->
-  <div class="d-flex align-items-center mb-4">
-    <img src="https://cdn-icons-png.flaticon.com/512/3500/3500833.png" 
-         width="42" height="42" alt="orders-icon">
-    <h2 class="ms-2 mb-0" 
-        style="font-weight: 700; color: #2f3542;">
-      Wholesaler Orders
-    </h2>
+  <!-- Overlay -->
+  <div class="hero-overlay"></div>
+
+  <!-- Center container -->
+  <div class="orders-container">
+
+    <div class="orders-card animate-in">
+
+      <!-- HEADER -->
+      <div class="orders-header">
+        <div class="icon-wrapper">
+          <i class="bi bi-receipt-cutoff"></i>
+        </div>
+
+        <h3>
+          {{ role === 'MANUFACTURER' ? 'Incoming Orders' : 'Orders' }}
+        </h3>
+        <p>
+          Review and manage order requests
+        </p>
+      </div>
+
+      <!-- LOADING -->
+      <div *ngIf="loading" class="alert-info-box">
+        Loading orders...
+      </div>
+
+      <!-- ERROR -->
+      <div *ngIf="message && !loading" class="alert-warning-box">
+        {{ message }}
+      </div>
+
+      <!-- TABLE -->
+      <div *ngIf="orders.length > 0 && !loading" class="table-responsive">
+        <table class="orders-table">
+
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Status</th>
+
+              <th *ngIf="role === 'MANUFACTURER' || role === 'WHOLESALER'">
+                Action
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let o of orders">
+
+              <td>#{{ o.id }}</td>
+              <td>{{ o.product?.name }}</td>
+              <td>{{ o.quantity }}</td>
+
+              <td>
+                <span class="status confirmed" *ngIf="o.status === 'CONFIRMED'">
+                  Confirmed
+                </span>
+
+                <span class="status pending" *ngIf="o.status === 'PENDING'">
+                  Pending
+                </span>
+
+                <span class="status shipped" *ngIf="o.status === 'SHIPPED'">
+                  Shipped
+                </span>
+
+                <span class="status cancelled" *ngIf="o.status === 'CANCELLED'">
+                  Cancelled
+                </span>
+              </td>
+
+              <td *ngIf="role === 'MANUFACTURER' || role === 'WHOLESALER'">
+                <button
+                  class="btn approve"
+                  (click)="updateStatus(o.id, 'CONFIRMED')"
+                  [disabled]="o.status !== 'PENDING'">
+                  Approve
+                </button>
+
+                <button
+                  class="btn reject"
+                  (click)="updateStatus(o.id, 'CANCELLED')"
+                  [disabled]="o.status !== 'PENDING'">
+                  Reject
+                </button>
+              </td>
+            </tr>
+          </tbody>
+
+        </table>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div *ngIf="orders.length === 0 && !loading && !message"
+           class="empty-state">
+        No orders found.
+      </div>
+
+    </div>
+
   </div>
-
-  <!-- Error message -->
-  <div *ngIf="message" 
-       class="alert alert-danger"
-       style="border-radius: 10px; font-size: 15px; font-weight: 500;">
-    {{ message }}
-  </div>
-
-  <!-- ✅ Orders Table -->
-  <div *ngIf="orders.length > 0" 
-       class="card shadow-sm p-3"
-       style="
-         border-radius: 15px;
-         background: linear-gradient(135deg, #ffffff 0%, #f7fbff 100%);
-       ">
-
-    <table class="table align-middle"
-           style="border-radius: 12px; overflow: hidden;">
-      
-      <thead style="background: #2f3542; color: white;">
-        <tr>
-          <th>Order ID</th>
-          <th>Quantity</th>
-          <th>Status</th>
-          <th>Product ID</th>
-          <th>User ID</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr *ngFor="let o of orders"
-            style="transition: 0.2s;"
-            onmouseover="this.style.background='#f1f7ff'"
-            onmouseout="this.style.background='transparent'">
-
-          <td style="font-weight: 600;">{{ o.id }}</td>
-          <td>{{ o.quantity }}</td>
-
-          <!-- ✅ Status Color Badges -->
-          <td>
-            <span class="badge"
-                  [ngClass]="{
-                    'bg-success': o.status === 'CONFIRMED',
-                    'bg-warning text-dark': o.status === 'PENDING' || o.status === 'PLACED',
-                    'bg-primary': o.status === 'SHIPPED',
-                    'bg-danger': o.status === 'CANCELLED'
-                  }"
-                  style="padding: 6px 10px; font-size: 13px;">
-              {{ o.status || o.orderStatus }}
-            </span>
-          </td>
-
-          <td>{{ o.product?.id }}</td>
-          <td>{{ o.user?.id }}</td>
-        </tr>
-      </tbody>
-    </table>
-
-  </div>
-
-  <!-- When no orders exist -->
-  <p *ngIf="orders.length === 0 && !message"
-     class="text-muted text-center mt-3"
-     style="font-style: italic; font-size: 16px;">
-    No orders found.
-  </p>
 
 </div>

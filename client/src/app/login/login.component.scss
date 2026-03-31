@@ -40,7 +40,7 @@
   width: 100%;
   max-width: 420px;
 
-  min-height: 500px;        /* ✅ NEW: slightly taller container */
+  min-height: 550px;        /* ✅ NEW: slightly taller container */
   padding: 38px 30px;       /* ✅ more vertical breathing room */
 
   border-radius: 20px;
@@ -60,7 +60,7 @@
   margin: 0 auto 14px;
 
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b80ff, #529efc);
+  background: linear-gradient(135deg, #2563eb, #6366f1);
 
   display: flex;
   align-items: center;
@@ -88,7 +88,7 @@
 }
 
 .form-group label {
-  font-size: 13px;
+  font-size: 18px;
   font-weight: 600;
   margin-bottom: 4px;
   display: block;
@@ -100,7 +100,7 @@
   border-radius: 12px;
   border: 1px solid #d0d7e2;
   padding: 10px 12px;
-  font-size: 14.5px;
+  font-size: 16px;
 
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -138,10 +138,10 @@ input.ng-invalid.ng-touched {
 /* ===== BUTTON ===== */
 .login-btn {
   margin-top: 16px;
-  padding: 13px 0;
+  padding: 18px 0;
   border-radius: 14px;
 
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 600;
   color: #ffffff;
 

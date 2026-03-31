@@ -1,114 +1,96 @@
-<!-- 🌟 Full Modern Create Product UI -->
-<div class="container d-flex justify-content-center align-items-center mt-4"
-     style="min-height: 75vh; font-family: 'Poppins', sans-serif;">
+<div class="create-product-hero">
 
-  <div class="card p-4 shadow"
-       style="
-         max-width: 550px;
-         width: 100%;
-         border-radius: 18px;
-         background: linear-gradient(135deg, #ffffff 0%, #f4f9ff 100%);
-         box-shadow: 0 8px 28px rgba(0,0,0,0.12);
-       ">
+  <!-- overlay -->
+  <div class="hero-overlay"></div>
 
-    <!-- Header Icon -->
-    <div class="text-center mb-3">
-      <img src="https://cdn-icons-png.flaticon.com/512/747/747376.png"
-           width="70"
-           style="opacity: 0.9;">
+  <!-- center container -->
+  <div class="create-product-container">
+
+    <div class="create-product-card animate-in">
+
+      <!-- ICON -->
+      <div class="icon-wrapper">
+        <i class="bi bi-box-seam-fill"></i>
+      </div>
+
+      <h3 class="title">Create Product</h3>
+
+      <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+
+        <!-- PRODUCT NAME -->
+        <div class="form-group">
+          <label>Product Name</label>
+          <input
+            type="text"
+            class="custom-input"
+            formControlName="name"
+            placeholder="Enter product name"
+          />
+          <small class="error-text"
+                 *ngIf="itemForm.get('name')?.touched && itemForm.get('name')?.invalid">
+            Product name is required
+          </small>
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div class="form-group">
+          <label>Description</label>
+          <input
+            type="text"
+            class="custom-input"
+            formControlName="description"
+            placeholder="Enter description"
+          />
+        </div>
+
+        <!-- PRICE -->
+        <div class="form-group">
+          <label>Price (₹)</label>
+          <input
+            type="number"
+            class="custom-input"
+            formControlName="price"
+            placeholder="Enter price"
+          />
+          <small class="error-text"
+                 *ngIf="itemForm.get('price')?.touched && itemForm.get('price')?.invalid">
+            Enter a valid price
+          </small>
+        </div>
+
+        <!-- STOCK -->
+        <div class="form-group">
+          <label>Stock Quantity</label>
+          <input
+            type="number"
+            class="custom-input"
+            formControlName="stockQuantity"
+            placeholder="Enter initial stock"
+          />
+          <small class="error-text"
+                 *ngIf="itemForm.get('stockQuantity')?.touched && itemForm.get('stockQuantity')?.invalid">
+            Stock quantity must be greater than 0
+          </small>
+        </div>
+
+        <!-- API ERROR -->
+        <div *ngIf="message" class="error-box">
+          {{ message }}
+        </div>
+
+        <!-- SUBMIT -->
+        <button
+          class="submit-btn"
+          type="submit"
+          [disabled]="itemForm.invalid">
+          <i class="bi bi-plus-circle me-2"></i>
+          Create Product
+        </button>
+
+      </form>
+
     </div>
 
-    <h3 class="text-center mb-4"
-        style="font-weight: 700; color: #2f3542;">
-      Create Product
-    </h3>
-
-    <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
-
-      <!-- ✅ Product Name -->
-      <div class="mb-3">
-        <label class="form-label" style="font-weight: 600;">Product Name</label>
-        <input type="text" class="form-control"
-               formControlName="name"
-               placeholder="Enter product name"
-               style="
-                 height: 44px;
-                 border-radius: 10px;
-                 padding: 10px;
-                 border: 1px solid #ccc;
-                 transition: 0.25s;
-               ">
-      </div>
-
-      <!-- ✅ Description -->
-      <div class="mb-3">
-        <label class="form-label" style="font-weight: 600;">Description</label>
-        <input type="text" class="form-control"
-               formControlName="description"
-               placeholder="Enter description"
-               style="
-                 height: 44px;
-                 border-radius: 10px;
-                 padding: 10px;
-                 border: 1px solid #ccc;
-               ">
-      </div>
-
-      <!-- ✅ Price -->
-      <div class="mb-3">
-        <label class="form-label" style="font-weight: 600;">Price</label>
-        <input type="number" class="form-control"
-               formControlName="price"
-               placeholder="Enter price"
-               style="
-                 height: 44px;
-                 border-radius: 10px;
-                 padding: 10px;
-                 border: 1px solid #ccc;
-               ">
-      </div>
-
-      <!-- ✅ Stock -->
-      <div class="mb-3">
-        <label class="form-label" style="font-weight: 600;">Stock Quantity</label>
-        <input type="number" class="form-control"
-               formControlName="stockQuantity"
-               placeholder="Enter initial stock"
-               style="
-                 height: 44px;
-                 border-radius: 10px;
-                 padding: 10px;
-                 border: 1px solid #ccc;
-               ">
-      </div>
-
-      <!-- ❌ Error Message -->
-      <div *ngIf="message"
-           class="alert alert-danger text-center"
-           style="border-radius: 10px; font-weight: 500;">
-        {{ message }}
-      </div>
-
-      <!-- ✅ Stylish Submit Button -->
-      <button class="btn w-100"
-              type="submit"
-              [disabled]="itemForm.invalid"
-              style="
-                background: linear-gradient(90deg, #4e8cff, #77b5ff);
-                border: none;
-                padding: 12px;
-                border-radius: 10px;
-                font-size: 17px;
-                font-weight: 600;
-                color: white;
-                transition: 0.25s;
-                font-family: 'Poppins', sans-serif;
-              "
-              onmouseover="this.style.transform='scale(1.03)'"
-              onmouseout="this.style.transform='scale(1)'">
-        Create Product
-      </button>
-
-    </form>
   </div>
+
 </div>

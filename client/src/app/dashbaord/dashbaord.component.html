@@ -1,11 +1,10 @@
 <div class="dashboard-hero">
-
   <div class="dashboard-overlay"></div>
 
   <div class="dashboard-content">
 
-    <!-- LEFT: HERO TEXT (UNCHANGED) -->
-    <div class="dashboard-text">
+    <!-- LEFT HERO -->
+    <div class="dashboard-text animate-left">
 
       <h1 class="hero-heading">
         WELCOME TO<br />
@@ -18,34 +17,29 @@
         operations with speed and reliability.
       </p>
 
-      <!-- <div class="hero-meta">
-        Logged in as
-        <span class="role-pill">{{ role }}</span>
-      </div> -->
-
       <div class="hero-hint">
         Use the navigation bar above to manage your operations ↑
       </div>
 
     </div>
 
-    <!-- RIGHT: FLIP ROLE CARDS -->
-    <div class="dashboard-cards">
+    <!-- RIGHT FLIP CARDS -->
+    <div class="dashboard-cards animate-right">
 
       <!-- Manufacturer -->
-      <div class="flip-card">
-        <div class="flip-card-inner">
+      <div class="flip-card" [hidden]="role && role !== 'MANUFACTURER'">
+        <div class="flip-inner">
 
-          <div class="flip-card-front">
-            <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d" />
+          <div class="flip-front">
+            <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d">
             <div class="role-label">Manufacturer</div>
           </div>
 
-          <div class="flip-card-back">
+          <div class="flip-back">
             <h3>Manufacturer</h3>
             <p>
               Create products, manage production workflows,
-              monitor supply levels, and fulfill orders efficiently.
+              monitor supply levels and fulfill orders efficiently.
             </p>
           </div>
 
@@ -53,19 +47,19 @@
       </div>
 
       <!-- Wholesaler -->
-      <div class="flip-card">
-        <div class="flip-card-inner">
+      <div class="flip-card" [hidden]="role && role !== 'WHOLESALER'">
+        <div class="flip-inner">
 
-          <div class="flip-card-front">
-            <img src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7" />
+          <div class="flip-front">
+            <img src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7">
             <div class="role-label">Wholesaler</div>
           </div>
 
-          <div class="flip-card-back">
+          <div class="flip-back">
             <h3>Wholesaler</h3>
             <p>
-              Place bulk orders, manage inventory and 
-              coordinate distribution.
+              Manage inventory, place bulk orders,
+              and coordinate product distribution smoothly.
             </p>
           </div>
 
@@ -73,19 +67,19 @@
       </div>
 
       <!-- Consumer -->
-      <div class="flip-card">
-        <div class="flip-card-inner">
+      <div class="flip-card" [hidden]="role && role !== 'CONSUMER'">
+        <div class="flip-inner">
 
-          <div class="flip-card-front">
-            <img src="https://images.unsplash.com/photo-1607082349566-187342175e2f" />
+          <div class="flip-front">
+            <img src="https://images.unsplash.com/photo-1607082349566-187342175e2f">
             <div class="role-label">Consumer</div>
           </div>
 
-          <div class="flip-card-back consumer">
+          <div class="flip-back consumer">
             <h3>Consumer</h3>
             <p>
               Browse products, place orders,
-              and track purchases.
+              and track purchases in real time.
             </p>
           </div>
 
@@ -95,5 +89,4 @@
     </div>
 
   </div>
-
 </div>

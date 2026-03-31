@@ -2,14 +2,15 @@
 
   <div class="card registration-card shadow-lg p-4">
 
-    <!-- ✅ ONE icon wrapper only -->
+    <!-- ✅ ICON (ONLY IMG, NO TEXT) -->
     <div class="registration-icon-wrapper">
-      <img
-        src="https://cdn-icons-png.flaticon.com/512/747/747376.png"
-        alt="User Registration Icon"
-        class="registration-icon"
-      />
-    </div>
+  <img
+    src="https://cdn-icons-png.flaticon.com/512/747/747376.png"
+    alt="User Registration"
+    class="registration-icon"
+  />
+</div>
+
 
     <h3 class="text-center registration-title mt-5 mb-4">
       User Registration
@@ -17,7 +18,7 @@
 
     <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
 
-      <!-- Username -->
+      <!-- USERNAME -->
       <div class="mb-3">
         <label class="form-label">Username</label>
         <input
@@ -26,9 +27,15 @@
           class="form-control custom-input"
           placeholder="Enter username"
         />
+        <small
+          class="error-text"
+          *ngIf="itemForm.get('username')?.touched &&
+                 itemForm.get('username')?.errors?.['required']">
+          Username is required
+        </small>
       </div>
 
-      <!-- Email -->
+      <!-- EMAIL -->
       <div class="mb-3">
         <label class="form-label">Email</label>
         <input
@@ -37,9 +44,21 @@
           class="form-control custom-input"
           placeholder="Enter email"
         />
+        <small
+          class="error-text"
+          *ngIf="itemForm.get('email')?.touched &&
+                 itemForm.get('email')?.errors?.['required']">
+          Email is required
+        </small>
+        <small
+          class="error-text"
+          *ngIf="itemForm.get('email')?.touched &&
+                 itemForm.get('email')?.errors?.['email']">
+          Enter a valid email address
+        </small>
       </div>
 
-      <!-- Password -->
+      <!-- PASSWORD -->
       <div class="mb-3">
         <label class="form-label">Password</label>
         <input
@@ -48,22 +67,33 @@
           class="form-control custom-input"
           placeholder="Enter password"
         />
+        <small
+          class="error-text"
+          *ngIf="itemForm.get('password')?.touched &&
+                 itemForm.get('password')?.errors?.['required']">
+          Password is required
+        </small>
       </div>
 
-      <!-- Role -->
+      <!-- ROLE -->
       <div class="mb-3">
         <label class="form-label">Role</label>
         <select formControlName="role" class="form-select custom-input">
           <option value="" disabled>Select role</option>
           <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
         </select>
+        <small
+          class="error-text"
+          *ngIf="itemForm.get('role')?.touched &&
+                 itemForm.get('role')?.errors?.['required']">
+          Role selection is required
+        </small>
       </div>
 
       <button
         class="btn w-100 register-btn"
         type="submit"
-        [disabled]="itemForm.invalid"
-      >
+        [disabled]="itemForm.invalid">
         Register
       </button>
 
@@ -75,5 +105,4 @@
     </p>
 
   </div>
-
 </div>

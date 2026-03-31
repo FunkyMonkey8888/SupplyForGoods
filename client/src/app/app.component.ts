@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../services/auth.service';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -9,20 +9,47 @@ import { Router } from '@angular/router';
 })
 export class AppComponent implements OnInit {
 
-  IsLoggin: boolean = false;
+  // ✅ Auth state
+  IsLoggin = false;
   roleName: string | null = null;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  // ✅ UI state for navbar
+  showMenu = false;     // user dropdown (Logout)
+  isMenuOpen = false;   // mobile navbar toggle
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    this.IsLoggin = this.authService.getLoginStatus;
-    this.roleName = this.authService.getRole;
+    // ✅ Update navbar state when route changes
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.refreshAuthState();
+        this.showMenu = false;   // close dropdown on navigation
+        this.isMenuOpen = false;
+      }
+    });
+
+    this.refreshAuthState();
   }
 
+  private refreshAuthState(): void {
+    this.IsLoggin = this.authService.isLoggedIn();
+    this.roleName = this.authService.getRole();
+  }
+
+  // ✅ Toggle user dropdown (Logout)
+  toggleMenu(event: Event): void {
+    event.preventDefault();
+    this.showMenu = !this.showMenu;
+  }
+
+  // ✅ Logout
   logout(): void {
-    this.authService.logout();
-    this.IsLoggin = false;
-    this.roleName = null;
-    this.router.navigate(['/login']);
+    this.showMenu = false;
+    this.isMenuOpen = false;
+    this.authService.logout(); // already redirects to /login
   }
 }

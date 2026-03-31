@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { HttpService } from '../../services/http.service';
 import { AuthService } from '../../services/auth.service';
 
@@ -11,45 +10,83 @@ import { AuthService } from '../../services/auth.service';
 })
 export class ConsumerPlaceOrderComponent implements OnInit {
 
-  itemForm!: FormGroup;
-  message: string = '';
+  orderForm!: FormGroup;
+
+  products: any[] = [];
+  selectedProduct: any = null;
+
+  userId!: number;
+
+  loading = false;
+  successMessage = '';
+  errorMessage = '';
 
   constructor(
     private fb: FormBuilder,
     private http: HttpService,
-    private auth: AuthService,
-    private router: Router
+    private auth: AuthService
   ) {}
 
   ngOnInit(): void {
-    this.itemForm = this.fb.group({
-      productId: ['', Validators.required],
-      quantity: ['', Validators.required],
-      status: ['', Validators.required]
+    this.userId = Number(this.auth.getUserId());
+    this.buildForm();
+    this.loadProducts();
+  }
+
+  private buildForm(): void {
+    this.orderForm = this.fb.group({
+      quantity: ['', [Validators.required, Validators.min(1)]],
+      status: ['PLACED']
     });
   }
 
-  onSubmit(): void {
-    if (this.itemForm.invalid) {
-      this.message = "Please fill all fields.";
+  /* ✅ Load products from ALL wholesalers */
+  private loadProducts(): void {
+    this.http.getProductsByConsumers().subscribe({
+      next: res => this.products = res,
+      error: () => {
+        this.errorMessage = 'Failed to load products.';
+      }
+    });
+  }
+
+  selectProduct(product: any): void {
+    this.selectedProduct = product;
+    this.successMessage = '';
+    this.errorMessage = '';
+  }
+
+  placeOrder(): void {
+
+    if (!this.selectedProduct) {
+      this.errorMessage = 'Please select a product';
       return;
     }
 
-    const userId = localStorage.getItem('userId');
-    const productId = this.itemForm.value.productId;
+    if (this.orderForm.invalid) {
+      this.orderForm.markAllAsTouched();
+      return;
+    }
 
-    const payload = {
-      quantity: this.itemForm.value.quantity,
-      status: this.itemForm.value.status
-    };
+    this.loading = true;
 
-    this.http.consumerPlaceOrder(payload, productId, userId).subscribe({
+    this.http.consumerPlaceOrder(
+      {
+        quantity: this.orderForm.value.quantity,
+        status: 'PLACED'
+      },
+      this.selectedProduct.id,
+      this.userId
+    ).subscribe({
       next: () => {
-        this.message = "";
-        this.router.navigate(['/consumer-get-orders']);
+        this.successMessage = 'Order placed successfully';
+        this.loading = false;
+        this.orderForm.reset({ status: 'PLACED' });
+        this.selectedProduct = null;
       },
       error: () => {
-        this.message = "Order failed. Try again.";
+        this.errorMessage = 'Order placement failed';
+        this.loading = false;
       }
     });
   }

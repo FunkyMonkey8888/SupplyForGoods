@@ -2,19 +2,24 @@ package com.edutech.supply_of_goods_management.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.edutech.supply_of_goods_management.entity.Inventory;
 import com.edutech.supply_of_goods_management.entity.Product;
+import com.edutech.supply_of_goods_management.repository.InventoryRepository;
 import com.edutech.supply_of_goods_management.repository.ProductRepository;
 import java.util.List;
 @Service
 public class ProductService {
 
     private final ProductRepository repo;
+    private final InventoryRepository inventoryRepo;
 
-    public ProductService(ProductRepository repo) {
+    public ProductService(ProductRepository repo, InventoryRepository inventoryRepo) {
         this.repo = repo;
+        this.inventoryRepo = inventoryRepo;
     }
 
     public Product createProduct(Product product) {
+        if(product.getPrice() <=0 || product.getStockQuantity() <=0) throw new IllegalArgumentException("Price or quantity cannot be less than 0");
         return repo.save(product);
     }
 
@@ -34,5 +39,9 @@ public class ProductService {
 
     public List<Product> getAllProducts() {
         return repo.findAll();
+    }
+
+    public void deleteProduct(Long id){
+        repo.deleteById(id);
     }
 }
