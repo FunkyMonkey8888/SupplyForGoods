@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -44,25 +45,34 @@ public class UserService implements UserDetailsService {
 
     public User registerUser(RegisterRequest req) {
 
+        
+
+
+
         // ✅ Enforce invite code for privileged roles
-        if (!"CONSUMER".equalsIgnoreCase(req.getRole()) || "ADMIN".equalsIgnoreCase(req.getRole())) {
+        if (!"CONSUMER".equalsIgnoreCase(req.getRole()) ) {
 
-            InviteCode invite = inviteRepo
-                    .findByRoleAndUsedFalse(req.getRole().toUpperCase())
-                    .orElseThrow(() ->
-                            new RuntimeException("Invite code required for role"));
+        List<InviteCode> invites =
+            inviteRepo.findByRoleAndUsedFalse(req.getRole().toUpperCase());
 
-            if (invite.getExpiresAt().isBefore(LocalDateTime.now())) {
-                throw new RuntimeException("Invite code expired");
+        InviteCode matchedInvite = null;
+
+        for (InviteCode invite : invites) {
+            if (passwordEncoder.matches(req.getInviteCode(), invite.getCodeHash())) {
+                matchedInvite = invite;
+                break;
             }
+        }
 
-            if (!passwordEncoder.matches(req.getInviteCode(), invite.getCodeHash())) {
-                throw new RuntimeException("Invalid invite code");
-            }
+        if (matchedInvite == null) {
+            throw new RuntimeException("Invalid or expired invite code");
+        }
 
-            // ✅ One‑time use enforcement
-            invite.setUsed(true);
-            inviteRepo.save(invite);
+        // ✅ Mark ONLY the matched code as used
+        matchedInvite.setUsed(true);
+        inviteRepo.save(matchedInvite);
+
+
         }
 
         User user = new User();

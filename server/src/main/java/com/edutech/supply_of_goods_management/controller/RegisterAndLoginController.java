@@ -80,7 +80,7 @@ public class RegisterAndLoginController {
         UserDetails userDetails = org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
                 .password(user.getPassword())
-                .authorities("ROLE_" + user.getRole())
+                .authorities(user.getRole())
                 .build();
 
         String token = jwtUtil.generateToken(userDetails, user.getRole());

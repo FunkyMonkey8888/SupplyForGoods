@@ -30,7 +30,7 @@ const routes: Routes = [
  { path: 'consumer-get-orders', component: ConsumerGetOrdersComponent }, 
  
   {
-    path: 'admin/invite',
+    path: 'admin',
     component: AdminInviteComponent,
     canActivate: [AdminGuard]
   },
