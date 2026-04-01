@@ -26,13 +26,11 @@ public class ConsumerController {
         this.feedbackService = feedbackService;
     }
 
-    // ✅ Browse Products
     @GetMapping("/products")
     public ResponseEntity<List<Product>> browseProducts() {
         return ResponseEntity.ok(productService.getAllProducts());
     }
 
-    // ✅ Place Order
     @PostMapping("/order")
     public ResponseEntity<Order> placeOrder(@RequestParam Long productId,
                                             @RequestParam Long userId,
@@ -40,15 +38,13 @@ public class ConsumerController {
         return ResponseEntity.ok(orderService.placeOrder(productId, userId, order));
     }
 
-    // ✅ Get All Orders
     @GetMapping("/orders")
     public ResponseEntity<List<Order>> getAllOrders(@RequestParam Long userId) {
         return ResponseEntity.ok(orderService.getOrdersByUser(userId));
     }
 
-    // ✅ Provide Feedback
     @PostMapping("/order/{orderId}/feedback")
-    public ResponseEntity<Feedback> provideFeedback(@PathVariable Long orderId,
+    public ResponseEntity<Feedback> submitFeedback(@PathVariable Long orderId,
                                                     @RequestParam Long userId,
                                                     @RequestBody Feedback feedback) {
         return ResponseEntity.ok(feedbackService.giveFeedback(orderId, userId, feedback));
