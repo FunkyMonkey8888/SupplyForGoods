@@ -70,15 +70,21 @@
           <td>{{ o.quantity }}</td>
 
           <td>
-            <span class="badge"
+              <span class="badge"
               [ngClass]="{
                 'bg-success': o.status === 'CONFIRMED',
-                'bg-warning text-dark': o.status === 'PENDING',
-                'bg-danger': o.status === 'CANCELLED'
+                'bg-danger': o.status === 'CANCELLED',
+                'bg-warning text-dark': o.status === 'PENDING'
               }">
-              {{ o.status }}
-            </span>
-          </td>
+          {{ o.status }}
+        </span>
+
+        <!-- ✅ Waiting for Stock Hint -->
+        <div *ngIf="o.status === 'PENDING'"
+            class="small text-muted mt-1">
+          Waiting for stock
+        </div>
+        </td>
 
           <td>
             <button class="btn btn-sm btn-success me-2"

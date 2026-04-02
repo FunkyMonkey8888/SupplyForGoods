@@ -14,6 +14,7 @@ export class AddInventoryComponent implements OnInit {
 
   products: any[] = [];
   selectedProduct: any = null;
+  inventoryAdded:boolean =  false;
 
   wholesalerId!: number | string;
 
@@ -42,7 +43,7 @@ export class AddInventoryComponent implements OnInit {
 
   private loadProducts(): void {
     this.http.getProductsByWholesaler().subscribe({
-      next: res => this.products = res,
+      next: res => {this.products = res; this.inventoryAdded = true},
       error: () => this.errorMessage = 'Failed to load products'
     });
   }
