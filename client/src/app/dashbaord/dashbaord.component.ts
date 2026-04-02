@@ -2,18 +2,23 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { HttpService } from '../../services/http.service';
 import { Router } from '@angular/router';
-
+declare var Chart: any;
 @Component({
   selector: 'app-dashbaord',
   templateUrl: './dashbaord.component.html',
   styleUrls: ['./dashbaord.component.scss']
 })
+
 export class DashbaordComponent implements OnInit {
+
+  
 
   role: string | null = null;
   username: string | null = null;
-  userId: number | string | null = null;
-  isLoggedIn:boolean = false;
+  userId: number | null = null;
+  isLoggedIn = false;
+
+  analytics: any = null;
 
   products: any[] = [];
   consumerOrders: any[] = [];
@@ -32,13 +37,14 @@ export class DashbaordComponent implements OnInit {
   ngOnInit(): void {
     this.role = this.auth.getRole();
     this.username = this.auth.getUsername();
-    this.userId = this.auth.getUserId();
+    this.userId = Number(this.auth.getUserId());
     this.isLoggedIn = !!this.role && !!this.userId;
 
-    if (!this.role || !this.userId) return;
+    if (!this.isLoggedIn) return;
 
     if (this.role === 'MANUFACTURER') {
       this.loadManufacturerProducts();
+      this.loadManufacturerAnalytics();
     }
 
     if (this.role === 'CONSUMER') {
@@ -48,155 +54,96 @@ export class DashbaordComponent implements OnInit {
     if (this.role === 'WHOLESALER') {
       this.loadWholesalerOrders();
       this.loadWholesalerInventory();
+      this.loadWholesalerAnalytics();
     }
   }
 
+  /* ================= ANALYTICS ================= */
+
+  loadWholesalerAnalytics(): void {
+    this.http.getWholesalerAnalytics(this.userId!).subscribe({
+      next: (data) => {
+        this.analytics = data;
+        this.renderWholesalerChart();
+      },
+      error: () => this.error = 'Failed to load wholesaler analytics'
+    });
+  }
+
+  loadManufacturerAnalytics(): void {
+    this.http.getManufacturerAnalytics(this.userId!).subscribe({
+      next: (data) => {
+        this.analytics = data;
+        this.renderManufacturerChart();
+      },
+      error: () => this.error = 'Failed to load manufacturer analytics'
+    });
+  }
+
+  /* ================= DATA LOADERS ================= */
+
   loadManufacturerProducts(): void {
     this.http.getProductsByManufacturer(this.userId!).subscribe({
-      next: res => (this.products = res),
-      error: () => (this.error = 'Failed to load products')
+      next: res => this.products = res,
+      error: () => this.error = 'Failed to load products'
     });
   }
 
   loadConsumerOrders(): void {
-    this.http.getOrderConsumer(this.userId!).subscribe(res => {
-      this.consumerOrders = res;
+    this.http.getOrderConsumer(this.userId!).subscribe({
+      next: res => this.consumerOrders = res,
+      error: () => this.error = 'Failed to load orders'
     });
   }
 
   loadWholesalerOrders(): void {
-    this.http.getOrderByWholesalers(this.userId!).subscribe(res => {
-      this.wholesalerOrders = res;
+    this.http.getOrderByWholesalers(this.userId!).subscribe({
+      next: res => this.wholesalerOrders = res,
+      error: () => this.error = 'Failed to load wholesaler orders'
     });
   }
 
   loadWholesalerInventory(): void {
-    this.http.getInventoryByWholesalers(this.userId!).subscribe(res => {
-      this.inventories = res;
+    this.http.getInventoryByWholesalers(this.userId!).subscribe({
+      next: res => this.inventories = res,
+      error: () => this.error = 'Failed to load inventory'
+    });
+  }
+
+  /* ================= CHARTS ================= */
+
+  renderWholesalerChart(): void {
+    new Chart('wholesalerChart', {
+      type: 'pie',
+      data: {
+        labels: ['Pending', 'Confirmed', 'Cancelled'],
+        datasets: [{
+          data: [
+            this.analytics.pendingOrders,
+            this.analytics.confirmedOrders,
+            this.analytics.cancelledOrders
+          ],
+          backgroundColor: ['#fbc02d', '#2e7d32', '#c62828']
+        }]
+      }
+    });
+  }
+
+  renderManufacturerChart(): void {
+    new Chart('manufacturerChart', {
+      type: 'bar',
+      data: {
+        labels: ['Confirmed', 'Pending', 'Cancelled'],
+        datasets: [{
+          label: 'Orders',
+          data: [
+            this.analytics.confirmedOrders,
+            this.analytics.pendingOrders,
+            this.analytics.cancelledOrders
+          ],
+          backgroundColor: ['#2e7d32', '#fbc02d', '#c62828']
+        }]
+      }
     });
   }
 }
-
-
-
-
-
-// export class DashbaordComponent implements OnInit {
-
-//   role: string | null = null;
-//   username: string | null = null;
-//   userId: number | string | null = null;
-
-//   // Manufacturer
-//   products: any[] = [];
-
-//   // Consumer
-//   consumerOrders: any[] = [];
-//   filteredConsumerOrders: any[] = [];
-//   orderSearchText = '';
-
-//   // Wholesaler
-//   wholesalerOrders: any[] = [];
-//   filteredWholesalerOrders: any[] = [];
-//   inventories: any[] = [];
-
-//   loading = false;
-//   error = '';
-
-//   constructor(
-//     private auth: AuthService,
-//     private http: HttpService,
-//     private router: Router
-//   ) {}
-
-//   ngOnInit(): void {
-//     this.role = this.auth.getRole();
-//     this.username = this.auth.getUsername();
-//     this.userId = this.auth.getUserId();
-
-//     if (!this.role || !this.userId) return;
-
-//     if (this.role === 'MANUFACTURER') {
-//       this.loadManufacturerProducts();
-//     }
-
-//     if (this.role === 'CONSUMER') {
-//       this.loadConsumerOrders();
-//     }
-
-//     if (this.role === 'WHOLESALER') {
-//       this.loadWholesalerOrders();
-//       this.loadWholesalerInventory();
-//     }
-//   }
-
-//   /* ================= MANUFACTURER ================= */
-
-//   loadManufacturerProducts(): void {
-//     this.loading = true;
-//     this.http.getProductsByManufacturer(this.userId!).subscribe({
-//       next: res => {
-//         this.products = res;
-//         this.loading = false;
-//       },
-//       error: () => {
-//         this.error = 'Failed to load products';
-//         this.loading = false;
-//       }
-//     });
-//   }
-
-//   editProduct(product: any): void {
-//     this.router.navigate(['/update-product', product.id]);
-//   }
-
-//   deleteProduct(productId: number): void {
-//     if (!confirm('Are you sure you want to delete this product?')) return;
-
-//     this.http.deleteProductByManufacturer(
-//       productId
-//     ).subscribe(() => {
-//       this.products = this.products.filter(p => p.id !== productId);
-//     });
-//   }
-
-//   /* ================= CONSUMER ================= */
-
-//   loadConsumerOrders(): void {
-//     this.http.getOrderConsumer(this.userId!).subscribe(res => {
-//       this.consumerOrders = res;
-//       this.filteredConsumerOrders = res;
-//     });
-//   }
-
-//   filterConsumerOrders(): void {
-//     const text = this.orderSearchText.toLowerCase();
-//     this.filteredConsumerOrders = this.consumerOrders.filter(o =>
-//       o.product?.name.toLowerCase().includes(text) ||
-//       o.status.toLowerCase().includes(text)
-//     );
-//   }
-
-//   /* ================= WHOLESALER ================= */
-
-//   loadWholesalerOrders(): void {
-//     this.http.getOrderByWholesalers(this.userId!).subscribe(res => {
-//       this.wholesalerOrders = res;
-//       this.filteredWholesalerOrders = res;
-//     });
-//   }
-
-//   filterWholesalerOrders(): void {
-//     const text = this.orderSearchText.toLowerCase();
-//     this.filteredWholesalerOrders = this.wholesalerOrders.filter(o =>
-//       o.product?.name.toLowerCase().includes(text) ||
-//       o.status.toLowerCase().includes(text)
-//     );
-//   }
-
-//   loadWholesalerInventory(): void {
-//     this.http.getInventoryByWholesalers(this.userId!).subscribe(res => {
-//       this.inventories = res;
-//     });
-//   }
-// }

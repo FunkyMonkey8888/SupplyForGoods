@@ -1,4 +1,6 @@
+<!-- ========================================= -->
 <!-- ✅ LANDING VIEW (NOT LOGGED IN) -->
+<!-- ========================================= -->
 <div *ngIf="!isLoggedIn" class="text-center py-5">
   <h2 class="fw-bold">Welcome to SupplyChain Pro</h2>
   <p class="text-muted mt-2">
@@ -6,110 +8,207 @@
   </p>
 
   <div class="mt-4">
-    <a routerLink="/registration" class="btn btn-primary me-3">
-      Get Started
-    </a>
-    <a routerLink="/login" class="btn btn-outline-secondary">
-      Login
-    </a>
+    <a routerLink="/registration" class="btn btn-primary me-3">Get Started</a>
+    <a routerLink="/login" class="btn btn-outline-secondary">Login</a>
   </div>
 </div>
 
-<!-- ✅ ACTUAL DASHBOARD (LOGGED IN ONLY) -->
-<div *ngIf="isLoggedIn">
+<!-- ========================================= -->
+<!-- ✅ DASHBOARD VIEW (LOGGED IN) -->
+<!-- ========================================= -->
+<div *ngIf="isLoggedIn" class="container py-4">
 
-  <!-- existing dashboard content -->
-  <!-- <header class="dashboard-header">
-    <h2>Welcome, {{ username }}</h2>
-    <span class="role-badge">{{ role }}</span>
-  </header> -->
+  <!-- ✅ HEADER -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0">
+      Welcome, {{ username }}
+      <span class="badge bg-dark ms-2">{{ role }}</span>
+    </h3>
+  </div>
 
-  <!-- rest of your role-based sections -->
+  <!-- ✅ ERROR -->
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
 
+  <!-- ========================================= -->
+  <!-- ================= MANUFACTURER =========== -->
+  <!-- ========================================= -->
+  <section *ngIf="role === 'MANUFACTURER'">
 
-<div class="dashboard-container">
+    <h4 class="mb-3">📦 Manufacturer Dashboard</h4>
 
-  <!-- HEADER -->
-  <header class="dashboard-header">
-    <div>
-      <h2>Welcome, {{ username }}</h2>
-      <span class="role-badge">{{ role }}</span>
+    <!-- ✅ ANALYTICS CARDS -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <h6>Total Orders</h6>
+          <h3>{{ analytics?.totalOrders || 0 }}</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <h6>Confirmed Orders</h6>
+          <h3 class="text-success">{{ analytics?.confirmedOrders || 0 }}</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <h6>Pending Orders</h6>
+          <h3 class="text-warning">{{ analytics?.pendingOrders || 0 }}</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <h6>Cancelled Orders</h6>
+          <h3 class="text-danger">{{ analytics?.cancelledOrders || 0 }}</h3>
+        </div>
+      </div>
     </div>
-  </header>
 
-  <!-- ERROR -->
-  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+    <!-- ✅ CHART -->
+    <div class="card p-3 mb-4">
+      <h6 class="mb-3">Order Distribution</h6>
+      <canvas id="manufacturerChart"></canvas>
+    </div>
 
-  <!-- ================= MANUFACTURER ================= -->
-  <section *ngIf="role === 'MANUFACTURER'" class="role-section">
-    <h3>Manufacturer Dashboard</h3>
-
-    <div class="actions mb-3">
-      <a routerLink="/create-product" class="btn btn-primary">
+    <!-- ✅ ACTIONS -->
+    <div class="mb-3">
+      <a routerLink="/create-product" class="btn btn-primary me-2">
         + Create Product
       </a>
-
-      <a routerLink="/get-orders" class="btn btn-warning ms-2">
+      <a routerLink="/get-orders" class="btn btn-outline-dark">
         Review Orders
       </a>
     </div>
 
-    <div *ngIf="products.length > 0; else noProducts" class="card-grid">
-      <div class="card" *ngFor="let product of products">
-        <h4>{{ product.name }}</h4>
-        <p>{{ product.description }}</p>
-        <strong>₹{{ product.price }}</strong>
+    <!-- ✅ PRODUCT LIST -->
+    <h5 class="mt-4">My Products</h5>
+
+    <div *ngIf="products.length === 0" class="text-muted mt-2">
+      No products created yet.
+    </div>
+
+    <div class="row">
+      <div class="col-md-3" *ngFor="let p of products">
+        <div class="card p-3 mb-3 shadow-sm">
+          <h6>{{ p.name }}</h6>
+          <p class="small text-muted">{{ p.description }}</p>
+          <strong>₹{{ p.price }}</strong>
+        </div>
       </div>
     </div>
 
-    <ng-template #noProducts>
-      <p class="text-muted">No products created yet.</p>
-    </ng-template>
   </section>
 
-  <!-- ================= CONSUMER ================= -->
-  <section *ngIf="role === 'CONSUMER'" class="role-section">
-    <h3>Consumer Dashboard</h3>
+  <!-- ========================================= -->
+  <!-- ================= CONSUMER ============== -->
+  <!-- ========================================= -->
+  <section *ngIf="role === 'CONSUMER'">
 
-    <div class="actions mb-3">
-      <a routerLink="/consumer-place-order" class="btn btn-primary">
+    <h4 class="mb-3">🛒 Consumer Dashboard</h4>
+
+    <div class="mb-3">
+      <a routerLink="/consumer-place-order" class="btn btn-primary me-2">
         Browse Products
       </a>
-
-      <a routerLink="/consumer-place-order" class="btn btn-success ms-2">
-        Place Order
-      </a>
-
-      <a routerLink="/consumer-get-orders" class="btn btn-outline-dark ms-2">
+      <a routerLink="/consumer-get-orders" class="btn btn-outline-dark">
         My Orders
       </a>
     </div>
 
-    <p class="text-muted">
-      Use the actions above to browse products and track your orders.
-    </p>
+    <!-- ✅ EMPTY STATE -->
+    <div *ngIf="consumerOrders.length === 0" class="text-muted mt-3">
+      No orders yet. Start browsing products to place an order.
+    </div>
+
+    <!-- ✅ ORDERS -->
+    <div *ngFor="let o of consumerOrders" class="card p-3 mb-3 shadow-sm">
+      <p><strong>Order ID:</strong> {{ o.id }}</p>
+      <p><strong>Product:</strong> {{ o.product?.name }}</p>
+      <p><strong>Quantity:</strong> {{ o.quantity }}</p>
+      <p>
+        <strong>Status:</strong>
+        <span class="badge"
+              [ngClass]="{
+                'bg-success': o.status === 'CONFIRMED',
+                'bg-warning text-dark': o.status === 'PENDING',
+                'bg-danger': o.status === 'CANCELLED'
+              }">
+          {{ o.status }}
+        </span>
+      </p>
+    </div>
+
   </section>
 
-  <!-- ================= WHOLESALER ================= -->
-  <section *ngIf="role === 'WHOLESALER'" class="role-section">
-    <h3>Wholesaler Dashboard</h3>
+  <!-- ========================================= -->
+  <!-- ================= WHOLESALER ============ -->
+  <!-- ========================================= -->
+  <section *ngIf="role === 'WHOLESALER'">
 
-    <div class="actions mb-3">
-      <a routerLink="/add-inventory" class="btn btn-primary">
+    <h4 class="mb-3">🏭 Wholesaler Dashboard</h4>
+
+    <!-- ✅ ANALYTICS CARDS -->
+    <div class="row mb-4">
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <h6>Pending Orders</h6>
+          <h3 class="text-warning">{{ analytics?.pendingOrders || 0 }}</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <h6>Confirmed Orders</h6>
+          <h3 class="text-success">{{ analytics?.confirmedOrders || 0 }}</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <h6>Total Stock</h6>
+          <h3>{{ analytics?.totalStock || 0 }}</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <h6>Low Stock Items</h6>
+          <h3 class="text-danger">{{ analytics?.lowStock || 0 }}</h3>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ✅ CHART -->
+    <div class="card p-3 mb-4">
+      <h6 class="mb-3">Order Status Overview</h6>
+      <canvas id="wholesalerChart"></canvas>
+    </div>
+
+    <!-- ✅ ACTIONS -->
+    <div class="mb-3">
+      <a routerLink="/add-inventory" class="btn btn-primary me-2">
         Add Inventory
       </a>
-
-      <a routerLink="/place-product" class="btn btn-success ms-2">
-        Place Order
-      </a>
-
-      <a routerLink="/get-orders" class="btn btn-outline-dark ms-2">
+      <a routerLink="/get-orders" class="btn btn-outline-dark">
         View Orders
       </a>
     </div>
 
+    <!-- ✅ INVENTORY TABLE -->
     <h5 class="mt-4">My Inventory</h5>
-    <table class="table table-bordered" *ngIf="inventories.length > 0">
+
+    <div *ngIf="inventories.length === 0" class="text-muted mt-2">
+      No inventory added yet — add stock to fulfill orders.
+    </div>
+
+    <table *ngIf="inventories.length > 0" class="table table-bordered mt-2">
       <thead>
         <tr>
           <th>Product</th>
@@ -124,10 +223,6 @@
       </tbody>
     </table>
 
-    <p *ngIf="inventories.length === 0" class="text-muted">
-      No inventory added yet.
-    </p>
   </section>
 
-</div>
 </div>

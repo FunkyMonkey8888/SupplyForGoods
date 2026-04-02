@@ -214,4 +214,23 @@ export class HttpService {
       this.getHeaders()
     );
   }
+
+
+  /* ================= ANALYTICS APIs ================= */
+
+getWholesalerAnalytics(wholesalerId: number) {
+  return this.http.get<any>(
+    `${this.serverName}/api/analytics/wholesaler?wholesalerId=${wholesalerId}`,
+    this.getHeaders()
+  );
+}
+
+getManufacturerAnalytics(manufacturerId: number) {
+  return this.http.get<any>(
+    `${this.serverName}/api/analytics/manufacturer?manufacturerId=${manufacturerId}`,
+    this.getHeaders()
+  );
+}
+
+
 }

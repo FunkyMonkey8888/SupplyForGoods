@@ -3,6 +3,7 @@ package com.edutech.supply_of_goods_management.repository;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.edutech.supply_of_goods_management.entity.Inventory;
@@ -29,5 +30,12 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
 
     Optional<Inventory> findFirstByProduct(Product product);
+
+
+    @Query("SELECT SUM(i.stockQuantity) FROM Inventory i")
+    Long totalStock();
+
+    @Query("SELECT i FROM Inventory i WHERE i.stockQuantity < 10")
+    List<Inventory> lowStockItems();
 
 }
