@@ -24,6 +24,10 @@ public class Feedback {
 
     private Date timestamp;
 
+    private double rating;
+
+    
+
     @ManyToOne
     @JoinColumn(name = "order_id")
     @JsonIgnore
@@ -74,5 +78,13 @@ public class Feedback {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
     }
 }
