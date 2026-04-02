@@ -50,18 +50,22 @@
           <td>{{ o.quantity }}</td>
 
           <!-- ✅ Status Color Badges -->
-          <td>
-            <span class="badge"
-                  [ngClass]="{
-                    'bg-success': o.status === 'CONFIRMED',
-                    'bg-warning text-dark': o.status === 'PENDING' || o.status === 'PLACED',
-                    'bg-primary': o.status === 'SHIPPED',
-                    'bg-danger': o.status === 'CANCELLED'
-                  }"
-                  style="padding: 6px 10px; font-size: 13px;">
-              {{ o.status || o.orderStatus }}
-            </span>
-          </td>
+            <td>
+    <span class="badge"
+          [ngClass]="{
+            'bg-success': o.status === 'CONFIRMED',
+            'bg-danger': o.status === 'CANCELLED',
+            'bg-warning text-dark': o.status === 'PENDING'
+          }">
+      {{ o.status }}
+    </span>
+
+    <!-- ✅ Waiting for Stock Hint -->
+    <div *ngIf="o.status === 'PENDING'"
+        class="small text-muted mt-1">
+      Waiting for stock
+    </div>
+  </td>
 
           <td>{{ o.product?.id }}</td>
           <td>{{ o.user?.id }}</td>
@@ -72,10 +76,21 @@
   </div>
 
   <!-- When no orders exist -->
-  <p *ngIf="orders.length === 0 && !message"
+  <!-- <p *ngIf="orders.length === 0 && !message"
      class="text-muted text-center mt-3"
      style="font-style: italic; font-size: 16px;">
     No orders found.
+  </p> -->
+  <!-- ✅ Empty State: No Orders for Wholesaler -->
+<div *ngIf="orders.length === 0 && !message"
+     class="text-center text-muted mt-4">
+
+  <i class="bi bi-inbox" style="font-size: 42px;"></i>
+  <p class="fw-semibold mt-2">No orders yet</p>
+  <p class="small">
+    Consumer orders will appear here once users place orders
+    for products you handle.
   </p>
+</div>
 
 </div>

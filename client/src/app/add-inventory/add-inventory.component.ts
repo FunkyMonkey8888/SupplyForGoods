@@ -13,6 +13,7 @@ export class AddInventoryComponent implements OnInit {
 
   itemForm!: FormGroup;
   message: string = '';
+  inventoryAdded = false;
 
   constructor(
     private fb: FormBuilder,
@@ -42,7 +43,8 @@ export class AddInventoryComponent implements OnInit {
 
     this.http.addInventory(payload, productId).subscribe({
       next: () => {
-        this.message = "";
+        this.inventoryAdded = true;
+        this.message = '';
         this.router.navigate(['/get-orders']);
       },
       error: () => {
