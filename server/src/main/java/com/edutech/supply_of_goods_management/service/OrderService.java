@@ -89,7 +89,7 @@ public class OrderService {
 
     // Get orders for manufacturer
     public List<Order> getOrdersByManufacturer(Long manufacturerId) {
-        return orderRepo.findByProductManufacturerId(manufacturerId);
+        return orderRepo.findByProductManufacturerIdAndUserRole(manufacturerId, "WHOLESALER");
     }
 
     // Check valid order status transitions

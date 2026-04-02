@@ -60,7 +60,7 @@ export class ConsumerGetOrdersComponent implements OnInit {
       return;
     }
 
-    const payload = { rating, comment };
+    const payload = { content: comment };
 
     this.http.addConsumerFeedBack(orderId, this.userId, payload).subscribe({
       next: () => {

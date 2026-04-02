@@ -22,4 +22,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // Find orders by product IDs and user role
     List<Order> findByProductIdInAndUserRole(List<Long> productIds, String role);
+
+    List<Order> findByProductManufacturerIdAndUserRole(
+        Long manufacturerId,
+        String role
+);
+
 }

@@ -1,5 +1,7 @@
 package com.edutech.supply_of_goods_management.service;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +36,7 @@ public class FeedbackService {
         User u = userRepo.findById(userId).orElseThrow();
         f.setOrder(o);
         f.setUser(u);
+        f.setTimestamp(new Date());
         return repo.save(f);
     }
 }
