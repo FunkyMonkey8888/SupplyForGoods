@@ -8,6 +8,40 @@
     </p>
   </div>
 
+  <!-- ✅ NEW: Search + Sorting Bar -->
+  <div class="d-flex gap-3 mb-4">
+    <!-- Search -->
+    <input type="text"
+           class="form-control"
+           placeholder="Search products..."
+           [(ngModel)]="searchText"
+           (input)="onSearch()">
+
+    <!-- Sorting -->
+    <select class="form-select"
+            (change)="onSortChange($event)">
+      <option value="">Sort</option>
+      <option value="az">A → Z</option>
+      <option value="za">Z → A</option>
+      <option value="low-high">Price: Low → High</option>
+      <option value="high-low">Price: High → Low</option>
+    </select>
+  </div>
+
+  <!-- ✅ NEW: Pagination Buttons -->
+  <div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-outline-secondary me-2"
+            (click)="prevPage()"
+            [disabled]="page === 0">
+      ‹ Prev
+    </button>
+
+    <button class="btn btn-outline-secondary"
+            (click)="nextPage()">
+      Next ›
+    </button>
+  </div>
+
   <!-- ================= STEP 1: PRODUCT SELECTION ================= -->
   <h5 class="mb-3">📦 Step 1: Choose a Product</h5>
 
@@ -22,6 +56,11 @@
         <div class="card-body">
 
           <h6 class="fw-semibold mb-1">{{ product.name }}</h6>
+
+          <!-- ✅ NEW: Rating Display -->
+          <div class="text-warning small mb-1">
+            ⭐ {{ getRating(product) }} ratings
+          </div>
 
           <p class="text-muted small mb-2">
             {{ product.description || 'No description available' }}
@@ -75,8 +114,10 @@
                      formControlName="quantity">
 
               <small class="text-danger"
-                     *ngIf="orderForm.get('quantity')?.touched &&
-                            orderForm.get('quantity')?.invalid">
+                     *ngIf="
+                       orderForm.get('quantity')?.touched &&
+                       orderForm.get('quantity')?.invalid
+                     ">
                 Please enter a valid quantity (minimum 1)
               </small>
             </div>
@@ -101,11 +142,10 @@
               ❌ {{ errorMessage }}
             </div>
 
-            <!-- Submit -->
+            <!-- Submit Button -->
             <button type="submit"
                     class="btn btn-primary w-100"
                     [disabled]="loading">
-
               {{ loading ? 'Placing your order…' : 'Confirm Order' }}
             </button>
 

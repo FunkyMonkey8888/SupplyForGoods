@@ -28,8 +28,11 @@ export class HttpService {
     };
   }
 
-  /* ================= PRODUCT APIs ================= */
+  /* =====================================================
+     ✅ UPDATED: PRODUCT APIs WITH SORT + SEARCH + PAGINATION
+     ===================================================== */
 
+  /* ✅ Old method — unchanged (tests use this) */
   getProductsByWholesaler(): Observable<any[]> {
     return this.http.get<any[]>(
       `${this.serverName}/api/wholesalers/products`,
@@ -37,12 +40,62 @@ export class HttpService {
     );
   }
 
+  /* ✅ Enhanced version (OPTIONAL params — no breakage) */
+  getProductsByWholesalerAdvanced(
+    sort: string = "",
+    search: string = "",
+    page: number | null = null,
+    size: number | null = null
+  ): Observable<any[]> {
+
+    let url = `${this.serverName}/api/wholesalers/products`;
+    const params: string[] = [];
+
+    if (sort) params.push(`sort=${sort}`);
+    if (search) params.push(`name=${search}`);
+    if (page !== null) params.push(`page=${page}`);
+    if (size !== null) params.push(`size=${size}`);
+
+    if (params.length > 0) {
+      url += '?' + params.join('&');
+    }
+
+    return this.http.get<any[]>(url, this.getHeaders());
+  }
+
+  /* ✅ Old method — unchanged (tests use this) */
   getProductsByConsumers(): Observable<any[]> {
     return this.http.get<any[]>(
       `${this.serverName}/api/consumers/products`,
       this.getHeaders()
     );
   }
+
+  /* ✅ Enhanced version (OPTIONAL params — no breakage) */
+  getProductsByConsumersAdvanced(
+    sort: string = "",
+    search: string = "",
+    page: number | null = null,
+    size: number | null = null
+  ): Observable<any[]> {
+
+    let url = `${this.serverName}/api/consumers/products`;
+    const params: string[] = [];
+
+    if (sort) params.push(`sort=${sort}`);
+    if (search) params.push(`name=${search}`);
+    if (page !== null) params.push(`page=${page}`);
+    if (size !== null) params.push(`size=${size}`);
+
+    if (params.length > 0) {
+      url += '?' + params.join('&');
+    }
+
+    return this.http.get<any[]>(url, this.getHeaders());
+  }
+
+
+  /* ================= MANUFACTURER PRODUCT APIs ================= */
 
   getProductsByManufacturer(manufacturerId: number | string): Observable<any[]> {
     return this.http.get<any[]>(
@@ -59,35 +112,27 @@ export class HttpService {
     );
   }
 
-  // updateProduct(id: any, details?: any): Observable<any> {
-  //   return this.http.put(
-  //     `${this.serverName}/api/manufacturers/product/${id}`,
-  //     details,
-  //     this.getHeaders()
-  //   );
-  // }
-
   updateProduct(id: any, details?: any): Observable<any> {
 
-  if (typeof id === 'object' && id !== null) {
-    const obj = id;
+    if (typeof id === 'object' && id !== null) {
+      const obj = id;
 
-    id =
-      obj.id ??
-      obj.productId ??
-      obj.product?.id ??
-      Object.values(obj).find(v => typeof v === 'number') ??
-      987;
+      id =
+        obj.id ??
+        obj.productId ??
+        obj.product?.id ??
+        Object.values(obj).find(v => typeof v === 'number') ??
+        987;
 
-    details = obj;
+      details = obj;
+    }
+
+    return this.http.put(
+      `${this.serverName}/api/manufacturers/product/${Number(id)}`,
+      details,
+      this.getHeaders()
+    );
   }
-
-  return this.http.put(
-    `${this.serverName}/api/manufacturers/product/${Number(id)}`,
-    details,
-    this.getHeaders()
-  );
-}
 
   deleteProductByManufacturer(id: any): Observable<any> {
     return this.http.delete(
@@ -95,6 +140,7 @@ export class HttpService {
       this.getHeaders()
     );
   }
+
 
   /* ================= INVENTORY APIs ================= */
 
@@ -120,6 +166,7 @@ export class HttpService {
       this.getHeaders()
     );
   }
+
 
   /* ================= ORDER APIs ================= */
 
@@ -160,7 +207,6 @@ export class HttpService {
     );
   }
 
-  // ✅ Unified order-status update (WORKS FOR BOTH ROLES)
   updateOrderStatus(orderId: any, status: string): Observable<any> {
     return this.http.put(
       `${this.serverName}/api/wholesalers/order/${orderId}?status=${status}`,
@@ -169,7 +215,6 @@ export class HttpService {
     );
   }
 
-  // ✅ ✅ FIXED: manufacturer endpoint (plural "orders")
   updateOrderStatusByManufacturer(orderId: any, status: string): Observable<any> {
     return this.http.put(
       `${this.serverName}/api/manufacturers/orders/${orderId}?status=${status}`,
@@ -177,6 +222,7 @@ export class HttpService {
       this.getHeaders()
     );
   }
+
 
   /* ================= AUTH APIs ================= */
 

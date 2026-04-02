@@ -16,16 +16,14 @@
     </div>
 
     <!-- No Inventory Message -->
-    <div class="col-12"
-         *ngIf="inventories.length === 0">
+    <div class="col-12" *ngIf="inventories.length === 0">
       <div class="alert alert-warning">
         You must add inventory before placing any orders.
       </div>
     </div>
 
     <!-- Inventory Cards -->
-    <div class="col-md-4 mb-3"
-         *ngFor="let inv of inventories">
+    <div class="col-md-4 mb-3" *ngFor="let inv of inventories">
 
       <div class="card inventory-card h-100"
            [class.selected]="selectedInventory?.id === inv.id"
@@ -74,14 +72,11 @@
             <strong>{{ selectedInventory.stockQuantity }}</strong>
           </div>
 
-          <form [formGroup]="itemForm"
-                (ngSubmit)="onSubmit()">
+          <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
 
             <!-- Quantity -->
             <div class="mb-3">
-              <label class="form-label fw-semibold">
-                Quantity
-              </label>
+              <label class="form-label fw-semibold">Quantity</label>
 
               <input type="number"
                      class="form-control"
@@ -95,33 +90,23 @@
               </small>
             </div>
 
-            <!-- Status -->
-            <div class="mb-3">
-              <label class="form-label fw-semibold">
-                Status
-              </label>
-
-              <input type="text"
-                     class="form-control"
-                     formControlName="status"
-                     readonly>
-            </div>
-
-            <!-- Messages -->
+            <!-- ✅ SUCCESS MESSAGE -->
             <div *ngIf="successMessage"
-                 class="alert alert-success">
-              {{ successMessage }}
+                 class="alert alert-success text-center fade-in mt-2">
+              ✅ {{ successMessage }}
             </div>
 
+            <!-- ✅ ERROR MESSAGE -->
             <div *ngIf="errorMessage"
-                 class="alert alert-danger">
-              {{ errorMessage }}
+                 class="alert alert-danger text-center mt-2">
+              ❌ {{ errorMessage }}
             </div>
 
-            <!-- Submit -->
+            <!-- ✅ Submit Button (Blinking When Loading) -->
             <button type="submit"
                     class="btn btn-primary w-100"
-                    [disabled]="loading || !selectedInventory">
+                    [class.blinking]="loading"
+                    [disabled]="!selectedInventory">
               {{ loading ? 'Placing Order…' : 'Place Order' }}
             </button>
 
