@@ -1,0 +1,51 @@
+<div class="view-products-hero">
+
+  <div class="hero-overlay"></div>
+
+  <div class="view-products-container">
+
+    <div class="view-products-card animate-in">
+
+      <!-- HEADER -->
+      <div class="view-products-header">
+        <div class="icon-wrapper">
+          <i class="bi bi-box-seam-fill"></i>
+        </div>
+
+        <h3>Your Products</h3>
+        <p>Products added by you</p>
+      </div>
+
+      <!-- PRODUCT GRID -->
+      <div class="product-grid">
+
+        <div class="product-card" *ngFor="let p of products">
+          <h4>{{ p.name }}</h4>
+          <p class="description">{{ p.description }}</p>
+
+          <div class="product-footer">
+            <span class="price">₹{{ p.price }}</span>
+            <span class="stock">
+              Stock: {{ p.stockQuantity }}
+            </span>
+          </div>
+        </div>
+
+      </div>
+      <!-- ADD PRODUCT BUTTON -->
+<!-- ADD PRODUCT BUTTON -->
+<div class="add-product-wrapper">
+  <button
+    class="add-product-btn"
+    routerLink="/create-product">
+    + Add Products
+  </button>
+</div>
+
+
+
+    </div>
+
+  </div>
+
+</div>

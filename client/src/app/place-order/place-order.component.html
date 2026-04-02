@@ -1,136 +1,104 @@
-<div class="container py-4 place-order">
-
-  <!-- Header -->
-  <div class="text-center mb-4">
-    <h2 class="fw-bold">Place Order</h2>
-    <p class="text-muted">
-      Select inventory and place your order
-    </p>
-  </div>
-
-  <!-- ================= INVENTORY LIST ================= -->
-  <div class="row mb-4">
-
-    <div class="col-12">
-      <h5 class="mb-3">Available Inventory</h5>
-    </div>
-
-    <!-- No Inventory Message -->
-    <div class="col-12"
-         *ngIf="inventories.length === 0">
-      <div class="alert alert-warning">
-        You must add inventory before placing any orders.
-      </div>
-    </div>
-
-    <!-- Inventory Cards -->
-    <div class="col-md-4 mb-3"
-         *ngFor="let inv of inventories">
-
-      <div class="card inventory-card h-100"
-           [class.selected]="selectedInventory?.id === inv.id"
-           (click)="selectInventory(inv)">
-
-        <div class="card-body">
-
-          <h6 class="fw-semibold mb-1">
-            {{ inv.product.name }}
-          </h6>
-
-          <p class="text-muted small mb-2">
-            {{ inv.product.description || 'No description' }}
-          </p>
-
-          <div class="d-flex justify-content-between align-items-center">
-            <span class="fw-bold">
-              ₹{{ inv.product.price }}
-            </span>
-
-            <span class="badge bg-success">
-              Stock: {{ inv.stockQuantity }}
-            </span>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ================= ORDER FORM ================= -->
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-
-      <div class="card shadow-sm">
-        <div class="card-body">
-
-          <h5 class="mb-3">Order Details</h5>
-
-          <!-- Selected Inventory -->
-          <div *ngIf="selectedInventory" class="alert alert-info">
-            Ordering from inventory of
-            <strong>{{ selectedInventory.product.name }}</strong><br />
-            Available Stock:
-            <strong>{{ selectedInventory.stockQuantity }}</strong>
-          </div>
-
-          <form [formGroup]="itemForm"
-                (ngSubmit)="onSubmit()">
-
-            <!-- Quantity -->
-            <div class="mb-3">
-              <label class="form-label fw-semibold">
-                Quantity
-              </label>
-
-              <input type="number"
-                     class="form-control"
-                     formControlName="quantity"
-                     placeholder="Enter quantity">
-
-              <small class="text-danger"
-                     *ngIf="itemForm.get('quantity')?.touched &&
-                            itemForm.get('quantity')?.invalid">
-                Quantity must be at least 1
-              </small>
-            </div>
-
-            <!-- Status -->
-            <div class="mb-3">
-              <label class="form-label fw-semibold">
-                Status
-              </label>
-
-              <input type="text"
-                     class="form-control"
-                     formControlName="status"
-                     readonly>
-            </div>
-
-            <!-- Messages -->
-            <div *ngIf="successMessage"
-                 class="alert alert-success">
-              {{ successMessage }}
-            </div>
-
-            <div *ngIf="errorMessage"
-                 class="alert alert-danger">
-              {{ errorMessage }}
-            </div>
-
-            <!-- Submit -->
-            <button type="submit"
-                    class="btn btn-primary w-100"
-                    [disabled]="loading || !selectedInventory">
-              {{ loading ? 'Placing Order…' : 'Place Order' }}
-            </button>
-
-          </form>
-
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-</div>
+<div class="place-order-hero">
+  
+    <div class="hero-overlay"></div>
+    
+      <div class="place-order-container">
+      
+          <div class="place-order-card animate-in">
+          
+                <!-- HEADER -->
+                      <div class="place-order-header">
+                              <div class="icon-wrapper">
+                                        <i class="bi bi-box-seam-fill"></i>
+                                                </div>
+                                                
+                                                        <h3>Place Order</h3>
+                                                                <p>Select inventory and place your order</p>
+                                                                      </div>
+                                                                      
+                                                                            <!-- INVENTORY SECTION -->
+                                                                                  <div class="inventory-section">
+                                                                                  
+                                                                                          <h5 class="section-title">Available Inventory</h5>
+                                                                                          
+                                                                                                  <!-- No Inventory -->
+                                                                                                          <div *ngIf="inventories.length === 0" class="alert-warning">
+                                                                                                                    You must add inventory before placing any orders.
+                                                                                                                            </div>
+                                                                                                                            
+                                                                                                                                    <!-- Inventory Cards -->
+                                                                                                                                            <div class="inventory-grid">
+                                                                                                                                                      <div
+                                                                                                                                                                  class="inventory-card"
+                                                                                                                                                                              *ngFor="let inv of inventories"
+                                                                                                                                                                                          [class.selected]="selectedInventory?.id === inv.id"
+                                                                                                                                                                                                      (click)="selectInventory(inv)"
+                                                                                                                                                                                                                >
+                                                                                                                                                                                                                            <h6>{{ inv.product.name }}</h6>
+                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                        <p class="description">
+                                                                                                                                                                                                                                                      {{ inv.product.description || 'No description' }}
+                                                                                                                                                                                                                                                                  </p>
+                                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                              <div class="inventory-footer">
+                                                                                                                                                                                                                                                                                            <span class="price">₹{{ inv.product.price }}</span>
+                                                                                                                                                                                                                                                                                                          <span class="stock">Stock: {{ inv.stockQuantity }}</span>
+                                                                                                                                                                                                                                                                                                                      </div>
+                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                              </div>
+                                                                                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                                                                                                    <!-- ORDER FORM -->
+                                                                                                                                                                                                                                                                                                                                                          <div class="order-form-section">
+                                                                                                                                                                                                                                                                                                                                                          
+                                                                                                                                                                                                                                                                                                                                                                  <h5>Order Details</h5>
+                                                                                                                                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                                                                                                                          <!-- Selected Inventory -->
+                                                                                                                                                                                                                                                                                                                                                                                  <div *ngIf="selectedInventory" class="selected-info">
+                                                                                                                                                                                                                                                                                                                                                                                            Ordering from
+                                                                                                                                                                                                                                                                                                                                                                                                      <strong>{{ selectedInventory.product.name }}</strong><br />
+                                                                                                                                                                                                                                                                                                                                                                                                                Available stock:
+                                                                                                                                                                                                                                                                                                                                                                                                                          <strong>{{ selectedInventory.stockQuantity }}</strong>
+                                                                                                                                                                                                                                                                                                                                                                                                                                  </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                                                                                                                                                                                          <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+                                                                                                                                                                                                                                                                                                                                                                                                                                          
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="form-group">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                <label>Quantity <br></label>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <input
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          type="number"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        formControlName="quantity"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      placeholder="Enter quantity"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  />
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              <small class="error-text"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 *ngIf="itemForm.get('quantity')?.touched &&
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           itemForm.get('quantity')?.invalid">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         Quantity must be at least 1
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     </small>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         <!-- SUCCESS -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   <div *ngIf="successMessage" class="alert-success">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               ✅ {{ successMessage }}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   <!-- ERROR -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             <div *ngIf="errorMessage" class="alert-error">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         {{ errorMessage }}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             <button
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         type="submit"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     class="submit-btn"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 [disabled]="loading || !selectedInventory">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             {{ loading ? 'Placing Order…' : 'Place Order' }}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       </button>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               </form>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           </div>

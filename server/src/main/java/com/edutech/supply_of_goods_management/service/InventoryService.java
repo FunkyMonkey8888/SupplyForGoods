@@ -11,12 +11,15 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+// Service class for inventory operations
 @Service
 public class InventoryService {
 
+    // Repository dependencies
     private final InventoryRepository repo;
     private final ProductRepository productRepo;
 
+    // Constructor-based dependency injection
     public InventoryService(InventoryRepository repo,
                             ProductRepository productRepo) {
         this.repo = repo;
@@ -25,55 +28,32 @@ public class InventoryService {
 
     /* ---------------- BASIC CRUD ---------------- */
 
-//     public Inventory addInventory(Long productId, Inventory inventory) {
-//         Product product = productRepo.findById(productId)
-//                 .orElseThrow(() -> new RuntimeException("Product not found"));
+    // Add inventory or update existing stock
+    public Inventory addInventory(Long productId, Inventory inventory) {
 
-//         // if(inventory.getWholesalerId() == null ) throw new IllegalArgumentException("Wholesaler cannot be null");
+        // Fetch product
+        Product product = productRepo.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
 
-//         inventory.setProduct(product);
-//         return repo.save(inventory);
-//     }
+        // Check if inventory already exists for product and wholesaler
+        Inventory existing = repo
+            .findByProductAndWholesalerId(product, inventory.getWholesalerId())
+            .orElse(null);
 
-// public Inventory addInventory(Long productId, Inventory inventory) {
+        // If inventory exists, update stock
+        if (existing != null) {
+            existing.setStockQuantity(
+                existing.getStockQuantity() + inventory.getStockQuantity()
+            );
+            return repo.save(existing);
+        }
 
-//     Product product = productRepo.findById(productId)
-//             .orElseThrow(() -> new RuntimeException("Product not found"));
-
-//     Optional<Inventory> existing = repo
-//             .findByProductAndWholesalerId(product, inventory.getWholesalerId());
-
-//     if (existing.isPresent()) {
-//         Inventory inv = existing.get();
-//         inv.setStockQuantity(inv.getStockQuantity() + inventory.getStockQuantity());
-//         return repo.save(inv);
-//     }
-
-//     inventory.setProduct(product);
-//     return repo.save(inventory);
-// }
-
-public Inventory addInventory(Long productId, Inventory inventory) {
-
-    Product product = productRepo.findById(productId)
-            .orElseThrow(() -> new RuntimeException("Product not found"));
-
-    Inventory existing = repo
-        .findByProductAndWholesalerId(product, inventory.getWholesalerId())
-        .orElse(null);
-
-    if (existing != null) {
-        existing.setStockQuantity(
-            existing.getStockQuantity() + inventory.getStockQuantity()
-        );
-        return repo.save(existing);
+        // Save new inventory
+        inventory.setProduct(product);
+        return repo.save(inventory);
     }
 
-    inventory.setProduct(product);
-    return repo.save(inventory);
-}
-
-
+    // Update inventory quantity
     public Inventory updateInventory(Long id, int qty) {
         Inventory inv = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Inventory not found"));
@@ -82,42 +62,39 @@ public Inventory addInventory(Long productId, Inventory inventory) {
         return repo.save(inv);
     }
 
+    // Get inventories by wholesaler
     public List<Inventory> getInventoriesByWholesaler(Long wholesalerId) {
         return repo.findByWholesalerId(wholesalerId);
     }
 
     /* ---------------- ORDER STATE MACHINE HOOKS ---------------- */
 
-    /**
-     * Called when OrderStatus moves to CONFIRMED
-     */
+    // Reserve inventory when order is confirmed
     @Transactional
-public void reserveInventory(Order order) {
+    public void reserveInventory(Order order) {
 
-    Product product = order.getProduct();
+        Product product = order.getProduct();
 
-    // ✅ Find the wholesaler who owns inventory for this product
-    Inventory inventory = repo
-            .findFirstByProduct(product)
-            .orElseThrow(() ->
-                new RuntimeException("Inventory not found for product"));
+        // Find inventory for the product
+        Inventory inventory = repo
+                .findFirstByProduct(product)
+                .orElseThrow(() ->
+                        new RuntimeException("Inventory not found for product"));
 
-    // ✅ Stock check
-    if (inventory.getStockQuantity() < order.getQuantity()) {
-        throw new IllegalStateException("Insufficient inventory stock");
+        // Check stock availability
+        if (inventory.getStockQuantity() < order.getQuantity()) {
+            throw new IllegalStateException("Insufficient inventory stock");
+        }
+
+        // Deduct stock
+        inventory.setStockQuantity(
+                inventory.getStockQuantity() - order.getQuantity()
+        );
+
+        repo.save(inventory);
     }
 
-    // ✅ Deduct stock
-    inventory.setStockQuantity(
-            inventory.getStockQuantity() - order.getQuantity()
-    );
-
-    repo.save(inventory);
-}
-
-    /**
-     * Called when OrderStatus moves to CANCELLED
-     */
+    // Release inventory when order is cancelled
     @Transactional
     public void releaseInventory(Order order) {
 
@@ -125,12 +102,14 @@ public void reserveInventory(Order order) {
         Long wholesalerId = order.getUser().getId();
         int qty = order.getQuantity();
 
+        // Fetch inventory for product and wholesaler
         Inventory inventory = repo
                 .findByProductAndWholesalerId(product, wholesalerId)
                 .orElseThrow(() ->
                         new RuntimeException("Inventory not found for product")
                 );
 
+        // Restore stock
         inventory.setStockQuantity(
                 inventory.getStockQuantity() + qty
         );
@@ -138,9 +117,11 @@ public void reserveInventory(Order order) {
         repo.save(inventory);
     }
 
+    // Delete inventory by ID
     @Transactional
     public void deleteInventory(Long id){
-        Inventory inventory = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Inventory not found"));
+        Inventory inventory = repo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Inventory not found"));
         repo.delete(inventory);
     }
 }

@@ -19,6 +19,8 @@ import { GetOrdersComponent } from './get-orders/get-orders.component';
 import { AddInventoryComponent } from './add-inventory/add-inventory.component';
 import { ConsumerPlaceOrderComponent } from './consumer-place-order/consumer-place-order.component';
 import { ConsumerGetOrdersComponent } from './consumer-get-orders/consumer-get-orders.component';
+import { ViewProductsComponent } from './view-products/view-products.component';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -33,14 +35,16 @@ import { ConsumerGetOrdersComponent } from './consumer-get-orders/consumer-get-o
       GetOrdersComponent,
       AddInventoryComponent,
       ConsumerPlaceOrderComponent,
-      ConsumerGetOrdersComponent
+      ConsumerGetOrdersComponent,
+      ViewProductsComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule 
+    HttpClientModule ,
+    CommonModule
   ],
   providers: [HttpService],
   bootstrap: [AppComponent]

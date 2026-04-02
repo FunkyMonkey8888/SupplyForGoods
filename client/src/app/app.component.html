@@ -28,7 +28,13 @@
         </a>
       </li>
 
-      <!-- ✅ NEW BUTTON -->
+      <!-- ✅ VIEW PRODUCTS (NEW OPTION) -->
+      <li class="nav-item" *ngIf="roleName === 'MANUFACTURER'">
+        <a class="nav-link" [routerLink]="['/view-products']">
+          View Products
+        </a>
+      </li>
+
       <li class="nav-item" *ngIf="roleName === 'MANUFACTURER'">
         <a class="nav-link" [routerLink]="['/get-orders']">
           Review Orders
@@ -79,9 +85,10 @@
       </li>
 
       <li *ngIf="IsLoggin" class="nav-item">
-        <a class="nav-link auth-btn logout"
-           (click)="logout()"
-           [routerLink]="['/login']">
+        <a
+          class="nav-link auth-btn logout"
+          (click)="logout()"
+          [routerLink]="['/login']">
           Logout
         </a>
       </li>

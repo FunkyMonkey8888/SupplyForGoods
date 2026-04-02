@@ -1,112 +1,96 @@
-<div class="container py-5 add-inventory">
+<div class="add-inventory-hero">
 
-  <!-- HEADER -->
-  <div class="text-center mb-5">
-    <h2 class="fw-bold">Add Inventory</h2>
-    <p class="text-muted">
-      Select a product and update its stock quantity
-    </p>
-  </div>
+  <div class="hero-overlay"></div>
 
-  <!-- PRODUCT LIST -->
-  <div class="row mb-5">
+  <div class="add-inventory-container">
 
-    <div class="col-12 mb-3">
-      <h5 class="section-title">Select Product</h5>
-    </div>
+    <div class="add-inventory-card animate-in">
 
-    <div class="col-lg-4 col-md-6 mb-4"
-         *ngFor="let product of products">
-
-      <div class="card product-card h-100"
-           [class.selected]="selectedProduct?.id === product.id"
-           (click)="selectProduct(product)">
-
-        <div class="card-body">
-
-          <h6 class="fw-semibold mb-1">
-            {{ product.name }}
-          </h6>
-
-          <p class="text-muted small mb-2">
-            Price: ₹{{ product.price }}
-          </p>
-
-          <span class="badge stock-badge">
-            Stock: {{ product.stockQuantity }}
-          </span>
-
+      <!-- HEADER -->
+      <div class="add-inventory-header">
+        <div class="icon-wrapper">
+          <i class="bi bi-boxes"></i>
         </div>
 
+        <h3>Add Inventory</h3>
+        <p>Select a product and update its stock quantity</p>
       </div>
 
-    </div>
-  </div>
+      <!-- PRODUCTS -->
+      <div class="products-section">
 
-  <!-- INVENTORY FORM -->
-  <div class="row justify-content-center">
-    <div class="col-lg-5 col-md-7">
+        <h5 class="section-title">Select Product</h5>
 
-      <div class="card inventory-form-card">
-        <div class="card-body p-4">
+        <div class="products-grid">
 
-          <h5 class="mb-3">Inventory Details</h5>
+          <div
+            class="product-card"
+            *ngFor="let product of products"
+            [class.selected]="selectedProduct?.id === product.id"
+            (click)="selectProduct(product)"
+          >
+            <h6>{{ product.name }}</h6>
 
-          <div *ngIf="selectedProduct"
-               class="alert alert-info small text-center">
-            Updating stock for
-            <strong>{{ selectedProduct.name }}</strong>
+            <p class="description">
+              ₹{{ product.price }}
+            </p>
+
+            <!-- ✅ STOCK SHOWN AND HIGHLIGHTED -->
+            <span class="stock-badge">
+              Stock: <strong>{{ product.stockQuantity }}</strong>
+            </span>
           </div>
 
-          <form [formGroup]="itemForm"
-                (ngSubmit)="onSubmit()">
-
-            <div class="mb-3">
-              <label class="form-label fw-semibold">
-                Stock Quantity
-              </label>
-
-              <input
-                type="number"
-                class="form-control form-control-lg"
-                formControlName="stockQuantity"
-                placeholder="Enter quantity"
-              />
-
-              <small class="text-danger"
-                     *ngIf="
-                       itemForm.get('stockQuantity')?.touched &&
-                       itemForm.get('stockQuantity')?.invalid
-                     ">
-                Quantity must be greater than 0
-              </small>
-            </div>
-
-            <div *ngIf="successMessage"
-                 class="alert alert-success text-center">
-              {{ successMessage }}
-            </div>
-
-            <div *ngIf="errorMessage"
-                 class="alert alert-danger text-center">
-              {{ errorMessage }}
-            </div>
-
-            <button
-              type="submit"
-              class="btn btn-primary w-100 btn-lg"
-              [disabled]="loading || !selectedProduct">
-
-              {{ loading ? 'Updating...' : 'Add Inventory' }}
-
-            </button>
-
-          </form>
-
         </div>
       </div>
 
+      <!-- FORM -->
+      <div class="inventory-form-section">
+
+        <h5>Inventory Details</h5>
+
+        <div *ngIf="selectedProduct" class="selected-info">
+          Updating stock for
+          <strong>{{ selectedProduct.name }}</strong>
+        </div>
+
+        <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+
+          <div class="form-group">
+            <label>Stock Quantity</label>
+            <input
+              type="number"
+              formControlName="stockQuantity"
+              placeholder="Enter quantity"
+            />
+            <small class="error-text"
+                   *ngIf="itemForm.get('stockQuantity')?.touched &&
+                          itemForm.get('stockQuantity')?.invalid">
+              Quantity must be greater than 0
+            </small>
+          </div>
+
+          <div *ngIf="successMessage" class="alert-success">
+            ✅ {{ successMessage }}
+          </div>
+
+          <div *ngIf="errorMessage" class="alert-error">
+            {{ errorMessage }}
+          </div>
+
+          <button
+            type="submit"
+            class="submit-btn"
+            [disabled]="loading || !selectedProduct">
+            {{ loading ? 'Updating…' : 'Add Inventory' }}
+          </button>
+
+        </form>
+
+      </div>
+
     </div>
+
   </div>
 
 </div>

@@ -14,8 +14,8 @@ export class AppComponent implements OnInit {
   roleName: string | null = null;
 
   // ✅ UI state for navbar
-  showMenu = false;     // user dropdown (Logout)
-  isMenuOpen = false;   // mobile navbar toggle
+  showMenu = false;
+  isMenuOpen = false;
 
   constructor(
     private authService: AuthService,
@@ -23,11 +23,10 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // ✅ Update navbar state when route changes
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.refreshAuthState();
-        this.showMenu = false;   // close dropdown on navigation
+        this.showMenu = false;
         this.isMenuOpen = false;
       }
     });
@@ -40,16 +39,14 @@ export class AppComponent implements OnInit {
     this.roleName = this.authService.getRole();
   }
 
-  // ✅ Toggle user dropdown (Logout)
   toggleMenu(event: Event): void {
     event.preventDefault();
     this.showMenu = !this.showMenu;
   }
 
-  // ✅ Logout
   logout(): void {
     this.showMenu = false;
     this.isMenuOpen = false;
-    this.authService.logout(); // already redirects to /login
+    this.authService.logout();
   }
 }

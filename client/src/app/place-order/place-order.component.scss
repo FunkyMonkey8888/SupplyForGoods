@@ -1,41 +1,202 @@
-.order-container {
-  max-width: 900px;
-  margin: auto;
-  padding: 25px;
+.place-order-hero {
+  position: relative;
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, rgba(6,15,40,0.9), rgba(25,50,140,0.85)),
+    url('https://images.unsplash.com/photo-1578575437130-527eed3abbec');
+  background-size: cover;
+  background-position: center;
+  padding-top: 80px;            /* ⬇️ reduced from 90px */
   font-family: 'Poppins', sans-serif;
 }
 
-.title {
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.place-order-container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px); /* ⬇️ synced with padding */
+}
+
+/* MAIN CARD */
+.place-order-card {
+  width: 1050px;
+  max-width: 95%;
+
+  /* ⬇️ reduced vertical padding */
+  padding: 22px 36px;
+
+  border-radius: 24px;
+  background: linear-gradient(135deg, #ffffff, #f3f7ff);
+  box-shadow: 0 26px 60px rgba(0,0,0,0.30);
+}
+
+/* HEADER */
+.place-order-header {
   text-align: center;
-  font-weight: 700;
-  margin-bottom: 25px;
-  color: #2f3542;
+
+  /* ⬇️ reduced bottom gap */
+  margin-bottom: 20px;
+
+  h3 {
+    font-size: 26px;
+    font-weight: 700;
+  }
+
+  p {
+    font-size: 14px;
+    color: #6b7280;
+  }
 }
 
-.card {
-  padding: 20px;
-  border-radius: 14px;
+.icon-wrapper {
+  width: 68px;                 /* ⬇️ slightly smaller */
+  height: 68px;
+  margin: 0 auto 8px;         /* ⬇️ less vertical space */
+  border-radius: 50%;
+  background: linear-gradient(135deg,#4e8cff,#77b5ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  i {
+    font-size: 30px;
+    color: #ffffff;
+  }
+}
+
+/* INVENTORY */
+.section-title {
+  font-weight: 600;
+  margin-bottom: 10px;        /* ⬇️ reduced */
+}
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+
+  /* ⬇️ reduced spacing below inventory */
+  margin-bottom: 20px;
+}
+
+.inventory-card {
+  padding: 15px;              /* ⬇️ reduced */
+  border-radius: 16px;
   background: #ffffff;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  border: 1.5px solid #e5e7eb;
+  cursor: pointer;
 }
 
-.selected-product {
-  margin-bottom: 15px;
-  color: #1e293b;
+.inventory-card.selected {
+  border-color: #4e8cff;
+}
+
+.inventory-card h6 {
+  font-size: 15px;
   font-weight: 600;
 }
 
-.table th {
-  background: #1f2937;
-  color: white;
+.description {
+  font-size: 13px;
+  color: #6b7280;
 }
 
-.btn-block {
+.inventory-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;                   /* ⬇️ tighter */
+  margin-top: 6px;
+}
+
+.price {
+  font-weight: 700;
+}
+
+.stock {
+  font-size: 12px;
+  background: rgba(22,163,74,0.15);
+  color: #16a34a;
+  padding: 4px 8px;
+  border-radius: 8px;
+  width: fit-content;
+}
+
+/* ORDER FORM */
+.order-form-section {
+  border-top: 1px solid #e5e7eb;
+
+  /* ⬇️ reduced form start spacing */
+  padding-top: 16px;
+}
+
+.selected-info {
+  background: #eff6ff;
+  padding: 8px;               /* ⬇️ reduced */
+  border-radius: 12px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.form-group {
+  margin-bottom: 12px;        /* ⬇️ reduced */
+}
+
+.form-group input {
+  width: 30%;
+  height: 42px;               /* ⬇️ reduced */
+  padding: 8px 10px;
+  font-size: 14px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+}
+
+.error-text {
+  font-size: 12px;
+  color: #dc2626;
+}
+
+/* ALERTS */
+.alert-success,
+.alert-warning,
+.alert-error {
+  padding: 8px;               /* ⬇️ reduced */
+  border-radius: 10px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* BUTTON */
+.submit-btn {
   width: 100%;
-  margin-top: 10px;
+  height: 44px;               /* ⬇️ reduced */
+  border-radius: 14px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(90deg,#4e8cff,#77b5ff);
+  color: #ffffff;
+
+  margin-top: 6px;            /* ⬇️ tighter */
 }
 
-.form-control:focus {
-  border-color: #4e8cff;
-  box-shadow: 0 0 0 0.2rem rgba(78, 140, 255, 0.25);
+.submit-btn:disabled {
+  opacity: 0.65;
+}
+
+/* ANIMATION */
+.animate-in {
+  animation: fadeUp .4s ease-out; /* ⬇️ slightly quicker */
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(10px); }
+  to { opacity:1; transform:translateY(0); }
 }

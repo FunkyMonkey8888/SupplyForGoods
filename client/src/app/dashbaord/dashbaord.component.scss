@@ -71,7 +71,7 @@
 
 /* ===== FLIP CARD ===== */
 .flip-card {
-  width: 400px;
+  width: 480px;
   height: 180px;
   perspective: 1200px;
 }
@@ -182,3 +182,10 @@
     min-width: 250px;
   }
 }
+.card {
+  background: rgba(255, 255, 255, 0.03); /* Subtle transparency */
+  backdrop-filter: blur(12px);             /* The 'Glass' effect */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+

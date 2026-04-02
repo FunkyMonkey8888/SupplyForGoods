@@ -39,6 +39,7 @@
           <thead>
             <tr>
               <th>Order ID</th>
+              <th>Ordered By</th>
               <th>Product</th>
               <th>Quantity</th>
               <th>Status</th>
@@ -53,6 +54,7 @@
             <tr *ngFor="let o of orders">
 
               <td>#{{ o.id }}</td>
+              <td> {{o.user?.username}} </td>
               <td>{{ o.product?.name }}</td>
               <td>{{ o.quantity }}</td>
 
