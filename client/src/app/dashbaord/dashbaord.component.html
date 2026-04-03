@@ -294,26 +294,29 @@
     <!-- ================= ORDERS PANEL ================= -->
     <div *ngIf="consumerPanel === 'orders'" class="mt-3">
 
+      <!-- ✅ FIX 1: close this div properly -->
       <div *ngIf="consumerOrders.length === 0" class="text-muted">
         No orders yet. Start browsing products.
-    </div>
+      </div>
 
-    <div *ngFor="let o of consumerOrders" class="card p-3 mb-3 shadow-sm">
-      <p><strong>Order ID:</strong> {{ o.id }}</p>
-      <p><strong>Product:</strong> {{ o.product?.name }}</p>
-      <p><strong>Quantity:</strong> {{ o.quantity }}</p>
-      <p>
-        <strong>Status:</strong>
-        <span class="badge"
-              [ngClass]="{
-                'bg-success': o.status === 'CONFIRMED',
-                'bg-warning text-dark': o.status === 'PENDING',
-                'bg-danger': o.status === 'CANCELLED'
-              }">
-          {{ o.status }}
-        </span>
-      </p>
-    </div>
+      <div *ngFor="let o of consumerOrders" class="card p-3 mb-3 shadow-sm">
+        <p><strong>Order ID:</strong> {{ o.id }}</p>
+        <p><strong>Product:</strong> {{ o.product?.name }}</p>
+        <p><strong>Quantity:</strong> {{ o.quantity }}</p>
+        <p>
+          <strong>Status:</strong>
+          <span class="badge"
+                [ngClass]="{
+                  'bg-success': o.status === 'CONFIRMED',
+                  'bg-warning text-dark': o.status === 'PENDING',
+                  'bg-danger': o.status === 'CANCELLED'
+                }">
+            {{ o.status }}
+          </span>
+        </p>
+      </div>
+
+    </div> <!-- ✅ FIX 2: close consumerPanel 'orders' container -->
 
   </section>
 
