@@ -61,15 +61,11 @@ export class DashbaordComponent implements OnInit {
 this.notifTimer = setInterval(() => this.loadNotifications(), 15000); // every 15 sec
 
 
-    this.loadNotifications();
-this.notifTimer = setInterval(() => this.loadNotifications(), 15000); // every 15 sec
-
-
     if (!this.isLoggedIn) return;
 
     if (this.role === 'MANUFACTURER') {
       this.loadManufacturerProducts();
-      this.loadManufacturerAnalytics(); // ✅ merges basic + advanced // ✅ merges basic + advanced
+      this.loadManufacturerAnalytics(); // ✅ merges basic + advanced
     }
 
     if (this.role === 'CONSUMER') {
@@ -80,9 +76,12 @@ this.notifTimer = setInterval(() => this.loadNotifications(), 15000); // every 1
     if (this.role === 'WHOLESALER') {
       this.loadWholesalerOrders();
       this.loadWholesalerInventory();
-      this.loadWholesalerAnalytics();   // ✅ merges basic + advanced
+      this.loadWholesalerAnalytics();
     }
   }
+
+  /* ================= ANALYTICS ================= */
+
 
   /* ================= DATA LOADERS ================= */
 
@@ -295,9 +294,9 @@ this.notifTimer = setInterval(() => this.loadNotifications(), 15000); // every 1
         labels: ['Pending', 'Confirmed', 'Cancelled'],
         datasets: [{
           data: [
-            this.analytics.pendingOrders ?? 0,
-            this.analytics.confirmedOrders ?? 0,
-            this.analytics.cancelledOrders ?? 0
+            this.analytics.pendingOrders,
+            this.analytics.confirmedOrders,
+            this.analytics.cancelledOrders
           ],
           backgroundColor: ['#fbc02d', '#2e7d32', '#c62828']
         }]
