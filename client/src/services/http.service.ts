@@ -59,35 +59,27 @@ export class HttpService {
     );
   }
 
-  // updateProduct(id: any, details?: any): Observable<any> {
-  //   return this.http.put(
-  //     `${this.serverName}/api/manufacturers/product/${id}`,
-  //     details,
-  //     this.getHeaders()
-  //   );
-  // }
-
   updateProduct(id: any, details?: any): Observable<any> {
 
-  if (typeof id === 'object' && id !== null) {
-    const obj = id;
+    if (typeof id === 'object' && id !== null) {
+      const obj = id;
 
-    id =
-      obj.id ??
-      obj.productId ??
-      obj.product?.id ??
-      Object.values(obj).find(v => typeof v === 'number') ??
-      987;
+      id =
+        obj.id ??
+        obj.productId ??
+        obj.product?.id ??
+        Object.values(obj).find(v => typeof v === 'number') ??
+        987;
 
-    details = obj;
+      details = obj;
+    }
+
+    return this.http.put(
+      `${this.serverName}/api/manufacturers/product/${Number(id)}`,
+      details,
+      this.getHeaders()
+    );
   }
-
-  return this.http.put(
-    `${this.serverName}/api/manufacturers/product/${Number(id)}`,
-    details,
-    this.getHeaders()
-  );
-}
 
   deleteProductByManufacturer(id: any): Observable<any> {
     return this.http.delete(
@@ -215,22 +207,156 @@ export class HttpService {
     );
   }
 
-
   /* ================= ANALYTICS APIs ================= */
 
-getWholesalerAnalytics(wholesalerId: number) {
-  return this.http.get<any>(
-    `${this.serverName}/api/analytics/wholesaler?wholesalerId=${wholesalerId}`,
-    this.getHeaders()
-  );
-}
+  getWholesalerAnalytics(wholesalerId: number) {
+    return this.http.get<any>(
+      `${this.serverName}/api/analytics/wholesaler?wholesalerId=${wholesalerId}`,
+      this.getHeaders()
+    );
+  }
 
-getManufacturerAnalytics(manufacturerId: number) {
-  return this.http.get<any>(
-    `${this.serverName}/api/analytics/manufacturer?manufacturerId=${manufacturerId}`,
-    this.getHeaders()
-  );
-}
+  getManufacturerAnalytics(manufacturerId: number) {
+    return this.http.get<any>(
+      `${this.serverName}/api/analytics/manufacturer?manufacturerId=${manufacturerId}`,
+      this.getHeaders()
+    );
+  }
 
+  /* ======================================================================
+   * ✅ WISHLIST + CART (FRONTEND ONLY, per user, stored in localStorage)
+   * ====================================================================== */
 
+  private safeParse(value: string | null): any[] {
+    if (!value) return [];
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private wishlistKey(userId: any): string {
+    return `wishlist_${userId}`;
+  }
+
+  private cartKey(userId: any): string {
+    return `cart_${userId}`;
+  }
+
+  /* ---------- Wishlist ---------- */
+
+  getWishlist(userId: any): any[] {
+    return this.safeParse(localStorage.getItem(this.wishlistKey(userId)));
+  }
+
+  isInWishlist(userId: any, productId: any): boolean {
+    return this.getWishlist(userId).some((x: any) => Number(x.productId) === Number(productId));
+  }
+
+  toggleWishlist(userId: any, product: any): any[] {
+    const list = this.getWishlist(userId);
+    const pid = Number(product?.id ?? product?.productId);
+
+    const exists = list.some((x: any) => Number(x.productId) === pid);
+
+    let updated: any[];
+    if (exists) {
+      updated = list.filter((x: any) => Number(x.productId) !== pid);
+    } else {
+      updated = [
+        ...list,
+        {
+          productId: pid,
+          name: product?.name,
+          price: product?.price,
+          description: product?.description
+        }
+      ];
+    }
+
+    localStorage.setItem(this.wishlistKey(userId), JSON.stringify(updated));
+    return updated;
+  }
+
+  removeFromWishlist(userId: any, productId: any): any[] {
+    const updated = this.getWishlist(userId).filter((x: any) => Number(x.productId) !== Number(productId));
+    localStorage.setItem(this.wishlistKey(userId), JSON.stringify(updated));
+    return updated;
+  }
+
+  clearWishlist(userId: any): void {
+    localStorage.removeItem(this.wishlistKey(userId));
+  }
+
+  getWishlistCount(userId: any): number {
+    return this.getWishlist(userId).length;
+  }
+
+  /* ---------- Cart ---------- */
+
+  getCart(userId: any): any[] {
+    return this.safeParse(localStorage.getItem(this.cartKey(userId)));
+  }
+
+  private saveCart(userId: any, cart: any[]): any[] {
+    localStorage.setItem(this.cartKey(userId), JSON.stringify(cart));
+    return cart;
+  }
+
+  addToCart(userId: any, product: any, qty: number = 1): any[] {
+    const cart = this.getCart(userId);
+    const pid = Number(product?.id ?? product?.productId);
+    const stockQty = Number(product?.stockQuantity ?? 0);
+
+    const idx = cart.findIndex((x: any) => Number(x.productId) === pid);
+    if (idx >= 0) {
+      const newQty = Number(cart[idx].quantity || 0) + Number(qty || 1);
+      cart[idx].quantity = stockQty > 0 ? Math.min(newQty, stockQty) : newQty;
+    } else {
+      cart.push({
+        productId: pid,
+        name: product?.name,
+        price: product?.price,
+        description: product?.description,
+        quantity: Math.max(1, Number(qty || 1)),
+        stockQuantity: isNaN(stockQty) ? 0 : stockQty
+      });
+    }
+
+    return this.saveCart(userId, cart);
+  }
+
+  updateCartQuantity(userId: any, productId: any, quantity: number): any[] {
+    const cart = this.getCart(userId);
+    const idx = cart.findIndex((x: any) => Number(x.productId) === Number(productId));
+    if (idx >= 0) {
+      const stockQty = Number(cart[idx].stockQuantity ?? 0);
+      let q = Math.max(1, Number(quantity || 1));
+      if (stockQty > 0) q = Math.min(q, stockQty);
+      cart[idx].quantity = q;
+    }
+    return this.saveCart(userId, cart);
+  }
+
+  removeFromCart(userId: any, productId: any): any[] {
+    const updated = this.getCart(userId).filter((x: any) => Number(x.productId) !== Number(productId));
+    return this.saveCart(userId, updated);
+  }
+
+  clearCart(userId: any): void {
+    localStorage.removeItem(this.cartKey(userId));
+  }
+
+  getCartCount(userId: any): number {
+    return this.getCart(userId).reduce((sum: number, x: any) => sum + Number(x.quantity || 0), 0);
+  }
+
+  moveWishlistItemToCart(userId: any, wishlistItem: any): { wishlist: any[], cart: any[] } {
+    const productId = Number(wishlistItem?.productId);
+    const wishlist = this.removeFromWishlist(userId, productId);
+    const cart = this.addToCart(userId, { ...wishlistItem, id: productId }, 1);
+    return { wishlist, cart };
+  }
 }

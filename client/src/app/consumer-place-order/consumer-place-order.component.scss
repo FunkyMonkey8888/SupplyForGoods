@@ -6,6 +6,7 @@
   cursor: pointer;
   border: 2px solid transparent;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
 }
 
 .product-card:hover {
@@ -15,4 +16,37 @@
 .product-card.selected {
   border-color: #0d6efd;
   box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.2);
+}
+
+/* ✅ Small icon buttons for wishlist/cart */
+.icon-btn {
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.icon-btn:hover {
+  transform: translateY(-1px);
+}
+
+.icon-btn.wishlist {
+  background: rgba(220, 53, 69, 0.12);
+  color: #dc3545;
+}
+
+.icon-btn.wishlist.active {
+  background: rgba(220, 53, 69, 0.18);
+  box-shadow: 0 6px 14px rgba(220, 53, 69, 0.18);
+}
+
+.icon-btn.cart {
+  background: rgba(25, 135, 84, 0.12);
+  color: #198754;
 }

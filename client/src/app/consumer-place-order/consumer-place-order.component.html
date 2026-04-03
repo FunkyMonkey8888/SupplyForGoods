@@ -1,19 +1,40 @@
 <div class="container py-4 consumer-place-order" style="max-width: 1000px;">
 
   <!-- Header -->
-  <div class="text-center mb-5">
+  <div class="text-center mb-4">
     <h2 class="fw-bold">Place Your Order</h2>
     <p class="text-muted">
       Step 1: Choose a product • Step 2: Enter quantity • Step 3: Confirm
     </p>
+
+    <!-- ✅ Quick counts -->
+    <div class="d-flex justify-content-center gap-3 mt-2">
+      <span class="badge rounded-pill bg-danger-subtle text-danger-emphasis px-3 py-2">
+        ♥ Wishlist: {{ wishlistCount }}
+      </span>
+      <span class="badge rounded-pill bg-success-subtle text-success-emphasis px-3 py-2">
+        🛒 Cart: {{ cartCount }}
+      </span>
+    </div>
+
+    <!-- ✅ Small toast -->
+    <div *ngIf="uiMessage" class="mt-3">
+      <div class="alert py-2 mb-0 text-center"
+           [ngClass]="{
+             'alert-success': uiMessageType === 'success',
+             'alert-danger': uiMessageType === 'danger',
+             'alert-info': uiMessageType === 'info'
+           }">
+        {{ uiMessage }}
+      </div>
+    </div>
   </div>
 
   <!-- ================= STEP 1: PRODUCT SELECTION ================= -->
   <h5 class="mb-3">📦 Step 1: Choose a Product</h5>
 
   <div class="row g-3 mb-5">
-    <div class="col-md-4"
-         *ngFor="let product of products">
+    <div class="col-md-4" *ngFor="let product of products">
 
       <div class="card h-100 product-card cursor-pointer"
            [class.border-primary]="selectedProduct?.id === product.id"
@@ -21,7 +42,29 @@
 
         <div class="card-body">
 
-          <h6 class="fw-semibold mb-1">{{ product.name }}</h6>
+          <!-- ✅ Title row + actions -->
+          <div class="d-flex justify-content-between align-items-start mb-1">
+            <h6 class="fw-semibold mb-0">{{ product.name }}</h6>
+
+            <div class="d-flex gap-2">
+              <!-- Wishlist (stop propagation so it doesn't select card) -->
+              <button type="button"
+                      class="icon-btn wishlist"
+                      [class.active]="isInWishlist(product)"
+                      (click)="$event.stopPropagation(); toggleWishlist(product)"
+                      aria-label="Wishlist">
+                {{ isInWishlist(product) ? '♥' : '♡' }}
+              </button>
+
+              <!-- Add to Cart -->
+              <button type="button"
+                      class="icon-btn cart"
+                      (click)="$event.stopPropagation(); addToCart(product)"
+                      aria-label="Add to cart">
+                🛒
+              </button>
+            </div>
+          </div>
 
           <p class="text-muted small mb-2">
             {{ product.description || 'No description available' }}
@@ -30,8 +73,18 @@
           <div class="d-flex justify-content-between align-items-center">
             <span class="fw-bold text-success">₹{{ product.price }}</span>
 
+            <span class="badge"
+                  [ngClass]="{
+                    'bg-success-subtle text-success-emphasis': product.stockQuantity > 0,
+                    'bg-danger-subtle text-danger-emphasis': product.stockQuantity === 0
+                  }">
+              Stock: {{ product.stockQuantity ?? 'NA' }}
+            </span>
+          </div>
+
+          <div class="mt-2">
             <span class="badge bg-light text-dark">
-              Click to select
+              Click card to select
             </span>
           </div>
 
