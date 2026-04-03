@@ -9,7 +9,6 @@ import com.edutech.supply_of_goods_management.repository.OrderRepository;
 import com.edutech.supply_of_goods_management.repository.ProductRepository;
 import com.edutech.supply_of_goods_management.repository.UserRepository;
 import org.springframework.stereotype.Service;
-import com.edutech.supply_of_goods_management.service.NotificationService;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -23,23 +22,24 @@ public class OrderService {
     private final UserRepository userRepo;
     private final InventoryService inventoryService;
     private final InventoryRepository inventoryRepository;
+
+    // ✅ NEW: notifications (added only)
     private final NotificationService notificationService;
 
     public OrderService(OrderRepository orderRepo,
                         ProductRepository productRepo,
                         UserRepository userRepo,
-                        InventoryService inventoryService, 
-                    InventoryRepository ir, 
-                        NotificationService ns) {
+                        InventoryService inventoryService,
+                        InventoryRepository ir,
+                        NotificationService notificationService) {
 
         this.orderRepo = orderRepo;
         this.productRepo = productRepo;
         this.userRepo = userRepo;
         this.inventoryService = inventoryService;
         this.inventoryRepository = ir;
-        this.notificationService = ns;
+        this.notificationService = notificationService;
     }
-
 
     public Order placeOrder(Long productId, Long userId, Order order) {
 
@@ -51,92 +51,116 @@ public class OrderService {
 
         order.setProduct(product);
         order.setUser(user);
-
         order.setStatus("PENDING");
 
-        // Notify manufacturer of product demand
-notificationService.notifyUser(
-    product.getManufacturerId(),
-    "MANUFACTURER",
-    "New Order Placed",
-    "A new order was placed for: " + product.getName()
-);
+        Order saved = orderRepo.save(order);
 
-// Notify wholesaler(s) who handle this product
-List<Inventory> invs = inventoryRepository.findByProductId(product.getId());
-for (Inventory inv : invs) {
-    notificationService.notifyUser(
-        inv.getWholesalerId(),
-        "WHOLESALER",
-        "New Consumer Order",
-        "New consumer order for: " + product.getName()
-    );
-}
+        // ✅ NOTIFICATIONS (added only)
+        String role = user.getRole() == null ? "" : user.getRole().trim().toUpperCase();
+        String productName = product.getName();
 
+        // 1) Consumer order → notify Manufacturer + Wholesalers handling product
+        if ("CONSUMER".equals(role)) {
 
+            // notify manufacturer
+            if (product.getManufacturerId() != null) {
+                notificationService.notifyUser(
+                        product.getManufacturerId(),
+                        "MANUFACTURER",
+                        "New Consumer Order",
+                        "New consumer order placed for: " + productName + " (Qty: " + saved.getQuantity() + ")"
+                );
+            }
 
-        return orderRepo.save(order);
-    }
-
-
-    // @Transactional
-    // public Order updateOrderStatus(Long orderId, String newStatus) {
-
-    //     Order order = orderRepo.findById(orderId)
-    //             .orElseThrow(() -> new RuntimeException("Order not found"));
-
-    //     String currentStatus = order.getStatus();
-
-    //     if (currentStatus == null || currentStatus.isBlank()) {
-    //         throw new IllegalStateException("Order status is not initialized");
-    //     }
-
-    //     newStatus = newStatus.toUpperCase();
-
-    //     if (!isValidTransition(currentStatus, newStatus)) {
-    //         throw new IllegalStateException(
-    //                 "Invalid order status transition from " +
-    //                         currentStatus + " to " + newStatus
-    //         );
-    //     }
-
-    //     // ✅ Inventory hooks
-    //     if ("CONFIRMED".equals(newStatus)) {
-    //         inventoryService.reserveInventory(order);
-    //     }
-
-    //     if ("CANCELLED".equals(newStatus)) {
-    //         inventoryService.releaseInventory(order);
-    //     }
-
-    //     order.setStatus(newStatus);
-    //     return orderRepo.save(order);
-    // }
-    @Transactional
-public Order updateOrderStatus(Long orderId, String status) {
-
-    Order order = orderRepo.findById(orderId)
-            .orElseThrow(() -> new RuntimeException("Order not found"));
-
-    if ("CONFIRMED".equals(status)) {
-        try {
-            inventoryService.reserveInventory(order);
-        } catch (RuntimeException ex) {
-
-            // ✅ Inventory issue → delete product
-            Product product = order.getProduct();
-            productRepo.deleteById(product.getId());
-
-            throw new RuntimeException(
-                "Inventory unavailable. Product has been removed."
-            );
+            // notify wholesalers who have inventory entries for this product
+            List<Inventory> invs = inventoryRepository.findByProductId(productId);
+            for (Inventory inv : invs) {
+                notificationService.notifyUser(
+                        inv.getWholesalerId(),
+                        "WHOLESALER",
+                        "New Order Placed",
+                        "New consumer order for: " + productName + " (Qty: " + saved.getQuantity() + ")"
+                );
+            }
         }
+
+        // 2) Wholesaler order → notify Manufacturer
+        if ("WHOLESALER".equals(role)) {
+            if (product.getManufacturerId() != null) {
+                notificationService.notifyUser(
+                        product.getManufacturerId(),
+                        "MANUFACTURER",
+                        "New Wholesaler Order",
+                        "New wholesaler order placed for: " + productName + " (Qty: " + saved.getQuantity() + ")"
+                );
+            }
+        }
+
+        return saved;
     }
 
-    order.setStatus(status);
-    return orderRepo.save(order);
-}
+    @Transactional
+    public Order updateOrderStatus(Long orderId, String status) {
 
+        Order order = orderRepo.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        // Keep your existing behavior (no changes)
+        if ("CONFIRMED".equals(status)) {
+            try {
+                inventoryService.reserveInventory(order);
+            } catch (RuntimeException ex) {
+
+                // ✅ Inventory issue → delete product (your existing logic)
+                Product product = order.getProduct();
+                productRepo.deleteById(product.getId());
+
+                // ✅ NOTIFICATIONS on failure (added only)
+                User placedBy = order.getUser();
+                String placedByRole = placedBy.getRole() == null ? "" : placedBy.getRole().trim().toUpperCase();
+                Long placedById = placedBy.getId();
+                String productName = product.getName();
+
+                // notify the order owner (consumer/wholesaler)
+                notificationService.notifyUser(
+                        placedById,
+                        placedByRole,
+                        "Order Failed",
+                        "Order could not be confirmed for " + productName + " due to insufficient inventory."
+                );
+
+                // optional: notify manufacturer if needed
+                if (product.getManufacturerId() != null) {
+                    notificationService.notifyUser(
+                            product.getManufacturerId(),
+                            "MANUFACTURER",
+                            "Inventory Issue",
+                            "Order confirmation failed due to inventory for: " + productName
+                    );
+                }
+
+                throw new RuntimeException("Inventory unavailable. Product has been removed.");
+            }
+        }
+
+        order.setStatus(status);
+        Order saved = orderRepo.save(order);
+
+        // ✅ NOTIFICATIONS on status update (added only)
+        User placedBy = saved.getUser();
+        String placedByRole = placedBy.getRole() == null ? "" : placedBy.getRole().trim().toUpperCase();
+        Long placedById = placedBy.getId();
+        String productName = saved.getProduct() != null ? saved.getProduct().getName() : "product";
+
+        notificationService.notifyUser(
+                placedById,
+                placedByRole,
+                "Order Status Updated",
+                "Your order for " + productName + " is now " + status
+        );
+
+        return saved;
+    }
 
     public List<Order> getOrdersByUser(Long userId) {
         return orderRepo.findByUserId(userId);
@@ -146,23 +170,17 @@ public Order updateOrderStatus(Long orderId, String status) {
         return orderRepo.findByProductManufacturerIdAndUserRole(manufacturerId, "WHOLESALER");
     }
 
-
     private boolean isValidTransition(String current, String next) {
-
         switch (current) {
             case "PENDING":
                 return next.equals("CONFIRMED") || next.equals("CANCELLED") || next.equals("SHIPPED");
-
             case "CONFIRMED":
                 return next.equals("SHIPPED") || next.equals("CANCELLED");
-
             case "SHIPPED":
                 return next.equals("DELIVERED");
-
             case "DELIVERED":
             case "CANCELLED":
                 return false;
-
             default:
                 return false;
         }
@@ -170,21 +188,19 @@ public Order updateOrderStatus(Long orderId, String status) {
 
     public List<Order> getConsumerOrdersForWholesaler(Long wholesalerId) {
 
-    // Step 1: get all inventories of the wholesaler
-    List<Inventory> inventories =
-            inventoryRepository.findByWholesalerId(wholesalerId);
+        // Step 1: get all inventories of the wholesaler
+        List<Inventory> inventories = inventoryRepository.findByWholesalerId(wholesalerId);
 
-    // Step 2: extract product IDs
-    List<Long> productIds = inventories.stream()
-            .map(inv -> inv.getProduct().getId())
-            .distinct().collect(Collectors.toList());
+        // Step 2: extract product IDs
+        List<Long> productIds = inventories.stream()
+                .map(inv -> inv.getProduct().getId())
+                .distinct()
+                .collect(Collectors.toList());
 
-    if (productIds.isEmpty()) {
-        return List.of();
+        if (productIds.isEmpty()) {
+            return java.util.Collections.emptyList(); // Java 8 safe
+        }
+
+        return orderRepo.findByProductIdInAndUserRole(productIds, "CONSUMER");
     }
-
-    return orderRepo.findByProductIdInAndUserRole(
-            productIds, "CONSUMER"
-    );
-}
 }
