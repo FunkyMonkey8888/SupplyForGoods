@@ -44,6 +44,12 @@ export class DashbaordComponent implements OnInit {
     notifications: any[] = [];
     showNotifications = false;
     private notifTimer: any = null;
+  private wholesalerChartInstance: any = null;
+  private manufacturerChartInstance: any = null;
+
+    notifications: any[] = [];
+    showNotifications = false;
+    private notifTimer: any = null;
   constructor(
     private auth: AuthService,
     private http: HttpService,
@@ -60,11 +66,15 @@ export class DashbaordComponent implements OnInit {
 this.notifTimer = setInterval(() => this.loadNotifications(), 15000); // every 15 sec
 
 
+    this.loadNotifications();
+this.notifTimer = setInterval(() => this.loadNotifications(), 15000); // every 15 sec
+
+
     if (!this.isLoggedIn) return;
 
     if (this.role === 'MANUFACTURER') {
       this.loadManufacturerProducts();
-      this.loadManufacturerAnalytics(); // ✅ merges basic + advanced
+      this.loadManufacturerAnalytics(); // ✅ merges basic + advanced // ✅ merges basic + advanced
     }
 
     if (this.role === 'CONSUMER') {
@@ -290,9 +300,9 @@ this.notifTimer = setInterval(() => this.loadNotifications(), 15000); // every 1
         labels: ['Pending', 'Confirmed', 'Cancelled'],
         datasets: [{
           data: [
-            this.analytics?.pendingOrders ?? 0 ,
-            this.analytics?.confirmedOrders ?? 0 ,
-            this.analytics?.cancelledOrders ?? 0
+            this.analytics.pendingOrders,
+            this.analytics.confirmedOrders,
+            this.analytics.cancelledOrders
           ],
           backgroundColor: ['#fbc02d', '#2e7d32', '#c62828']
         }]
@@ -315,9 +325,9 @@ this.notifTimer = setInterval(() => this.loadNotifications(), 15000); // every 1
         datasets: [{
           label: 'Orders',
           data: [
-            this.analytics.confirmedOrders,
-            this.analytics.pendingOrders,
-            this.analytics.cancelledOrders
+            this.analytics.confirmedOrders ?? 0,
+            this.analytics.pendingOrders ?? 0,
+            this.analytics.cancelledOrders ?? 0
           ],
           backgroundColor: ['#2e7d32', '#fbc02d', '#c62828']
         }]

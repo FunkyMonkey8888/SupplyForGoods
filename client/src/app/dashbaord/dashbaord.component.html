@@ -39,6 +39,7 @@
     <h4 class="mb-3">📦 Manufacturer Dashboard</h4>
 
     <!-- ✅ BASIC ANALYTICS CARDS -->
+    <!-- ✅ BASIC ANALYTICS CARDS -->
     <div class="row mb-4">
       <div class="col-md-3">
         <div class="card p-3 text-center shadow-sm">
@@ -65,6 +66,7 @@
         <div class="card p-3 text-center shadow-sm">
           <h6>Cancelled Orders</h6>
           <h3 class="text-danger">{{ analytics?.cancelledOrders ?? 0 }}</h3>
+          <h3 class="text-danger">{{ analytics?.cancelledOrders ?? 0 }}</h3>
         </div>
       </div>
     </div>
@@ -73,6 +75,47 @@
     <div class="card p-3 mb-4">
       <h6 class="mb-3">Order Distribution</h6>
       <canvas id="manufacturerChart"></canvas>
+    </div>
+
+    <!-- ✅ ADVANCED KPIs -->
+    <div class="row mb-3" *ngIf="analytics">
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <div class="text-muted">Cancellation %</div>
+          <h3 class="text-danger">{{ analytics?.cancellationRate ?? 0 }}%</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <div class="text-muted">Unique Wholesalers</div>
+          <h3>{{ analytics?.uniqueWholesalers ?? 0 }}</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <div class="text-muted">Avg Order Qty</div>
+          <h3>{{ analytics?.avgOrderQuantity ?? 0 }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ TOP PRODUCTS -->
+    <div class="card p-3 mb-4" *ngIf="analytics">
+      <h6 class="mb-2">Top Products (Demand)</h6>
+
+      <div *ngIf="!analytics?.topProducts || analytics.topProducts.length === 0" class="text-muted">
+        No demand data yet.
+      </div>
+
+      <div *ngFor="let p of analytics?.topProducts"
+           class="d-flex justify-content-between border-bottom py-2">
+        <div><strong>{{ p.productName }}</strong></div>
+        <div class="text-muted small">
+          Orders: {{ p.orderCount }} | Qty: {{ p.quantitySum }}
+        </div>
+      </div>
     </div>
 
     <!-- ✅ ADVANCED KPIs -->
@@ -328,11 +371,13 @@
     <h4 class="mb-3">🏭 Wholesaler Dashboard</h4>
 
     <!-- ✅ BASIC KPIs -->
+    <!-- ✅ BASIC KPIs -->
     <div class="row mb-4">
 
       <div class="col-md-3">
         <div class="card p-3 text-center shadow-sm">
           <h6>Pending Orders</h6>
+          <h3 class="text-warning">{{ analytics?.pendingOrders ?? 0 }}</h3>
           <h3 class="text-warning">{{ analytics?.pendingOrders ?? 0 }}</h3>
         </div>
       </div>
@@ -341,6 +386,7 @@
         <div class="card p-3 text-center shadow-sm">
           <h6>Confirmed Orders</h6>
           <h3 class="text-success">{{ analytics?.confirmedOrders ?? 0 }}</h3>
+          <h3 class="text-success">{{ analytics?.confirmedOrders ?? 0 }}</h3>
         </div>
       </div>
 
@@ -348,12 +394,14 @@
         <div class="card p-3 text-center shadow-sm">
           <h6>Total Stock</h6>
           <h3>{{ analytics?.totalStock ?? 0 }}</h3>
+          <h3>{{ analytics?.totalStock ?? 0 }}</h3>
         </div>
       </div>
 
       <div class="col-md-3">
         <div class="card p-3 text-center shadow-sm">
           <h6>Low Stock Items</h6>
+          <h3 class="text-danger">{{ analytics?.lowStock ?? 0 }}</h3>
           <h3 class="text-danger">{{ analytics?.lowStock ?? 0 }}</h3>
         </div>
       </div>
@@ -364,6 +412,47 @@
     <div class="card p-3 mb-4">
       <h6 class="mb-3">Order Status Overview</h6>
       <canvas id="wholesalerChart"></canvas>
+    </div>
+
+    <!-- ✅ ADVANCED KPIs -->
+    <div class="row mb-3" *ngIf="analytics">
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <div class="text-muted">Cancellation %</div>
+          <h3 class="text-danger">{{ analytics?.cancellationRate ?? 0 }}%</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <div class="text-muted">Unique Consumers</div>
+          <h3>{{ analytics?.uniqueConsumers ?? 0 }}</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <div class="text-muted">Avg Order Qty</div>
+          <h3>{{ analytics?.avgOrderQuantity ?? 0 }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ TOP PRODUCTS -->
+    <div class="card p-3 mb-4" *ngIf="analytics">
+      <h6 class="mb-2">Top Products (Most Ordered)</h6>
+
+      <div *ngIf="!analytics?.topProducts || analytics.topProducts.length === 0" class="text-muted">
+        No orders data yet.
+      </div>
+
+      <div *ngFor="let p of analytics?.topProducts"
+           class="d-flex justify-content-between border-bottom py-2">
+        <div><strong>{{ p.productName }}</strong></div>
+        <div class="text-muted small">
+          Orders: {{ p.orderCount }} | Qty: {{ p.quantitySum }}
+        </div>
+      </div>
     </div>
 
     <!-- ✅ ADVANCED KPIs -->
