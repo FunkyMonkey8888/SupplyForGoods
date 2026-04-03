@@ -44,12 +44,7 @@ export class DashbaordComponent implements OnInit {
     notifications: any[] = [];
     showNotifications = false;
     private notifTimer: any = null;
-  private wholesalerChartInstance: any = null;
-  private manufacturerChartInstance: any = null;
 
-    notifications: any[] = [];
-    showNotifications = false;
-    private notifTimer: any = null;
   constructor(
     private auth: AuthService,
     private http: HttpService,
@@ -300,9 +295,9 @@ this.notifTimer = setInterval(() => this.loadNotifications(), 15000); // every 1
         labels: ['Pending', 'Confirmed', 'Cancelled'],
         datasets: [{
           data: [
-            this.analytics.pendingOrders,
-            this.analytics.confirmedOrders,
-            this.analytics.cancelledOrders
+            this.analytics.pendingOrders ?? 0,
+            this.analytics.confirmedOrders ?? 0,
+            this.analytics.cancelledOrders ?? 0
           ],
           backgroundColor: ['#fbc02d', '#2e7d32', '#c62828']
         }]
