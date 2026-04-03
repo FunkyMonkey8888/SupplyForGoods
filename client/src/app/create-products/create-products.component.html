@@ -1,23 +1,20 @@
 <div class="create-product-hero">
 
-  <!-- overlay -->
   <div class="hero-overlay"></div>
 
-  <!-- center container -->
   <div class="create-product-container">
 
     <div class="create-product-card animate-in">
 
-      <!-- ICON -->
       <div class="icon-wrapper">
         <i class="bi bi-box-seam-fill"></i>
       </div>
 
       <h3 class="title">Create Product</h3>
+      <p class="subtitle">Add a new product to your catalog</p>
 
       <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
 
-        <!-- PRODUCT NAME -->
         <div class="form-group">
           <label>Product Name</label>
           <input
@@ -32,7 +29,6 @@
           </small>
         </div>
 
-        <!-- DESCRIPTION -->
         <div class="form-group">
           <label>Description</label>
           <input
@@ -43,7 +39,6 @@
           />
         </div>
 
-        <!-- PRICE -->
         <div class="form-group">
           <label>Price (₹)</label>
           <input
@@ -58,7 +53,6 @@
           </small>
         </div>
 
-        <!-- STOCK -->
         <div class="form-group">
           <label>Stock Quantity</label>
           <input
@@ -73,12 +67,10 @@
           </small>
         </div>
 
-        <!-- API ERROR -->
         <div *ngIf="message" class="error-box">
           {{ message }}
         </div>
 
-        <!-- SUBMIT -->
         <button
           class="submit-btn"
           type="submit"

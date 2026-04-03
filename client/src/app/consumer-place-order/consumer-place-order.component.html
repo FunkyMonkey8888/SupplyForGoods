@@ -29,7 +29,10 @@
               [class.selected]="selectedProduct?.id === product.id"
               (click)="selectProduct(product)"
             >
-              <h6>{{ product.name }}</h6>
+              <div class="product-top">
+                <h6>{{ product.name }}</h6>
+                <span class="availability">Available</span>
+              </div>
 
               <p class="description">
                 {{ product.description || 'No description available' }}
@@ -37,7 +40,6 @@
 
               <div class="product-footer">
                 <span class="price">₹{{ product.price }}</span>
-                <span class="availability">Available</span>
               </div>
             </div>
           </div>
@@ -88,6 +90,7 @@
         </div>
 
       </div>
+
     </div>
 
   </div>

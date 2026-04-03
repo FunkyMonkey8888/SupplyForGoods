@@ -1,9 +1,7 @@
 <div class="orders-hero">
 
-  <!-- Overlay -->
   <div class="hero-overlay"></div>
 
-  <!-- Center container -->
   <div class="orders-container">
 
     <div class="orders-card animate-in">
@@ -17,9 +15,7 @@
         <h3>
           {{ role === 'MANUFACTURER' ? 'Incoming Orders' : 'Orders' }}
         </h3>
-        <p>
-          Review and manage order requests
-        </p>
+        <p>Review and manage order requests</p>
       </div>
 
       <!-- LOADING -->
@@ -43,7 +39,6 @@
               <th>Product</th>
               <th>Quantity</th>
               <th>Status</th>
-
               <th *ngIf="role === 'MANUFACTURER' || role === 'WHOLESALER'">
                 Action
               </th>
@@ -54,7 +49,7 @@
             <tr *ngFor="let o of orders">
 
               <td>#{{ o.id }}</td>
-              <td> {{o.user?.username}} </td>
+              <td>{{ o.user?.username }}</td>
               <td>{{ o.product?.name }}</td>
               <td>{{ o.quantity }}</td>
 
@@ -91,13 +86,14 @@
                   Reject
                 </button>
               </td>
+
             </tr>
           </tbody>
 
         </table>
       </div>
 
-      <!-- EMPTY STATE -->
+      <!-- EMPTY -->
       <div *ngIf="orders.length === 0 && !loading && !message"
            class="empty-state">
         No orders found.

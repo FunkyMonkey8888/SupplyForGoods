@@ -6,43 +6,104 @@
 
     <div class="view-products-card animate-in">
 
-      <!-- HEADER -->
       <div class="view-products-header">
         <div class="icon-wrapper">
           <i class="bi bi-box-seam-fill"></i>
         </div>
 
         <h3>Your Products</h3>
-        <p>Products added by you</p>
+        <p>Search, sort, and manage your products</p>
       </div>
 
-      <!-- PRODUCT GRID -->
-      <div class="product-grid">
+      <div class="toolbar">
 
-        <div class="product-card" *ngFor="let p of products">
-          <h4>{{ p.name }}</h4>
-          <p class="description">{{ p.description }}</p>
+        <div class="search-wrap">
+          <i class="bi bi-search"></i>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search by name, description, price, stock..."
+            [value]="searchTerm"
+            (input)="onSearchChange(($any($event.target)).value)"
+          />
+        </div>
 
-          <div class="product-footer">
-            <span class="price">₹{{ p.price }}</span>
-            <span class="stock">
-              Stock: {{ p.stockQuantity }}
-            </span>
+        <div class="controls">
+          <select class="control-select" (change)="changeSortKey(($any($event.target)).value)">
+            <option value="name" [selected]="sortKey === 'name'">Sort: Name</option>
+            <option value="price" [selected]="sortKey === 'price'">Sort: Price</option>
+            <option value="stockQuantity" [selected]="sortKey === 'stockQuantity'">Sort: Stock</option>
+          </select>
+
+          <button class="control-btn" type="button" (click)="toggleSortDir()">
+            <i class="bi" [ngClass]="sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down'"></i>
+            {{ sortDir === 'asc' ? 'Asc' : 'Desc' }}
+          </button>
+
+          <select class="control-select" (change)="changePageSize(($any($event.target)).value)">
+            <option *ngFor="let s of pageSizes" [value]="s" [selected]="pageSize === s">
+              {{ s }} / page
+            </option>
+          </select>
+        </div>
+
+      </div>
+
+      <div *ngIf="loading" class="info-box">
+        Loading products...
+      </div>
+
+      <div *ngIf="!loading && message" class="info-box warn">
+        {{ message }}
+      </div>
+
+      <div *ngIf="!loading && paged.length > 0" class="product-grid">
+
+        <div class="product-card" *ngFor="let p of paged">
+          <div class="p-top">
+            <div class="p-name">{{ p.name }}</div>
+            <div class="p-stock">Stock: {{ p.stockQuantity }}</div>
+          </div>
+
+          <div class="p-desc">{{ p.description }}</div>
+
+          <div class="p-meta">
+            <div class="p-price">₹{{ p.price }}</div>
           </div>
         </div>
 
       </div>
-      <!-- ADD PRODUCT BUTTON -->
-<!-- ADD PRODUCT BUTTON -->
-<div class="add-product-wrapper">
-  <button
-    class="add-product-btn"
-    routerLink="/create-product">
-    + Add Products
-  </button>
-</div>
 
+      <div *ngIf="!loading && filtered.length > 0" class="pagination">
 
+        <button class="page-btn" type="button" (click)="prevPage()" [disabled]="currentPage === 1">
+          Prev
+        </button>
+
+        <button
+          class="page-num"
+          type="button"
+          *ngFor="let p of pageNumbers"
+          (click)="goToPage(p)"
+          [class.active]="p === currentPage">
+          {{ p }}
+        </button>
+
+        <button class="page-btn" type="button" (click)="nextPage()" [disabled]="currentPage === totalPages">
+          Next
+        </button>
+
+        <div class="page-info">
+          Page {{ currentPage }} / {{ totalPages }}
+        </div>
+
+      </div>
+
+      <div class="add-product-action">
+        <button class="add-product-btn" routerLink="/create-product" type="button">
+          + Add Products
+        </button>
+      </div>
 
     </div>
 

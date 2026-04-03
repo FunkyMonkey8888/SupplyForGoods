@@ -1,32 +1,25 @@
 <div class="consumer-orders-hero">
 
-  <!-- overlay -->
   <div class="hero-overlay"></div>
 
-  <!-- content -->
   <div class="consumer-orders-container">
 
     <div class="orders-card animate-in">
 
-      <!-- HEADER -->
       <div class="orders-header">
         <div class="icon-wrapper">
           <i class="bi bi-bag-check-fill"></i>
         </div>
 
         <h3>Your Orders</h3>
-        <p>
-          Track your orders and share feedback after confirmation
-        </p>
+        <p>Track your orders and share feedback after confirmation</p>
       </div>
 
-      <!-- EMPTY STATE -->
       <div *ngIf="orders.length === 0" class="empty-state">
         <i class="bi bi-inbox"></i>
         <p>No orders found yet.</p>
       </div>
 
-      <!-- ORDERS TABLE -->
       <div *ngIf="orders.length > 0" class="table-responsive">
         <table class="orders-table">
 
@@ -43,28 +36,22 @@
           <tbody>
             <ng-container *ngFor="let o of orders">
 
-              <!-- ORDER ROW -->
               <tr [class.resolved]="o.status === 'CONFIRMED'">
                 <td>#{{ o.id }}</td>
                 <td>{{ o.product?.name }}</td>
                 <td>{{ o.quantity }}</td>
 
                 <td>
-                  <span *ngIf="o.status === 'CONFIRMED'"
-                        class="status confirmed">
+                  <span *ngIf="o.status === 'CONFIRMED'" class="status confirmed">
                     Confirmed
                   </span>
-                  <span *ngIf="o.status !== 'CONFIRMED'"
-                        class="status pending">
+                  <span *ngIf="o.status !== 'CONFIRMED'" class="status pending">
                     {{ o.status }}
                   </span>
                 </td>
 
                 <td>
-
-                  <!-- VIEW FEEDBACK -->
-                  <div *ngIf="submittedFeedback[o.id]"
-                       class="feedback-view">
+                  <div *ngIf="submittedFeedback[o.id]" class="feedback-view">
 
                     <div class="stars">
                       <i class="bi bi-star-fill"
@@ -73,30 +60,23 @@
                       </i>
                     </div>
 
-                    <small>
-                      “{{ submittedFeedback[o.id].comment }}”
-                    </small>
+                    <small>“{{ submittedFeedback[o.id].comment }}”</small>
                   </div>
 
-                  <!-- GIVE FEEDBACK -->
                   <button
                     *ngIf="o.status === 'CONFIRMED' && !submittedFeedback[o.id]"
-                    class="btn btn-feedback"
+                    class="btn-feedback"
                     (click)="openFeedback(o.id)">
                     Give Feedback
                   </button>
 
-                  <span *ngIf="o.status !== 'CONFIRMED'"
-                        class="pending-text">
+                  <span *ngIf="o.status !== 'CONFIRMED'" class="pending-text">
                     Pending confirmation
                   </span>
-
                 </td>
               </tr>
 
-              <!-- FEEDBACK FORM -->
-              <tr *ngIf="activeOrderId === o.id"
-                  class="feedback-row">
+              <tr *ngIf="activeOrderId === o.id" class="feedback-row">
                 <td colspan="5">
 
                   <div class="feedback-box">
@@ -116,8 +96,7 @@
                       [(ngModel)]="comments[o.id]">
                     </textarea>
 
-                    <button class="btn btn-submit"
-                            (click)="submitFeedback(o.id)">
+                    <button class="btn-submit" (click)="submitFeedback(o.id)">
                       Submit Feedback
                     </button>
 

@@ -29,16 +29,16 @@
             [class.selected]="selectedProduct?.id === product.id"
             (click)="selectProduct(product)"
           >
-            <h6>{{ product.name }}</h6>
+            <div class="product-top">
+              <h6>{{ product.name }}</h6>
+              <span class="stock-badge">
+                Stock: <strong>{{ product.stockQuantity }}</strong>
+              </span>
+            </div>
 
             <p class="description">
               ₹{{ product.price }}
             </p>
-
-            <!-- ✅ STOCK SHOWN AND HIGHLIGHTED -->
-            <span class="stock-badge">
-              Stock: <strong>{{ product.stockQuantity }}</strong>
-            </span>
           </div>
 
         </div>
@@ -50,8 +50,7 @@
         <h5>Inventory Details</h5>
 
         <div *ngIf="selectedProduct" class="selected-info">
-          Updating stock for
-          <strong>{{ selectedProduct.name }}</strong>
+          Updating stock for <strong>{{ selectedProduct.name }}</strong>
         </div>
 
         <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">

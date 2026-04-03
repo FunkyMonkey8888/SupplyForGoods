@@ -1,35 +1,33 @@
-/* ===== HERO BACKGROUND ===== */
-.login-hero {
-  min-height: 100vh;
-  width: 100%;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(6, 15, 40, 0.9),
-      rgba(25, 50, 140, 0.85)
-    ),
-    url('https://images.unsplash.com/photo-1578575437130-527eed3abbec');
-
-  background-size: cover;
-  background-position: center;
-  font-family: 'Poppins', sans-serif;
-
-  padding-top: 96px; /* navbar offset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-/* Overlay */
+/* ===== BACKGROUND ===== */
+.login-hero {
+  min-height: 100vh;
+  padding-top: 90px;
+  position: relative;
+  font-family: 'Poppins', sans-serif;
+
+  background:
+    radial-gradient(1200px 600px at 20% 10%, rgba(124,58,237,0.35), transparent 60%),
+    radial-gradient(900px 500px at 80% 15%, rgba(59,130,246,0.28), transparent 55%),
+    radial-gradient(900px 500px at 50% 90%, rgba(236,72,153,0.20), transparent 60%),
+    linear-gradient(135deg, #070a16 0%, #0b1026 45%, #0a0f1f 100%);
+}
+
 .login-overlay {
   position: absolute;
   inset: 0;
 }
 
-/* Container */
+/* ===== CONTAINER ===== */
 .login-container {
   position: relative;
   z-index: 2;
-
-  min-height: calc(100vh - 96px);
+  min-height: calc(100vh - 90px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,46 +37,48 @@
 .login-card {
   width: 100%;
   max-width: 420px;
-
-  min-height: 550px;        /* ✅ NEW: slightly taller container */
-  padding: 38px 30px;       /* ✅ more vertical breathing room */
+  padding: 26px 22px 22px;
 
   border-radius: 20px;
-  background: linear-gradient(135deg, #ffffff 0%, #f3f7ff 100%);
-  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.28);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  backdrop-filter: blur(16px);
 
+  box-shadow: 0 24px 55px rgba(0,0,0,0.55);
   text-align: center;
-}
-.login-title {
-  margin-bottom: 26px; /* was ~22px */
 }
 
 /* ===== ICON ===== */
 .login-icon {
-  width: 82px;
-  height: 82px;
-  margin: 0 auto 14px;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 12px;
+  border-radius: 16px;
 
-  border-radius: 50%;
-  background: linear-gradient(135deg, #2563eb, #6366f1);
+  background: linear-gradient(135deg, rgba(59,130,246,0.95), rgba(124,58,237,0.95));
+  box-shadow: 0 12px 30px rgba(99,102,241,0.45);
 
   display: flex;
   align-items: center;
   justify-content: center;
-
-  box-shadow: 0 10px 30px rgba(78, 140, 255, 0.45);
 }
 
-.login-icon img {
-  width: 38px;
-  filter: brightness(0) invert(1);
+.login-icon i {
+  font-size: 34px;
+  color: #ffffff;
 }
 
-/* ===== TITLE ===== */
+/* ===== TITLES ===== */
 .login-title {
-  font-weight: 700;
-  color: #2f3542;
-  margin-bottom: 22px;
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.login-subtitle {
+  font-size: 13px;
+  opacity: 0.8;
+  margin-bottom: 18px;
 }
 
 /* ===== FORM ===== */
@@ -90,86 +90,104 @@
 .form-group label {
   font-size: 18px;
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   display: block;
+  color: rgba(229,231,235,0.9);
 }
 
-/* Inputs */
+/* INPUTS */
 .custom-input {
-  height: 44px;
+  width: 100%;
+  height: 42px;
   border-radius: 12px;
-  border: 1px solid #d0d7e2;
   padding: 10px 12px;
-  font-size: 16px;
+  font-size: 14px;
+  color: #e5e7eb;
 
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(255,255,255,0.10);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
-.custom-input:hover {
-  border-color: #56a2f8;
+.custom-input::placeholder {
+  color: rgba(229,231,235,0.45);
 }
 
 .custom-input:focus {
   outline: none;
-  border-color: #4e8cff;
-  box-shadow: 0 0 0 3px rgba(78, 140, 255, 0.2);
+  border-color: rgba(99,102,241,0.8);
+  box-shadow:
+    0 0 0 4px rgba(99,102,241,0.18),
+    0 0 22px rgba(99,102,241,0.25);
 }
 
-/* Angular invalid */
+/* INVALID */
 input.ng-invalid.ng-touched {
-  border-color: #dc2626;
+  border-color: rgba(239,68,68,0.7);
 }
 
-/* Validation text */
+/* ERROR TEXT */
 .error-text {
-  font-size: 12.5px;
-  color: #dc2626;
+  font-size: 12px;
+  color: #fecaca;
   margin-top: 4px;
   display: block;
 }
 
-/* Backend alert */
-.custom-alert {
-  margin-top: 10px;
-  border-radius: 12px;
-  font-weight: 500;
-}
-
-/* ===== BUTTON ===== */
-.login-btn {
-  margin-top: 16px;
-  padding: 18px 0;
+/* BACKEND ALERT */
+.login-alert {
+  margin: 10px 0 12px;
+  padding: 10px;
   border-radius: 14px;
 
-  font-size: 20px;
-  font-weight: 600;
+  background: rgba(239,68,68,0.16);
+  border: 1px solid rgba(239,68,68,0.22);
+  color: #fee2e2;
+
+  font-weight: 800;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* BUTTON */
+.login-btn {
+  width: 100%;
+  height: 44px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+
+  font-size: 18px;
+  font-weight: 800;
   color: #ffffff;
 
-  background: linear-gradient(90deg, #3a7af0, #4394f8);
-  border: none;
-
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  background: linear-gradient(90deg, rgba(59,130,246,0.95), rgba(124,58,237,0.95));
+  box-shadow: 0 14px 36px rgba(99,102,241,0.45);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .login-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 14px 28px rgba(78, 140, 255, 0.5);
+  box-shadow:
+    0 0 0 4px rgba(99,102,241,0.20),
+    0 20px 44px rgba(99,102,241,0.55);
 }
 
 .login-btn:disabled {
-  opacity: 0.75;
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
-/* ===== FOOTER ===== */
+/* FOOTER */
 .login-footer {
   margin-top: 18px;
-  font-size: 13.5px;
+  font-size: 12.5px;
+  color: rgba(229,231,235,0.85);
 }
 
 .login-footer a {
-  font-weight: 600;
-  color: #1e90ff;
+  font-weight: 800;
+  color: #93c5fd;
   text-decoration: none;
 }
 
@@ -177,15 +195,15 @@ input.ng-invalid.ng-touched {
   text-decoration: underline;
 }
 
-/* ===== ENTRANCE ANIMATION ===== */
+/* ANIMATION */
 .animate-in {
-  animation: fadeUp 0.6s ease-out forwards;
+  animation: fadeUp 0.55s ease-out;
 }
 
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(14px);
   }
   to {
     opacity: 1;
