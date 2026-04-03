@@ -216,12 +216,44 @@ export class HttpService {
     );
   }
 
-  getManufacturerAnalytics(manufacturerId: number) {
-    return this.http.get<any>(
-      `${this.serverName}/api/analytics/manufacturer?manufacturerId=${manufacturerId}`,
-      this.getHeaders()
-    );
-  }
+
+getManufacturerAnalytics(manufacturerId: number) {
+  return this.http.get<any>(
+    `${this.serverName}/api/analytics/manufacturer?manufacturerId=${manufacturerId}`,
+    this.getHeaders()
+  );
+}
+    getWholesalerAdvancedAnalytics(wholesalerId: number) {
+  return this.http.get<any>(
+    `${this.serverName}/api/analytics/wholesaler/advanced?wholesalerId=${wholesalerId}`,
+    this.getHeaders()
+  );
+}
+
+getManufacturerAdvancedAnalytics(manufacturerId: number) {
+  return this.http.get<any>(
+    `${this.serverName}/api/analytics/manufacturer/advanced?manufacturerId=${manufacturerId}`,
+    this.getHeaders()
+  );
+}
+
+/* ================= NOTIFICATIONS ================= */
+
+getUnreadNotifications(userId: number) {
+  return this.http.get<any[]>(
+    `${this.serverName}/api/notifications/unread?userId=${userId}`,
+    this.getHeaders()
+  );
+}
+
+markNotificationRead(id: number, userId: number) {
+  return this.http.put(
+    `${this.serverName}/api/notifications/${id}/read?userId=${userId}`,
+    {},
+    this.getHeaders()
+  );
+}
+
 
   /* ======================================================================
    * ✅ WISHLIST + CART (FRONTEND ONLY, per user, stored in localStorage)
