@@ -245,6 +245,23 @@ getManufacturerAdvancedAnalytics(manufacturerId: number) {
   );
 }
 
+/* ================= NOTIFICATIONS ================= */
+
+getUnreadNotifications(userId: number) {
+  return this.http.get<any[]>(
+    `${this.serverName}/api/notifications/unread?userId=${userId}`,
+    this.getHeaders()
+  );
+}
+
+markNotificationRead(id: number, userId: number) {
+  return this.http.put(
+    `${this.serverName}/api/notifications/${id}/read?userId=${userId}`,
+    {},
+    this.getHeaders()
+  );
+}
+
 
 
 }

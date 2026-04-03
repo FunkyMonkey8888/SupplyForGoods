@@ -6,21 +6,41 @@ import com.edutech.supply_of_goods_management.entity.Inventory;
 import com.edutech.supply_of_goods_management.entity.Product;
 import com.edutech.supply_of_goods_management.repository.InventoryRepository;
 import com.edutech.supply_of_goods_management.repository.ProductRepository;
+import com.edutech.supply_of_goods_management.service.NotificationService;
+import com.edutech.supply_of_goods_management.repository.UserRepository;
+import com.edutech.supply_of_goods_management.entity.User;
+
 import java.util.List;
 @Service
 public class ProductService {
 
     private final ProductRepository repo;
     private final InventoryRepository inventoryRepo;
+    private final UserRepository userRepo;
 
-    public ProductService(ProductRepository repo, InventoryRepository inventoryRepo) {
+    private final NotificationService notificationService;
+    public ProductService(ProductRepository repo, InventoryRepository inventoryRepo, NotificationService ns, UserRepository us) {
         this.repo = repo;
         this.inventoryRepo = inventoryRepo;
+        this.userRepo = us;
+        this.notificationService = ns;
     }
 
     public Product createProduct(Product product) {
         if(product.getPrice() <=0 || product.getStockQuantity() <=0) throw new IllegalArgumentException("Price or quantity cannot be less than 0");
-        return repo.save(product);
+
+        // after product saved
+        Product saved = repo.save(product);
+        List<User> wholesalers = userRepo.findByRole("WHOLESALER");  // implement repo method
+        for (User w : wholesalers) {
+            notificationService.notifyUser(
+                w.getId(),
+                "WHOLESALER",
+                "New Product Added",
+                "New product added: " + saved.getName()
+            );
+        }
+            return saved ;
     }
 
     public Product updateProduct(Long id, Product updated) {

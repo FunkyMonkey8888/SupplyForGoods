@@ -30,6 +30,9 @@ export class DashbaordComponent implements OnInit {
   private wholesalerChartInstance: any = null;
   private manufacturerChartInstance: any = null;
 
+    notifications: any[] = [];
+    showNotifications = false;
+    private notifTimer: any = null;
   constructor(
     private auth: AuthService,
     private http: HttpService,
@@ -41,6 +44,10 @@ export class DashbaordComponent implements OnInit {
     this.username = this.auth.getUsername();
     this.userId = Number(this.auth.getUserId());
     this.isLoggedIn = !!this.role && !!this.userId;
+
+    this.loadNotifications();
+this.notifTimer = setInterval(() => this.loadNotifications(), 15000); // every 15 sec
+
 
     if (!this.isLoggedIn) return;
 
@@ -188,4 +195,31 @@ export class DashbaordComponent implements OnInit {
       options: { responsive: true }
     });
   }
+
+  loadNotifications(): void {
+  if (!this.userId) return;
+
+  this.http.getUnreadNotifications(this.userId).subscribe({
+    next: (res) => this.notifications = res,
+    error: () => { /* silently ignore for UX */ }
+  });
+}
+
+toggleNotifications(): void {
+  this.showNotifications = !this.showNotifications;
+}
+
+markRead(nId: number): void {
+  if (!this.userId) return;
+
+  this.http.markNotificationRead(nId, this.userId).subscribe({
+    next: () => {
+      this.notifications = this.notifications.filter(n => n.id !== nId);
+    }
+  });
+}
+
+  ngOnDestroy(): void {
+  if (this.notifTimer) clearInterval(this.notifTimer);
+}
 }
