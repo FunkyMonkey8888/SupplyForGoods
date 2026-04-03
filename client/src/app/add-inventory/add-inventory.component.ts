@@ -25,7 +25,7 @@ export class AddInventoryComponent implements OnInit {
   ngOnInit(): void {
     this.itemForm = this.fb.group({
       productId: ['', Validators.required],
-      stockQuantity: ['', Validators.required]
+      stockQuantity: ['', [Validators.required, Validators.min(1)]]
     });
   }
 

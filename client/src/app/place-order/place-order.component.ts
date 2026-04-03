@@ -14,7 +14,7 @@ export class PlaceOrderComponent implements OnInit {
  
   formModel: any = {
     quantity: '',
-    status: 'PLACED'
+    status: 'PENDING'
   };
  
   productList: any[] = [];
@@ -33,7 +33,7 @@ export class PlaceOrderComponent implements OnInit {
  
   ngOnInit(): void {
     this.itemForm = this.fb.group({
-      quantity: [this.formModel.quantity, Validators.required],
+      quantity: [this.formModel.quantity, [Validators.required, Validators.min(1)]],
       status: [this.formModel.status, Validators.required]
     });
  
@@ -89,7 +89,7 @@ export class PlaceOrderComponent implements OnInit {
       next: () => {
         this.showMessage = true;
         this.responseMessage = 'Order placed successfully';
-        this.itemForm.reset({ status: 'PLACED' });
+        this.itemForm.reset({ status: 'PENDING' });
         this.productId = null;
       },
       error: () => {

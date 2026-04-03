@@ -25,8 +25,8 @@ export class CreateProductsComponent implements OnInit {
     this.itemForm = this.fb.group({
       name: ['', Validators.required],
       description: ['', Validators.required],
-      price: ['', Validators.required],
-      stockQuantity: ['', Validators.required]
+      price: ['', [Validators.required, Validators.min(1)]],
+      stockQuantity: ['', [Validators.required, Validators.min(1)]]
     });
   }
 

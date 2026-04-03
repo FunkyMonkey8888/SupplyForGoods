@@ -24,8 +24,8 @@ export class ConsumerPlaceOrderComponent implements OnInit {
   ngOnInit(): void {
     this.itemForm = this.fb.group({
       productId: ['', Validators.required],
-      quantity: ['', Validators.required],
-      status: ['', Validators.required]
+      quantity: ['', [Validators.required, Validators.min(1)]],
+      status: ['PENDING', Validators.required]
     });
   }
 
