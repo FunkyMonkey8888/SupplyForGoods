@@ -2,16 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { HttpService } from '../../services/http.service';
 import { Router } from '@angular/router';
+
 declare var Chart: any;
+
 @Component({
   selector: 'app-dashbaord',
   templateUrl: './dashbaord.component.html',
   styleUrls: ['./dashbaord.component.scss']
 })
-
 export class DashbaordComponent implements OnInit {
-
-  
 
   role: string | null = null;
   username: string | null = null;
@@ -27,6 +26,9 @@ export class DashbaordComponent implements OnInit {
 
   loading = false;
   error = '';
+
+  private wholesalerChartInstance: any = null;
+  private manufacturerChartInstance: any = null;
 
   constructor(
     private auth: AuthService,
@@ -44,7 +46,7 @@ export class DashbaordComponent implements OnInit {
 
     if (this.role === 'MANUFACTURER') {
       this.loadManufacturerProducts();
-      this.loadManufacturerAnalytics();
+      this.loadManufacturerAnalytics(); // ✅ merges basic + advanced
     }
 
     if (this.role === 'CONSUMER') {
@@ -54,30 +56,8 @@ export class DashbaordComponent implements OnInit {
     if (this.role === 'WHOLESALER') {
       this.loadWholesalerOrders();
       this.loadWholesalerInventory();
-      this.loadWholesalerAnalytics();
+      this.loadWholesalerAnalytics();   // ✅ merges basic + advanced
     }
-  }
-
-  /* ================= ANALYTICS ================= */
-
-  loadWholesalerAnalytics(): void {
-    this.http.getWholesalerAnalytics(this.userId!).subscribe({
-      next: (data) => {
-        this.analytics = data;
-        this.renderWholesalerChart();
-      },
-      error: () => this.error = 'Failed to load wholesaler analytics'
-    });
-  }
-
-  loadManufacturerAnalytics(): void {
-    this.http.getManufacturerAnalytics(this.userId!).subscribe({
-      next: (data) => {
-        this.analytics = data;
-        this.renderManufacturerChart();
-      },
-      error: () => this.error = 'Failed to load manufacturer analytics'
-    });
   }
 
   /* ================= DATA LOADERS ================= */
@@ -110,40 +90,102 @@ export class DashbaordComponent implements OnInit {
     });
   }
 
+  /* ================= ANALYTICS (MERGED) ================= */
+
+  loadWholesalerAnalytics(): void {
+    const id = this.userId!;
+
+    // ✅ Basic analytics (pending/confirmed/totalStock/lowStock)
+    this.http.getWholesalerAnalytics(id).subscribe({
+      next: basic => {
+        this.analytics = { ...(this.analytics || {}), ...basic };
+        this.renderWholesalerChart();
+      },
+      error: () => this.error = 'Failed to load wholesaler basic analytics'
+    });
+
+    // ✅ Advanced analytics (cancellationRate/uniqueConsumers/avgOrderQuantity/topProducts)
+    this.http.getWholesalerAdvancedAnalytics(id).subscribe({
+      next: adv => {
+        this.analytics = { ...(this.analytics || {}), ...adv };
+        // Optional: redraw chart if you want, not required
+        // this.renderWholesalerChart();
+      },
+      error: () => this.error = 'Failed to load wholesaler advanced analytics'
+    });
+  }
+
+  loadManufacturerAnalytics(): void {
+    const id = this.userId!;
+
+    // ✅ Basic analytics (total/confirmed/pending/cancelled)
+    this.http.getManufacturerAnalytics(id).subscribe({
+      next: basic => {
+        this.analytics = { ...(this.analytics || {}), ...basic };
+        this.renderManufacturerChart();
+      },
+      error: () => this.error = 'Failed to load manufacturer basic analytics'
+    });
+
+    // ✅ Advanced analytics (cancellationRate/uniqueWholesalers/avgOrderQuantity/topProducts)
+    this.http.getManufacturerAdvancedAnalytics(id).subscribe({
+      next: adv => {
+        this.analytics = { ...(this.analytics || {}), ...adv };
+        // Optional: redraw chart if you want, not required
+        // this.renderManufacturerChart();
+      },
+      error: () => this.error = 'Failed to load manufacturer advanced analytics'
+    });
+  }
+
   /* ================= CHARTS ================= */
 
   renderWholesalerChart(): void {
-    new Chart('wholesalerChart', {
+    if (!this.analytics) return;
+
+    if (this.wholesalerChartInstance) {
+      this.wholesalerChartInstance.destroy();
+    }
+
+    this.wholesalerChartInstance = new Chart('wholesalerChart', {
       type: 'pie',
       data: {
         labels: ['Pending', 'Confirmed', 'Cancelled'],
         datasets: [{
           data: [
-            this.analytics.pendingOrders,
-            this.analytics.confirmedOrders,
-            this.analytics.cancelledOrders
+            this.analytics.pendingOrders ?? 0,
+            this.analytics.confirmedOrders ?? 0,
+            this.analytics.cancelledOrders ?? 0
           ],
           backgroundColor: ['#fbc02d', '#2e7d32', '#c62828']
         }]
-      }
+      },
+      options: { responsive: true }
     });
   }
 
   renderManufacturerChart(): void {
-    new Chart('manufacturerChart', {
+    if (!this.analytics) return;
+
+    if (this.manufacturerChartInstance) {
+      this.manufacturerChartInstance.destroy();
+    }
+
+    this.manufacturerChartInstance = new Chart('manufacturerChart', {
       type: 'bar',
       data: {
         labels: ['Confirmed', 'Pending', 'Cancelled'],
         datasets: [{
           label: 'Orders',
           data: [
-            this.analytics.confirmedOrders,
-            this.analytics.pendingOrders,
-            this.analytics.cancelledOrders
+            this.analytics.confirmedOrders ?? 0,
+            this.analytics.pendingOrders ?? 0,
+            this.analytics.cancelledOrders ?? 0
           ],
           backgroundColor: ['#2e7d32', '#fbc02d', '#c62828']
         }]
-      }
+      },
+      options: { responsive: true }
     });
   }
 }

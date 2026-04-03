@@ -231,6 +231,20 @@ getManufacturerAnalytics(manufacturerId: number) {
     this.getHeaders()
   );
 }
+    getWholesalerAdvancedAnalytics(wholesalerId: number) {
+  return this.http.get<any>(
+    `${this.serverName}/api/analytics/wholesaler/advanced?wholesalerId=${wholesalerId}`,
+    this.getHeaders()
+  );
+}
+
+getManufacturerAdvancedAnalytics(manufacturerId: number) {
+  return this.http.get<any>(
+    `${this.serverName}/api/analytics/manufacturer/advanced?manufacturerId=${manufacturerId}`,
+    this.getHeaders()
+  );
+}
+
 
 
 }
