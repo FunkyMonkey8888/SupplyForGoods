@@ -32,6 +32,120 @@
   </div>
 
   <!-- ========================================= -->
+  <!-- ================= MANUFACTURER =========== -->
+  <!-- ========================================= -->
+  <section *ngIf="role === 'MANUFACTURER'">
+
+    <h4 class="mb-3">📦 Manufacturer Dashboard</h4>
+
+    <!-- ✅ BASIC ANALYTICS CARDS -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <h6>Total Orders</h6>
+          <h3>{{ analytics?.totalOrders ?? 0 }}</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <h6>Confirmed Orders</h6>
+          <h3 class="text-success">{{ analytics?.confirmedOrders ?? 0 }}</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <h6>Pending Orders</h6>
+          <h3 class="text-warning">{{ analytics?.pendingOrders ?? 0 }}</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <h6>Cancelled Orders</h6>
+          <h3 class="text-danger">{{ analytics?.cancelledOrders ?? 0 }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ CHART -->
+    <div class="card p-3 mb-4">
+      <h6 class="mb-3">Order Distribution</h6>
+      <canvas id="manufacturerChart"></canvas>
+    </div>
+
+    <!-- ✅ ADVANCED KPIs -->
+    <div class="row mb-3" *ngIf="analytics">
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <div class="text-muted">Cancellation %</div>
+          <h3 class="text-danger">{{ analytics?.cancellationRate ?? 0 }}%</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <div class="text-muted">Unique Wholesalers</div>
+          <h3>{{ analytics?.uniqueWholesalers ?? 0 }}</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <div class="text-muted">Avg Order Qty</div>
+          <h3>{{ analytics?.avgOrderQuantity ?? 0 }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ TOP PRODUCTS -->
+    <div class="card p-3 mb-4" *ngIf="analytics">
+      <h6 class="mb-2">Top Products (Demand)</h6>
+
+      <div *ngIf="!analytics?.topProducts || analytics.topProducts.length === 0" class="text-muted">
+        No demand data yet.
+      </div>
+
+      <div *ngFor="let p of analytics?.topProducts"
+           class="d-flex justify-content-between border-bottom py-2">
+        <div><strong>{{ p.productName }}</strong></div>
+        <div class="text-muted small">
+          Orders: {{ p.orderCount }} | Qty: {{ p.quantitySum }}
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ ACTIONS -->
+    <div class="mb-3">
+      <a routerLink="/create-product" class="btn btn-primary me-2">
+        + Create Product
+      </a>
+      <a routerLink="/get-orders" class="btn btn-outline-dark">
+        Review Orders
+      </a>
+    </div>
+
+    <!-- ✅ PRODUCT LIST -->
+    <h5 class="mt-4">My Products</h5>
+
+    <div *ngIf="products.length === 0" class="text-muted mt-2">
+      No products created yet.
+    </div>
+
+    <div class="row">
+      <div class="col-md-3" *ngFor="let p of products">
+        <div class="card p-3 mb-3 shadow-sm">
+          <h6>{{ p.name }}</h6>
+          <p class="small text-muted">{{ p.description }}</p>
+          <strong>₹{{ p.price }}</strong>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ========================================= -->
   <!-- ================= CONSUMER ============== -->
   <!-- ========================================= -->
   <section *ngIf="role === 'CONSUMER'">
@@ -184,26 +298,146 @@
 
       <div *ngIf="consumerOrders.length === 0" class="text-muted">
         No orders yet. Start browsing products.
+    </div>
+
+    <div *ngFor="let o of consumerOrders" class="card p-3 mb-3 shadow-sm">
+      <p><strong>Order ID:</strong> {{ o.id }}</p>
+      <p><strong>Product:</strong> {{ o.product?.name }}</p>
+      <p><strong>Quantity:</strong> {{ o.quantity }}</p>
+      <p>
+        <strong>Status:</strong>
+        <span class="badge"
+              [ngClass]="{
+                'bg-success': o.status === 'CONFIRMED',
+                'bg-warning text-dark': o.status === 'PENDING',
+                'bg-danger': o.status === 'CANCELLED'
+              }">
+          {{ o.status }}
+        </span>
+      </p>
+    </div>
+
+  </section>
+
+  <!-- ========================================= -->
+  <!-- ================= WHOLESALER ============ -->
+  <!-- ========================================= -->
+  <section *ngIf="role === 'WHOLESALER'">
+
+    <h4 class="mb-3">🏭 Wholesaler Dashboard</h4>
+
+    <!-- ✅ BASIC KPIs -->
+    <div class="row mb-4">
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <h6>Pending Orders</h6>
+          <h3 class="text-warning">{{ analytics?.pendingOrders ?? 0 }}</h3>
+        </div>
       </div>
 
-      <div *ngFor="let o of consumerOrders" class="card p-3 mb-3 shadow-sm">
-        <p><strong>Order ID:</strong> {{ o.id }}</p>
-        <p><strong>Product:</strong> {{ o.product?.name }}</p>
-        <p><strong>Quantity:</strong> {{ o.quantity }}</p>
-        <p>
-          <strong>Status:</strong>
-          <span class="badge"
-                [ngClass]="{
-                  'bg-success': o.status === 'CONFIRMED',
-                  'bg-warning text-dark': o.status === 'PENDING',
-                  'bg-danger': o.status === 'CANCELLED'
-                }">
-            {{ o.status }}
-          </span>
-        </p>
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <h6>Confirmed Orders</h6>
+          <h3 class="text-success">{{ analytics?.confirmedOrders ?? 0 }}</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <h6>Total Stock</h6>
+          <h3>{{ analytics?.totalStock ?? 0 }}</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <h6>Low Stock Items</h6>
+          <h3 class="text-danger">{{ analytics?.lowStock ?? 0 }}</h3>
+        </div>
       </div>
 
     </div>
 
+    <!-- ✅ CHART -->
+    <div class="card p-3 mb-4">
+      <h6 class="mb-3">Order Status Overview</h6>
+      <canvas id="wholesalerChart"></canvas>
+    </div>
+
+    <!-- ✅ ADVANCED KPIs -->
+    <div class="row mb-3" *ngIf="analytics">
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <div class="text-muted">Cancellation %</div>
+          <h3 class="text-danger">{{ analytics?.cancellationRate ?? 0 }}%</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <div class="text-muted">Unique Consumers</div>
+          <h3>{{ analytics?.uniqueConsumers ?? 0 }}</h3>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card p-3 text-center shadow-sm">
+          <div class="text-muted">Avg Order Qty</div>
+          <h3>{{ analytics?.avgOrderQuantity ?? 0 }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ TOP PRODUCTS -->
+    <div class="card p-3 mb-4" *ngIf="analytics">
+      <h6 class="mb-2">Top Products (Most Ordered)</h6>
+
+      <div *ngIf="!analytics?.topProducts || analytics.topProducts.length === 0" class="text-muted">
+        No orders data yet.
+      </div>
+
+      <div *ngFor="let p of analytics?.topProducts"
+           class="d-flex justify-content-between border-bottom py-2">
+        <div><strong>{{ p.productName }}</strong></div>
+        <div class="text-muted small">
+          Orders: {{ p.orderCount }} | Qty: {{ p.quantitySum }}
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ ACTIONS -->
+    <div class="mb-3">
+      <a routerLink="/add-inventory" class="btn btn-primary me-2">
+        Add Inventory
+      </a>
+      <a routerLink="/get-orders" class="btn btn-outline-dark">
+        View Orders
+      </a>
+    </div>
+
+    <!-- ✅ INVENTORY -->
+    <h5 class="mt-4">My Inventory</h5>
+
+    <div *ngIf="inventories.length === 0" class="text-muted mt-2">
+      No inventory added yet — add stock to fulfill orders.
+    </div>
+
+    <table *ngIf="inventories.length > 0" class="table table-bordered mt-2">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Stock</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let inv of inventories">
+          <td>{{ inv.product?.name }}</td>
+          <td>{{ inv.stockQuantity }}</td>
+        </tr>
+      </tbody>
+    </table>
+
   </section>
+
 </div>
