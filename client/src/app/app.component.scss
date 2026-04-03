@@ -128,3 +128,10 @@
     transform: translateY(0);
   }
 }
+
+.app-main {
+  padding-top: 92px; /* if navbar fixed */
+  padding-left: 0;
+  padding-right: 0;
+  margin: 0;
+}

@@ -1,12 +1,56 @@
 <div class="sog-hero">
-
   <div class="sog-bg"></div>
   <div class="sog-overlay"></div>
 
   <div class="sog-wrap">
 
+    <!-- Top bar meta + notifications -->
+    <div class="topbar" *ngIf="isLoggedIn">
+      <div class="topbar-left">
+        <span class="meta-pill" *ngIf="username">User: {{ username }}</span>
+        <span class="meta-pill" *ngIf="role">Role: {{ role }}</span>
+      </div>
+
+      <div class="topbar-right">
+        <div class="notif-wrap">
+          <button class="notif-btn" type="button" (click)="toggleNotifications()">
+            <span class="notif-icon">🔔</span>
+            <span class="notif-badge" *ngIf="notifications.length">{{ notifications.length }}</span>
+          </button>
+
+          <div class="notif-panel" *ngIf="showNotifications">
+            <div class="notif-head">
+              <div class="notif-title">Notifications</div>
+              <button class="notif-close" type="button" (click)="toggleNotifications()">✕</button>
+            </div>
+
+            <div class="notif-empty" *ngIf="notifications.length === 0">
+              No new notifications.
+            </div>
+
+            <div class="notif-list" *ngIf="notifications.length > 0">
+              <div class="notif-item" *ngFor="let n of notifications">
+                <div class="notif-item-top">
+                  <div class="notif-item-title">{{ n.title }}</div>
+                  <button class="notif-mark" type="button" (click)="markRead(n.id)">
+                    Mark read
+                  </button>
+                </div>
+                <div class="notif-item-msg">{{ n.message }}</div>
+                <div class="notif-item-meta">
+                  <span *ngIf="n.createdAt">{{ n.createdAt | date:'medium' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /notif-wrap -->
+      </div>
+    </div>
+
     <div class="sog-grid">
 
+      <!-- LEFT -->
       <div class="sog-left">
 
         <div class="sog-kicker">
@@ -28,31 +72,38 @@
           Use the navigation bar above to manage your operations
         </p>
 
-        <!-- ✅ STATS / KPI SECTION (ALWAYS SHOWS WHEN LOGGED IN) -->
+        <!-- Alerts -->
+        <div *ngIf="error" class="sog-alert danger">
+          {{ error }}
+        </div>
+
+        <div *ngIf="!isLoggedIn" class="sog-alert">
+          Please login to view dashboard analytics.
+        </div>
+
+        <!-- ✅ KPI / Stats -->
         <div *ngIf="isLoggedIn" class="stats-row">
 
-          <!-- BASIC STATS (always available) -->
           <div class="stat-card">
             <div class="stat-label">Products</div>
-            <div class="stat-value">{{ products?.length || 0 }}</div>
+            <div class="stat-value">{{ products.length || 0 }}</div>
           </div>
 
           <div class="stat-card" *ngIf="role === 'WHOLESALER'">
             <div class="stat-label">Inventory</div>
-            <div class="stat-value">{{ inventories?.length || 0 }}</div>
+            <div class="stat-value">{{ inventories.length || 0 }}</div>
           </div>
 
           <div class="stat-card" *ngIf="role === 'WHOLESALER'">
             <div class="stat-label">Orders</div>
-            <div class="stat-value">{{ wholesalerOrders?.length || 0 }}</div>
+            <div class="stat-value">{{ wholesalerOrders.length || 0 }}</div>
           </div>
 
           <div class="stat-card" *ngIf="role === 'CONSUMER'">
             <div class="stat-label">Orders</div>
-            <div class="stat-value">{{ consumerOrders?.length || 0 }}</div>
+            <div class="stat-value">{{ consumerOrders.length || 0 }}</div>
           </div>
 
-          <!-- ANALYTICS KPIS (only if analytics exists) -->
           <div class="stat-card ok" *ngIf="analytics">
             <div class="stat-label">Confirmed</div>
             <div class="stat-value">{{ analytics.confirmedOrders || 0 }}</div>
@@ -74,33 +125,275 @@
           Analytics currently unavailable. Showing basic stats.
         </div>
 
-        <div class="sog-meta">
-          <span class="meta-pill" *ngIf="username">User: {{ username }}</span>
-          <span class="meta-pill" *ngIf="role">Role: {{ role }}</span>
+        <!-- ✅ Charts -->
+        <div *ngIf="isLoggedIn && analytics" class="chart-row">
+
+          <div class="chart-card" *ngIf="role === 'WHOLESALER'">
+            <div class="chart-title">Wholesaler Orders</div>
+            <canvas id="wholesalerChart"></canvas>
+
+            <div class="mini-kpis">
+              <div class="mini-kpi" *ngIf="analytics.totalStock != null">
+                <span class="k">Total Stock</span>
+                <span class="v">{{ analytics.totalStock }}</span>
+              </div>
+
+              <div class="mini-kpi" *ngIf="analytics.lowStockCount != null">
+                <span class="k">Low Stock</span>
+                <span class="v">{{ analytics.lowStockCount }}</span>
+              </div>
+
+              <div class="mini-kpi" *ngIf="analytics.uniqueConsumers != null">
+                <span class="k">Unique Consumers</span>
+                <span class="v">{{ analytics.uniqueConsumers }}</span>
+              </div>
+
+              <div class="mini-kpi" *ngIf="analytics.cancellationRate != null">
+                <span class="k">Cancellation Rate</span>
+                <span class="v">{{ analytics.cancellationRate }}%</span>
+              </div>
+
+              <div class="mini-kpi" *ngIf="analytics.avgOrderQuantity != null">
+                <span class="k">Avg Order Qty</span>
+                <span class="v">{{ analytics.avgOrderQuantity }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card" *ngIf="role === 'MANUFACTURER'">
+            <div class="chart-title">Manufacturer Orders</div>
+            <canvas id="manufacturerChart"></canvas>
+
+            <div class="mini-kpis">
+              <div class="mini-kpi" *ngIf="analytics.uniqueWholesalers != null">
+                <span class="k">Unique Wholesalers</span>
+                <span class="v">{{ analytics.uniqueWholesalers }}</span>
+              </div>
+
+              <div class="mini-kpi" *ngIf="analytics.avgOrderQuantity != null">
+                <span class="k">Avg Order Qty</span>
+                <span class="v">{{ analytics.avgOrderQuantity }}</span>
+              </div>
+
+              <div class="mini-kpi" *ngIf="analytics.cancellationRate != null">
+                <span class="k">Cancellation Rate</span>
+                <span class="v">{{ analytics.cancellationRate }}%</span>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <div *ngIf="error" class="sog-alert danger">
-          {{ error }}
+        <!-- ✅ Top products (advanced analytics) -->
+        <div class="top-products" *ngIf="analytics?.topProducts && analytics.topProducts.length">
+          <div class="section-title">Top Products</div>
+
+          <div class="tp-list">
+            <div class="tp-item" *ngFor="let p of analytics.topProducts">
+              <div class="tp-name">{{ p.productName || p.name || 'Product' }}</div>
+              <div class="tp-meta">
+                <span class="pill">Qty: {{ p.totalQuantity || p.qty || p.orderCount || 0 }}</span>
+                <span class="pill" *ngIf="p.totalOrders != null">Orders: {{ p.totalOrders || p.quantitySum }}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div *ngIf="!isLoggedIn" class="sog-alert">
-          Please login to view dashboard analytics.
+        <!-- ✅ Manufacturer: products list -->
+        <div class="section" *ngIf="role === 'MANUFACTURER'">
+          <div class="section-title">Your Products</div>
+
+          <div class="empty" *ngIf="products.length === 0">
+            No products yet.
+          </div>
+
+          <div class="list" *ngIf="products.length > 0">
+            <div class="list-item" *ngFor="let p of products">
+              <div class="li-title">{{ p.name || p.productName }}</div>
+              <div class="li-sub">
+                <span class="pill">Price: {{ p.price || 0 }}</span>
+                <span class="pill" *ngIf="p.stockQuantity != null">Stock: {{ p.stockQuantity }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ Wholesaler: inventory list -->
+        <div class="section" *ngIf="role === 'WHOLESALER'">
+          <div class="section-title">Your Inventory</div>
+
+          <div class="empty" *ngIf="inventories.length === 0">
+            No inventory added.
+          </div>
+
+          <div class="list" *ngIf="inventories.length > 0">
+            <div class="list-item" *ngFor="let inv of inventories">
+              <div class="li-title">
+                {{ inv.productName || inv.product?.name || ('Product #' + inv.productId) }}
+              </div>
+              <div class="li-sub">
+                <span class="pill">Stock: {{ inv.stock_quantity || inv.stockQuantity || 0 }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ Wholesaler: orders list -->
+        <div class="section" *ngIf="role === 'WHOLESALER'">
+          <div class="section-title">Wholesaler Orders</div>
+
+          <div class="empty" *ngIf="wholesalerOrders.length === 0">
+            No orders yet.
+          </div>
+
+          <div class="list" *ngIf="wholesalerOrders.length > 0">
+            <div class="list-item" *ngFor="let o of wholesalerOrders">
+              <div class="li-title">Order #{{ o.id }} • {{ o.status }}</div>
+              <div class="li-sub">
+                <span class="pill">Qty: {{ o.quantity }}</span>
+                <span class="pill" *ngIf="o.productName">Product: {{ o.productName }}</span>
+                <span class="pill" *ngIf="o.createdAt">{{ o.createdAt | date:'medium' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ Consumer: Orders / Wishlist / Cart -->
+        <div class="section" *ngIf="role === 'CONSUMER'">
+          <div class="section-title">Consumer</div>
+
+          <div class="tabs">
+            <button type="button" class="tab"
+                    [class.active]="consumerPanel === 'orders'"
+                    (click)="showConsumerPanel('orders')">
+              Orders
+            </button>
+
+            <button type="button" class="tab"
+                    [class.active]="consumerPanel === 'wishlist'"
+                    (click)="showConsumerPanel('wishlist')">
+              Wishlist ({{ wishlistCount || 0 }})
+            </button>
+
+            <button type="button" class="tab"
+                    [class.active]="consumerPanel === 'cart'"
+                    (click)="showConsumerPanel('cart')">
+              Cart ({{ cartCount || 0 }})
+            </button>
+          </div>
+
+          <!-- Orders panel -->
+          <div *ngIf="consumerPanel === 'orders'">
+            <div class="empty" *ngIf="consumerOrders.length === 0">
+              No orders yet.
+            </div>
+
+            <div class="list" *ngIf="consumerOrders.length > 0">
+              <div class="list-item" *ngFor="let o of consumerOrders">
+                <div class="li-title">Order #{{ o.id }} • {{ o.status }}</div>
+                <div class="li-sub">
+                  <span class="pill">Qty: {{ o.quantity }}</span>
+                  <span class="pill" *ngIf="o.productName">Product: {{ o.productName }}</span>
+                  <span class="pill" *ngIf="o.createdAt">{{ o.createdAt | date:'medium' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wishlist panel -->
+          <div *ngIf="consumerPanel === 'wishlist'">
+            <div class="empty" *ngIf="wishlist.length === 0">
+              Wishlist is empty.
+            </div>
+
+            <div class="list" *ngIf="wishlist.length > 0">
+              <div class="list-item" *ngFor="let w of wishlist">
+                <div class="li-title">{{ w.name || w.productName }}</div>
+                <div class="li-sub">
+                  <span class="pill">Price: {{ w.price || 0 }}</span>
+                </div>
+                <div class="li-actions">
+                  <button type="button" class="btn" (click)="moveWishlistToCart(w)">
+                    Move to cart
+                  </button>
+                  <button type="button" class="btn danger" (click)="removeWishlistItem(w.productId || w.id)">
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cart panel -->
+          <div *ngIf="consumerPanel === 'cart'">
+            <div class="empty" *ngIf="cart.length === 0">
+              Cart is empty.
+            </div>
+
+            <div class="sog-alert"
+                 *ngIf="cartMessage"
+                 [class.danger]="cartMessageType === 'danger'"
+                 [class.success]="cartMessageType === 'success'">
+              {{ cartMessage }}
+            </div>
+
+            <div class="list" *ngIf="cart.length > 0">
+              <div class="list-item" *ngFor="let c of cart">
+                <div class="li-title">{{ c.name || c.productName }}</div>
+                <div class="li-sub">
+                  <span class="pill">Price: {{ c.price || 0 }}</span>
+                </div>
+
+                <div class="qty-row">
+                  <button type="button" class="qty-btn" (click)="decQty(c)">−</button>
+
+                  <input class="qty-input"
+                         type="number"
+                         min="1"
+                         [value]="c.quantity || 1"
+                         (change)="updateQtyFromInput(c, $event)" />
+
+                  <button type="button" class="qty-btn" (click)="incQty(c)">+</button>
+
+                  <button type="button" class="btn danger" (click)="removeCartItem(c.productId || c.id)">
+                    Remove
+                  </button>
+                </div>
+              </div>
+
+              <div class="cart-summary">
+                <div class="cart-total">
+                  Total: <strong>{{ cartTotal() }}</strong>
+                </div>
+
+                <button type="button"
+                        class="btn primary"
+                        [disabled]="cartPlacing"
+                        (click)="placeAllCartOrders()">
+                  {{ cartPlacing ? 'Placing...' : 'Place All Orders' }}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>
+      <!-- /LEFT -->
 
+      <!-- RIGHT -->
       <div class="sog-right">
 
         <!-- Manufacturer -->
         <div class="flip-card" [class.active]="role === 'MANUFACTURER'">
           <div class="flip-inner">
-
             <div class="flip-front">
-              https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=60
+              <img
+                src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=60"
+                alt="Manufacturer" />
               <div class="front-overlay"></div>
               <div class="front-label">
                 <div class="front-title">Manufacturer</div>
-                <div class="front-sub">Manage products & inventory</div>
+                <div class="front-sub">Manage products &amp; inventory</div>
               </div>
             </div>
 
@@ -110,20 +403,20 @@
                 Create products, manage production workflows, monitor supply levels and fulfill orders efficiently.
               </div>
             </div>
-
           </div>
         </div>
 
         <!-- Wholesaler -->
         <div class="flip-card" [class.active]="role === 'WHOLESALER'">
           <div class="flip-inner">
-
             <div class="flip-front">
-              https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1200&q=60
+              <img
+                src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1200&q=60"
+                alt="Wholesaler" />
               <div class="front-overlay"></div>
               <div class="front-label">
                 <div class="front-title">Wholesaler</div>
-                <div class="front-sub">Orders, inventory & logistics</div>
+                <div class="front-sub">Orders, inventory &amp; logistics</div>
               </div>
             </div>
 
@@ -133,20 +426,20 @@
                 Manage inventory, place bulk orders, and coordinate product distribution smoothly.
               </div>
             </div>
-
           </div>
         </div>
 
         <!-- Consumer -->
         <div class="flip-card" [class.active]="role === 'CONSUMER'">
           <div class="flip-inner">
-
             <div class="flip-front">
-              https://images.unsplash.com/photo-1607082349566-187342175e2f?auto=format&fit=crop&w=1200&q=60
+              <img
+                src="https://images.unsplash.com/photo-1607082349566-187342175e2f?auto=format&fit=crop&w=1200&q=60"
+                alt="Consumer" />
               <div class="front-overlay"></div>
               <div class="front-label">
                 <div class="front-title">Consumer</div>
-                <div class="front-sub">Place orders & track status</div>
+                <div class="front-sub">Place orders &amp; track status</div>
               </div>
             </div>
 
@@ -156,14 +449,12 @@
                 Browse products, place orders, and track purchases in real time.
               </div>
             </div>
-
           </div>
         </div>
 
       </div>
+      <!-- /RIGHT -->
 
     </div>
-
   </div>
-
 </div>
