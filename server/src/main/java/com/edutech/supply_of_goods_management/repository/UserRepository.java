@@ -23,6 +23,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Check if email already exists
     boolean existsByEmail(String email);
 
+    List<User> findByRole(String role);
+
+
     @Query("SELECT u.role, COUNT(u) FROM User u GROUP BY u.role")
     List<Object[]> countByRoles();
 }

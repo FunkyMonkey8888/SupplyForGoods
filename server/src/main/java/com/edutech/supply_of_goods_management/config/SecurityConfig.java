@@ -60,7 +60,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/manufacturers/products").hasAuthority("MANUFACTURER")
                 .antMatchers("/api/manufacturers/orders").hasAuthority("MANUFACTURER")
                 .antMatchers("/api/manufacturers/*").hasAuthority("MANUFACTURER")
-                .antMatchers("/api/analytics/").hasAnyAuthority("MANUFACTURER","WHOLESALER")
+                .antMatchers("/api/analytics/**").hasAnyAuthority("MANUFACTURER","WHOLESALER")
+                .antMatchers("/api/notifications/**").permitAll()
 
                 // Wholesaler access endpoints
                 .antMatchers(HttpMethod.GET, "/api/wholesalers/products").hasAuthority("WHOLESALER")
