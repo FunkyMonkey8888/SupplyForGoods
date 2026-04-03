@@ -22,52 +22,52 @@
     <ul class="navbar-nav me-auto app-nav-links">
 
       <!-- ================= MANUFACTURER ================= -->
-      <li class="nav-item" *ngIf="roleName === 'MANUFACTURER'">
+      <li class="nav-item" *ngIf="role === 'MANUFACTURER'">
         <a class="nav-link" [routerLink]="['/create-product']">
           Create Products
         </a>
       </li>
 
       <!-- ✅ VIEW PRODUCTS (NEW OPTION) -->
-      <li class="nav-item" *ngIf="roleName === 'MANUFACTURER'">
+      <li class="nav-item" *ngIf="role === 'MANUFACTURER'">
         <a class="nav-link" [routerLink]="['/view-products']">
           View Products
         </a>
       </li>
 
-      <li class="nav-item" *ngIf="roleName === 'MANUFACTURER'">
+      <li class="nav-item" *ngIf="role === 'MANUFACTURER'">
         <a class="nav-link" [routerLink]="['/get-orders']">
           Review Orders
         </a>
       </li>
 
       <!-- ================= WHOLESALER ================= -->
-      <li class="nav-item" *ngIf="roleName === 'WHOLESALER'">
+      <li class="nav-item" *ngIf="role === 'WHOLESALER'">
         <a class="nav-link" [routerLink]="['/get-orders']">
           Get Orders
         </a>
       </li>
 
-      <li class="nav-item" *ngIf="roleName === 'WHOLESALER'">
+      <li class="nav-item" *ngIf="role === 'WHOLESALER'">
         <a class="nav-link" [routerLink]="['/place-product']">
           Place Order
         </a>
       </li>
 
-      <li class="nav-item" *ngIf="roleName === 'WHOLESALER'">
+      <li class="nav-item" *ngIf="role === 'WHOLESALER'">
         <a class="nav-link" [routerLink]="['/add-inventory']">
           Add Inventory
         </a>
       </li>
 
       <!-- ================= CONSUMER ================= -->
-      <li class="nav-item" *ngIf="roleName === 'CONSUMER'">
+      <li class="nav-item" *ngIf="role === 'CONSUMER'">
         <a class="nav-link" [routerLink]="['/consumer-place-order']">
           Place Order
         </a>
       </li>
 
-      <li class="nav-item" *ngIf="roleName === 'CONSUMER'">
+      <li class="nav-item" *ngIf="role === 'CONSUMER'">
         <a class="nav-link" [routerLink]="['/consumer-get-orders']">
           Orders
         </a>
