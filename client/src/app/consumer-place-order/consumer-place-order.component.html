@@ -1,7 +1,9 @@
 <div class="consumer-place-order-hero">
+
   <div class="hero-overlay"></div>
 
   <div class="consumer-place-order-container">
+
     <div class="place-order-card animation-in">
 
       <!-- HEADER -->
@@ -17,7 +19,7 @@
           </div>
         </div>
 
-        <!-- ✅ Quick counts (from TS: wishlistCount, cartCount) -->
+        <!-- ✅ Quick counts -->
         <div class="header-right">
           <div class="quick-badges">
             <div class="quick-badge">
@@ -25,7 +27,6 @@
               <span>Wishlist</span>
               <strong class="count">{{ wishlistCount || 0 }}</strong>
             </div>
-
             <div class="quick-badge">
               <i class="bi bi-cart-fill"></i>
               <span>Cart</span>
@@ -35,7 +36,7 @@
         </div>
       </div>
 
-      <!-- ✅ UI TOAST (TS: uiMessage, uiMessageType) -->
+      <!-- ✅ Toast -->
       <div class="ui-toast"
            *ngIf="uiMessage"
            [class.success]="uiMessageType === 'success'"
@@ -48,38 +49,28 @@
 
         <!-- PRODUCTS -->
         <div class="products-section">
-          <div class="section-head">
-            <h5 class="section-title">Available Products</h5>
-            <div class="section-hint">
-              Tap a product to select • Use ♥ to wishlist • 🛒 to add to cart
-            </div>
-          </div>
+          <h5 class="section-title">Available Products</h5>
 
           <div class="products-grid">
             <div
               class="product-card"
               *ngFor="let product of products"
               [class.selected]="selectedProduct?.id === product.id"
-              [class.out-of-stock]="(product?.stockQuantity ?? 0) === 0"
               (click)="selectProduct(product)"
             >
               <div class="product-top">
                 <div class="title-wrap">
                   <h6 class="product-name">{{ product.name }}</h6>
-
-                  <!-- ✅ Availability badge -->
-                  <span class="availability"
-                        [class.available]="(product?.stockQuantity ?? 0) > 0"
-                        [class.unavailable]="(product?.stockQuantity ?? 0) === 0">
-                    {{ (product?.stockQuantity ?? 0) > 0 ? 'Available' : 'Out of Stock' }}
-                  </span>
+                  <!-- ✅ No stock shown -->
+                  <span class="availability">In Catalog</span>
                 </div>
 
-                <!-- ✅ Actions: wishlist + cart (stopPropagation prevents selecting card when clicking icons) -->
+                <!-- ✅ ACTION BUTTONS -->
                 <div class="product-actions">
                   <button type="button"
                           class="icon-btn wishlist-btn"
-                          (click)="$event.stopPropagation(); toggleWishlist(product)">
+                          (click)="$event.stopPropagation(); toggleWishlist(product)"
+                          aria-label="Wishlist">
                     <i class="bi"
                        [class.bi-heart]="!isInWishlist(product)"
                        [class.bi-heart-fill]="isInWishlist(product)"></i>
@@ -87,8 +78,8 @@
 
                   <button type="button"
                           class="icon-btn cart-btn"
-                          [disabled]="(product?.stockQuantity ?? 0) === 0"
-                          (click)="$event.stopPropagation(); addToCart(product)">
+                          (click)="$event.stopPropagation(); addToCart(product)"
+                          aria-label="Add to cart">
                     <i class="bi bi-cart-plus"></i>
                   </button>
                 </div>
@@ -98,29 +89,10 @@
                 {{ product.description || 'No description available' }}
               </p>
 
-              <div class="product-meta">
-                <div class="meta-item">
-                  <span class="meta-label">Price</span>
-                  <span class="meta-value">₹{{ product.price }}</span>
-                </div>
-
-                <div class="meta-item">
-                  <span class="meta-label">Stock</span>
-                  <span class="meta-value">
-                    {{ product?.stockQuantity ?? 0 }}
-                  </span>
-                </div>
-              </div>
-
               <div class="product-footer">
-                <span class="select-hint"
-                      *ngIf="selectedProduct?.id !== product.id">
-                  Click to select
-                </span>
-                <span class="selected-hint"
-                      *ngIf="selectedProduct?.id === product.id">
-                  Selected ✓
-                </span>
+                <span class="price">₹{{ product.price }}</span>
+                <span class="select-hint" *ngIf="selectedProduct?.id !== product.id">Click to select</span>
+                <span class="selected-hint" *ngIf="selectedProduct?.id === product.id">Selected ✓</span>
               </div>
             </div>
           </div>
@@ -130,53 +102,15 @@
         <div class="order-form-section">
           <h5>Order Details</h5>
 
-          <!-- ✅ Selected Product Summary -->
           <div *ngIf="selectedProduct" class="selected-info">
-            <div class="selected-row">
-              <div class="selected-name">
-                Ordering <strong>{{ selectedProduct.name }}</strong>
-              </div>
-              <div class="selected-price">
-                ₹{{ selectedProduct.price }}
-              </div>
-            </div>
-
-            <div class="selected-row subtle">
-              <span>Stock: <strong>{{ selectedProduct?.stockQuantity ?? 0 }}</strong></span>
-              <span>Status: <strong>PLACED</strong></span>
-            </div>
-
-            <div class="selected-row subtle" *ngIf="(selectedProduct?.stockQuantity ?? 0) === 0">
-              <span class="stock-warning">Out of stock — cannot place order</span>
-            </div>
-
-            <!-- ✅ Quick actions for selected product -->
-            <div class="selected-actions">
-              <button type="button"
-                      class="mini-btn"
-                      (click)="toggleWishlist(selectedProduct)">
-                <i class="bi"
-                   [class.bi-heart]="!isInWishlist(selectedProduct)"
-                   [class.bi-heart-fill]="isInWishlist(selectedProduct)"></i>
-                {{ isInWishlist(selectedProduct) ? 'Wishlisted' : 'Wishlist' }}
-              </button>
-
-              <button type="button"
-                      class="mini-btn primary"
-                      [disabled]="(selectedProduct?.stockQuantity ?? 0) === 0"
-                      (click)="addToCart(selectedProduct)">
-                <i class="bi bi-cart-plus"></i>
-                Add to Cart
-              </button>
-            </div>
+            Ordering <strong>{{ selectedProduct.name }}</strong> •
+            <strong>₹{{ selectedProduct.price }}</strong>
           </div>
 
-          <!-- ✅ SUCCESS MESSAGE -->
           <div *ngIf="successMessage" class="alert-success">
             ✅ {{ successMessage }}
           </div>
 
-          <!-- ✅ ERROR MESSAGE -->
           <div *ngIf="errorMessage" class="alert-error">
             {{ errorMessage }}
           </div>
@@ -189,7 +123,6 @@
                 type="number"
                 formControlName="quantity"
                 placeholder="Enter quantity"
-                [disabled]="!selectedProduct || (selectedProduct?.stockQuantity ?? 0) === 0"
               />
               <small class="error-text"
                      *ngIf="orderForm.get('quantity')?.touched &&
@@ -198,24 +131,24 @@
               </small>
             </div>
 
+            <!-- Optional total preview -->
+            <div *ngIf="selectedProduct && orderForm.value.quantity" class="price-summary">
+              Total: <strong>₹{{ selectedProduct.price * orderForm.value.quantity }}</strong>
+            </div>
+
             <button
               type="submit"
               class="submit-btn"
-              [disabled]="loading || !selectedProduct || (selectedProduct?.stockQuantity ?? 0) === 0">
-              <span *ngIf="!loading">Place Order</span>
-              <span *ngIf="loading">Placing Order…</span>
+              [disabled]="loading || !selectedProduct">
+              {{ loading ? 'Placing Order…' : 'Place Order' }}
             </button>
 
           </form>
-
-          <!-- ✅ Guidance when no selection -->
-          <div class="empty-selection" *ngIf="!selectedProduct">
-            Select a product from the left to place an order.
-          </div>
-
         </div>
 
       </div>
+
     </div>
+
   </div>
 </div>
