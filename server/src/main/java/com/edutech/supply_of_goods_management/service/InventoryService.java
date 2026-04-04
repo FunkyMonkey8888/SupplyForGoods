@@ -120,8 +120,7 @@ public class InventoryService {
     // Delete inventory by ID
     @Transactional
     public void deleteInventory(Long id){
-        Inventory inventory = repo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Inventory not found"));
+        Inventory inventory = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Inventory not found"));
         repo.delete(inventory);
     }
 }

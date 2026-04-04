@@ -6,33 +6,44 @@ import com.edutech.supply_of_goods_management.entity.Inventory;
 import com.edutech.supply_of_goods_management.entity.Product;
 import com.edutech.supply_of_goods_management.repository.InventoryRepository;
 import com.edutech.supply_of_goods_management.repository.ProductRepository;
+import com.edutech.supply_of_goods_management.service.NotificationService;
+import com.edutech.supply_of_goods_management.repository.UserRepository;
+import com.edutech.supply_of_goods_management.entity.User;
 
 import java.util.List;
-
-// Service class for product-related operations
 @Service
 public class ProductService {
 
-    // Repository dependencies
     private final ProductRepository repo;
     private final InventoryRepository inventoryRepo;
+    private final UserRepository userRepo;
 
-    // Constructor-based dependency injection
-    public ProductService(ProductRepository repo, InventoryRepository inventoryRepo) {
+    private final NotificationService notificationService;
+    public ProductService(ProductRepository repo, InventoryRepository inventoryRepo, NotificationService ns, UserRepository us) {
         this.repo = repo;
         this.inventoryRepo = inventoryRepo;
+        this.userRepo = us;
+        this.notificationService = ns;
     }
 
     // Create a new product
     public Product createProduct(Product product) {
-        // Validate price and stock quantity
-        if (product.getPrice() <= 0 || product.getStockQuantity() <= 0)
-            throw new IllegalArgumentException("Price or quantity cannot be less than 0");
+        if(product.getPrice() <=0 || product.getStockQuantity() <=0) throw new IllegalArgumentException("Price or quantity cannot be less than 0");
 
-        return repo.save(product);
+        // after product saved
+        Product saved = repo.save(product);
+        List<User> wholesalers = userRepo.findByRole("WHOLESALER");  // implement repo method
+        for (User w : wholesalers) {
+            notificationService.notifyUser(
+                w.getId(),
+                "WHOLESALER",
+                "New Product Added",
+                "New product added: " + saved.getName()
+            );
+        }
+            return saved ;
     }
 
-    // Update existing product details
     public Product updateProduct(Long id, Product updated) {
         Product p = repo.findById(id).orElseThrow();
         p.setName(updated.getName());
@@ -43,18 +54,15 @@ public class ProductService {
         return repo.save(p);
     }
 
-    // Get products by manufacturer ID
     public List<Product> getProductsByManufacturer(Long id) {
         return repo.findByManufacturerId(id);
     }
 
-    // Get all products
     public List<Product> getAllProducts() {
         return repo.findAll();
     }
 
-    // Delete product by ID
-    public void deleteProduct(Long id) {
+    public void deleteProduct(Long id){
         repo.deleteById(id);
     }
 }
