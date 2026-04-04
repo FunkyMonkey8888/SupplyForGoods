@@ -5,13 +5,24 @@
 
     <!-- ✅ Icon Header -->
     <div class="text-center mb-3">
-      <i class="bi bi-shield-lock-fill"
+      <i class="bi"
+         [ngClass]="mode === 'PASSWORD' ? 'bi-shield-lock-fill' : 'bi-envelope-lock-fill'"
          style="font-size: 48px; color: #0d6efd;"></i>
     </div>
 
-    <h3 class="text-center mb-4 fw-bold">Login to Your Account</h3>
+    <h3 class="text-center mb-4 fw-bold">
+      {{ mode === 'PASSWORD' ? 'Login to Your Account' : 'OTP Login' }}
+    </h3>
 
-    <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+    <!-- Error -->
+    <div *ngIf="message" class="alert alert-danger text-center">
+      {{ message }}
+    </div>
+
+    <!-- ================= PASSWORD LOGIN ================= -->
+    <form *ngIf="mode === 'PASSWORD'"
+          [formGroup]="itemForm"
+          (ngSubmit)="onSubmit()">
 
       <!-- Username -->
       <div class="mb-3">
@@ -33,11 +44,6 @@
           placeholder="Enter password">
       </div>
 
-      <!-- Error -->
-      <div *ngIf="message" class="alert alert-danger text-center">
-        {{ message }}
-      </div>
-
       <!-- Submit -->
       <button
         class="btn btn-primary w-100"
@@ -54,6 +60,96 @@
         </span>
       </button>
 
+      <!-- OTP Login switch -->
+      <button class="btn btn-outline-dark w-100 mt-3"
+              type="button"
+              (click)="switchToOtp()"
+              [disabled]="loading">
+        Forgot password? Login with OTP
+      </button>
+
+    </form>
+
+    <!-- ================= OTP LOGIN ================= -->
+    <form *ngIf="mode === 'OTP'"
+          [formGroup]="otpForm">
+
+      <!-- Step 1: Email -->
+      <div *ngIf="otpStep === 'EMAIL'">
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Email</label>
+          <input
+            class="form-control"
+            type="email"
+            formControlName="email"
+            placeholder="Enter your email">
+        </div>
+
+        <button class="btn btn-primary w-100"
+                type="button"
+                (click)="sendOtp()"
+                [disabled]="loading || otpForm.get('email')?.invalid">
+          <span *ngIf="!loading">Send OTP</span>
+          <span *ngIf="loading">Sending…</span>
+        </button>
+
+        <button class="btn btn-link w-100 mt-2"
+                type="button"
+                (click)="switchToPassword()"
+                [disabled]="loading">
+          Back to Password Login
+        </button>
+      </div>
+
+      <!-- Step 2: Verify OTP -->
+      <div *ngIf="otpStep === 'VERIFY'">
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Email</label>
+          <input
+            class="form-control"
+            type="email"
+            formControlName="email"
+            placeholder="Enter your email">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">OTP (6 digits)</label>
+          <input
+            class="form-control text-center"
+            type="text"
+            maxlength="6"
+            inputmode="numeric"
+            formControlName="otp"
+            placeholder="Enter OTP">
+        </div>
+
+        <button class="btn btn-success w-100"
+                type="button"
+                (click)="verifyOtp()"
+                [disabled]="loading || otpForm.get('otp')?.invalid">
+          <span *ngIf="!loading">Verify & Login</span>
+          <span *ngIf="loading">Verifying…</span>
+        </button>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <button class="btn btn-link p-0"
+                  type="button"
+                  (click)="backToEmail()"
+                  [disabled]="loading">
+            Change Email
+          </button>
+
+          <button class="btn btn-link p-0"
+                  type="button"
+                  (click)="resendOtp()"
+                  [disabled]="loading || resendSeconds > 0">
+            Resend <span *ngIf="resendSeconds > 0">({{ resendSeconds }}s)</span>
+          </button>
+        </div>
+
+      </div>
     </form>
 
     <!-- Register Redirect -->

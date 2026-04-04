@@ -51,6 +51,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         if (path.startsWith("/api/user/login") ||
             path.startsWith("/api/user/register") ||
+            path.startsWith("/api/auth") ||
             request.getMethod().equalsIgnoreCase("OPTIONS")) {
 
             chain.doFilter(request, response);

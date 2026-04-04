@@ -19,6 +19,7 @@ import { GetOrdersComponent } from './get-orders/get-orders.component';
 import { AddInventoryComponent } from './add-inventory/add-inventory.component';
 import { ConsumerPlaceOrderComponent } from './consumer-place-order/consumer-place-order.component';
 import { ConsumerGetOrdersComponent } from './consumer-get-orders/consumer-get-orders.component';
+import { OtpLoginComponent } from './otp-login/otp-login.component';
 
 @NgModule({
   declarations: [
@@ -27,8 +28,7 @@ import { ConsumerGetOrdersComponent } from './consumer-get-orders/consumer-get-o
       RegistrationComponent,
       DashbaordComponent,     
       CreateProductsComponent,
-
-    
+      OtpLoginComponent,
       PlaceOrderComponent,
       GetOrdersComponent,
       AddInventoryComponent,

@@ -36,7 +36,14 @@
   box-shadow: 0 0 0 0.2rem rgba(78, 140, 255, 0.25);
 }
 
-/* Login button */
+/* OTP specific input */
+.form-control.text-center {
+  letter-spacing: 6px;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+/* Primary button */
 .btn-primary {
   background: linear-gradient(90deg, #4e8cff, #77b5ff);
   border: none;
@@ -52,9 +59,22 @@
   box-shadow: 0 6px 18px rgba(78, 140, 255, 0.4);
 }
 
-/* Disabled button */
-.btn-primary:disabled {
-  opacity: 0.7;
+/* Success button (OTP verify) */
+.btn-success {
+  border-radius: 10px;
+  padding: 12px;
+  font-weight: 600;
+}
+
+/* Outline button (OTP switch) */
+.btn-outline-dark {
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+/* Disabled buttons */
+button:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -66,14 +86,27 @@
   font-weight: 500;
 }
 
-/* Register link */
-a {
+/* Links */
+a,
+.btn-link {
   color: #1e90ff;
+  font-weight: 500;
   text-decoration: none;
 }
 
-a:hover {
+a:hover,
+.btn-link:hover {
   text-decoration: underline;
+}
+
+/* OTP resend / back row */
+.d-flex.justify-content-between {
+  font-size: 14px;
+}
+
+/* Icons */
+.bi {
+  display: inline-block;
 }
 
 /* Mobile adjustments */

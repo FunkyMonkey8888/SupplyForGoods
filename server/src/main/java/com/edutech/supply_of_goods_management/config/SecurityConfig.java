@@ -47,7 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 // ✅ PUBLIC ENDPOINTS
                 .antMatchers("/api/user/register", "/api/user/login").permitAll()
-                .antMatchers("/api/auth").permitAll()
+                .antMatchers("/api/auth/**").permitAll()
 
                 // ✅ MANUFACTURER ENDPOINTS
                 .antMatchers("/api/manufacturers/product").hasAuthority("MANUFACTURER")

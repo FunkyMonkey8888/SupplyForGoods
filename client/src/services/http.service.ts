@@ -401,4 +401,20 @@ markNotificationRead(id: number, userId: number) {
     const cart = this.addToCart(userId, { ...wishlistItem, id: productId }, 1);
     return { wishlist, cart };
   }
+
+  requestOtp(email: string) {
+  return this.http.post<any>(
+    `${this.serverName}/api/auth/request-otp`,
+    { email },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+}
+
+verifyOtp(email: string, otp: string) {
+  return this.http.post<any>(
+    `${this.serverName}/api/auth/verify-otp`,
+    { email, otp },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+}
 }

@@ -1,0 +1,48 @@
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+  <div class="card p-4 shadow-lg" style="max-width:420px;width:100%;border-radius:16px;">
+
+    <div class="text-center mb-3">
+      <i class="bi bi-envelope-lock-fill" style="font-size:48px;color:#0d6efd;"></i>
+    </div>
+
+    <h3 class="text-center fw-bold mb-2">OTP Login</h3>
+    <p class="text-center text-muted mb-3">Login using OTP sent to your email</p>
+
+    <div *ngIf="message" class="alert alert-danger text-center">
+      {{ message }}
+    </div>
+
+    <form [formGroup]="form">
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Email</label>
+        <input class="form-control" type="email" formControlName="email" placeholder="Enter email">
+      </div>
+
+      <div *ngIf="step === 'OTP'" class="mb-3">
+        <label class="form-label fw-semibold">OTP</label>
+        <input class="form-control text-center" type="text" maxlength="6"
+               formControlName="otp" placeholder="Enter 6-digit OTP">
+      </div>
+
+      <button *ngIf="step === 'EMAIL'" class="btn btn-primary w-100" type="button"
+              (click)="sendOtp()" [disabled]="loading || form.get('email')?.invalid">
+        {{ loading ? 'Sending...' : 'Send OTP' }}
+      </button>
+
+      <button *ngIf="step === 'OTP'" class="btn btn-success w-100" type="button"
+              (click)="verifyOtp()" [disabled]="loading || form.get('otp')?.invalid">
+        {{ loading ? 'Verifying...' : 'Verify & Login' }}
+      </button>
+
+      <div *ngIf="step === 'OTP'" class="d-flex justify-content-between mt-3">
+        <button class="btn btn-link p-0" type="button" (click)="backToPasswordLogin()">Back</button>
+        <button class="btn btn-link p-0" type="button" (click)="resendOtp()" [disabled]="resendSeconds > 0 || loading">
+          Resend <span *ngIf="resendSeconds > 0">({{ resendSeconds }}s)</span>
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
