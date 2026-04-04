@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { NavigationEnd, Router } from '@angular/router';
 import { HttpService } from '../services/http.service';
@@ -32,6 +33,7 @@ export class AppComponent implements OnInit, OnDestroy {
  
   ngOnInit(): void {
     // ✅ Update navbar + notifications on route change
+    // ✅ Update navbar + notifications on route change
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.refreshAuthState();
@@ -39,6 +41,7 @@ export class AppComponent implements OnInit, OnDestroy {
         // close dropdowns on navigation
         this.showMenu = false;
         this.isMenuOpen = false;
+        this.showNotifications = false;
         this.showNotifications = false;
       }
     });

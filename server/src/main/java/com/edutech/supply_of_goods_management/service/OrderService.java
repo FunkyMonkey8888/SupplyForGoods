@@ -31,7 +31,7 @@ public class OrderService {
     public OrderService(OrderRepository orderRepo,
                         ProductRepository productRepo,
                         UserRepository userRepo,
-                        InventoryService inventoryService,
+                        InventoryService inventoryService, 
                     InventoryRepository ir, 
                         NotificationService ns) {
 

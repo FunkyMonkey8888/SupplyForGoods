@@ -6,6 +6,7 @@ import { catchError, forkJoin, map, of, Subscription, filter } from 'rxjs';
 
 declare var Chart: any;
 
+
 @Component({
   selector: 'app-dashbaord',
   templateUrl: './dashbaord.component.html',
@@ -73,11 +74,12 @@ export class DashbaordComponent implements OnInit, OnDestroy {
 
     if (this.role === 'MANUFACTURER') {
       this.loadManufacturerProducts();
-      this.loadManufacturerAnalytics();
+      this.loadManufacturerAnalytics(); // ✅ merges basic + advanced
     }
 
     if (this.role === 'CONSUMER') {
       this.loadConsumerOrders();
+      this.refreshWishlistCart();
       this.refreshWishlistCart();
     }
 

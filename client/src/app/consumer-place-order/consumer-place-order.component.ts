@@ -39,6 +39,7 @@ export class ConsumerPlaceOrderComponent implements OnInit {
     this.userId = Number(this.auth.getUserId());
     this.buildForm();
     this.refreshCounts();
+    this.refreshCounts();
     this.loadProducts();
   }
  

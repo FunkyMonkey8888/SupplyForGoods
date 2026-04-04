@@ -4,12 +4,13 @@ import com.edutech.supply_of_goods_management.entity.Inventory;
 import com.edutech.supply_of_goods_management.entity.Order;
 import com.edutech.supply_of_goods_management.repository.InventoryRepository;
 import com.edutech.supply_of_goods_management.repository.OrderRepository;
-
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/analytics")
@@ -25,42 +26,38 @@ public class AnalyticsController {
     }
 
     /* =====================================================
-       WHOLESALER ANALYTICS
+       WHOLESALER ANALYTICS (basic)
        ===================================================== */
 
     @GetMapping("/wholesaler")
-    public Map<String, Object> getWholesalerAnalytics(
-            @RequestParam Long wholesalerId) {
+    public Map<String, Object> getWholesalerAnalytics(@RequestParam Long wholesalerId) {
 
         Map<String, Object> analytics = new HashMap<>();
 
-        /* ---------- ORDER ANALYTICS ---------- */
-        List<Order> orders =
-                orderRepo.findByUser_Id(wholesalerId);
+        // NOTE: This assumes findByUser_Id returns wholesaler's own orders.
+        // If your wholesaler dashboard is based on consumer-orders, use advanced endpoint below.
+        List<Long> productIds = inventoryRepo.findByWholesalerId(wholesalerId)
+                .stream()
+                .map(inv -> inv.getProduct().getId())
+                .distinct()
+                .collect(Collectors.toList());
 
-        long pendingOrders =
-                orders.stream().filter(o -> "PENDING".equals(o.getStatus())).count();
-        long confirmedOrders =
-                orders.stream().filter(o -> "CONFIRMED".equals(o.getStatus())).count();
-        long cancelledOrders =
-                orders.stream().filter(o -> "CANCELLED".equals(o.getStatus())).count();
+        List<Order> orders = productIds.isEmpty()
+                ? Collections.emptyList()
+                : orderRepo.findByProductIdInAndUserRole(productIds, "CONSUMER");
+        long pendingOrders = orders.stream().filter(o -> "PENDING".equals(o.getStatus())).count();
+        long confirmedOrders = orders.stream().filter(o -> "CONFIRMED".equals(o.getStatus())).count();
+        long cancelledOrders = orders.stream().filter(o -> "CANCELLED".equals(o.getStatus())).count();
 
         analytics.put("totalOrders", orders.size());
         analytics.put("pendingOrders", pendingOrders);
         analytics.put("confirmedOrders", confirmedOrders);
         analytics.put("cancelledOrders", cancelledOrders);
 
-        /* ---------- INVENTORY ANALYTICS ---------- */
-        List<Inventory> inventories =
-                inventoryRepo.findByWholesalerId(wholesalerId);
+        List<Inventory> inventories = inventoryRepo.findByWholesalerId(wholesalerId);
 
-        int totalStock =
-                inventories.stream().mapToInt(Inventory::getStockQuantity).sum();
-
-        long lowStockItems =
-                inventories.stream()
-                        .filter(i -> i.getStockQuantity() < 10)
-                        .count();
+        int totalStock = inventories.stream().mapToInt(Inventory::getStockQuantity).sum();
+        long lowStockItems = inventories.stream().filter(i -> i.getStockQuantity() < 10).count();
 
         analytics.put("totalStock", totalStock);
         analytics.put("lowStock", lowStockItems);
@@ -69,26 +66,19 @@ public class AnalyticsController {
     }
 
     /* =====================================================
-       MANUFACTURER ANALYTICS
+       MANUFACTURER ANALYTICS (basic)
        ===================================================== */
 
     @GetMapping("/manufacturer")
-    public Map<String, Object> getManufacturerAnalytics(
-            @RequestParam Long manufacturerId) {
+    public Map<String, Object> getManufacturerAnalytics(@RequestParam Long manufacturerId) {
 
         Map<String, Object> analytics = new HashMap<>();
 
-        List<Order> orders =
-                orderRepo.findByProductManufacturerId(manufacturerId);
+        List<Order> orders = orderRepo.findByProductManufacturerIdAndUserRole(manufacturerId, "WHOLESALER");
 
-        long confirmedOrders =
-                orders.stream().filter(o -> "CONFIRMED".equals(o.getStatus())).count();
-
-        long cancelledOrders =
-                orders.stream().filter(o -> "CANCELLED".equals(o.getStatus())).count();
-
-        long pendingOrders =
-                orders.stream().filter(o -> "PENDING".equals(o.getStatus())).count();
+        long confirmedOrders = orders.stream().filter(o -> "CONFIRMED".equals(o.getStatus())).count();
+        long cancelledOrders = orders.stream().filter(o -> "CANCELLED".equals(o.getStatus())).count();
+        long pendingOrders = orders.stream().filter(o -> "PENDING".equals(o.getStatus())).count();
 
         analytics.put("totalOrders", orders.size());
         analytics.put("confirmedOrders", confirmedOrders);
