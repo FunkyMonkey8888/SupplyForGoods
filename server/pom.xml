@@ -70,6 +70,18 @@
 			<artifactId>h2</artifactId>
 		</dependency>
 
+		<!-- Email support -->
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-mail</artifactId>
+</dependency>
+
+<!-- Validation (recommended) -->
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+
 		<!-- Hot reload -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
