@@ -5,10 +5,11 @@
   left: 0;
   width: 100%;
   height: 80px;
-  z-index: 1000;
+  z-index: 9999;
 
   background: rgba(10, 20, 40, 0.55);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 
   border-bottom: 1px solid rgba(255,255,255,0.08);
   font-family: 'Poppins', sans-serif;
@@ -23,6 +24,7 @@
   letter-spacing: 0.8px;
   color: #ffffff !important;
   position: relative;
+  text-decoration: none;
 }
 
 .app-brand::after {
@@ -43,20 +45,22 @@
   font-weight: 500;
   color: rgba(255,255,255,0.9) !important;
   margin-right: 22px;
-  padding: 10px 6px;
+  padding: 10px 10px;
+  border-radius: 12px;
   transition: all 0.18s ease;
 }
 
 .app-nav-links .nav-link:hover {
   color: #ffffff !important;
   text-shadow: 0 0 8px rgba(99,102,241,0.35);
+  background: rgba(255,255,255,0.06);
 }
 
 .app-nav-links .nav-link::after {
   content: '';
   position: absolute;
-  bottom: -6px;
-  left: 0;
+  bottom: 4px;
+  left: 10px;
   width: 0;
   height: 2.5px;
   border-radius: 2px;
@@ -65,7 +69,7 @@
 }
 
 .app-nav-links .nav-link:hover::after {
-  width: 100%;
+  width: calc(100% - 20px);
 }
 
 /* Auth buttons */
@@ -73,11 +77,14 @@
   padding: 12px 24px;
   border-radius: 999px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   color: #ffffff !important;
+  text-decoration: none;
 
   background: linear-gradient(90deg, #2563eb, #6366f1);
   box-shadow: 0 6px 18px rgba(99,102,241,0.45);
+  border: 1px solid rgba(255,255,255,0.12);
+
   transition: all 0.18s ease;
 }
 
@@ -91,12 +98,16 @@
 /* Logout */
 .app-nav-auth .logout {
   background: linear-gradient(90deg, #ef4444, #dc2626);
+  box-shadow: 0 6px 18px rgba(239,68,68,0.35);
 }
 
 /* Mobile toggle */
 .navbar-toggler {
   border: none;
+  outline: none;
+  box-shadow: none !important;
 }
+
 .navbar-toggler-icon {
   filter: invert(1);
 }
@@ -119,12 +130,232 @@
 
 /* Animation */
 @keyframes navFadeDown {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ======================================================
+   ✅ REQUIRED: MAIN WRAPPER OFFSET FOR FIXED NAVBAR
+   (prevents content hiding behind navbar)
+   ====================================================== */
+.app-main {
+  padding-top: 80px;
+  min-height: calc(100vh - 80px);
+  width: 100%;
+}
+
+/* ======================================================
+   ✅ NOTIFICATIONS (Button + Dropdown Panel)
+   Matches your glass theme + works with your TS
+   ====================================================== */
+.notif-wrap {
+  position: relative;
+  margin-right: 12px;
+}
+
+.notif-btn {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(229,231,235,0.92);
+
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.notif-btn i {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.notif-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.09);
+  border-color: rgba(255,255,255,0.18);
+  box-shadow: 0 16px 34px rgba(0,0,0,0.25);
+}
+
+.notif-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  background: #fb7185;
+  color: #0b1026;
+
+  font-size: 11px;
+  font-weight: 900;
+
+  box-shadow: 0 10px 22px rgba(251,113,133,0.30);
+}
+
+.notif-panel {
+  position: absolute;
+  right: 0;
+  top: 52px;
+
+  width: min(360px, 84vw);
+  max-height: 420px;
+  overflow: auto;
+
+  border-radius: 18px;
+  background: rgba(10, 14, 30, 0.88);
+  border: 1px solid rgba(255,255,255,0.14);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  box-shadow: 0 26px 70px rgba(0,0,0,0.55);
+  z-index: 10000;
+}
+
+.notif-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 12px 12px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+  background: rgba(10, 14, 30, 0.94);
+}
+
+.notif-title {
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(229,231,235,0.92);
+  letter-spacing: 0.3px;
+}
+
+.notif-close {
+  padding: 6px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: rgba(229,231,235,0.88);
+  cursor: pointer;
+}
+
+.notif-close:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.notif-empty {
+  padding: 14px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(229,231,235,0.72);
+}
+
+.notif-list {
+  padding: 10px;
+  display: grid;
+  gap: 10px;
+}
+
+.notif-item {
+  padding: 10px 10px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.notif-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.notif-item-title {
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(229,231,235,0.92);
+}
+
+.notif-mark {
+  font-size: 11px;
+  font-weight: 900;
+
+  padding: 6px 9px;
+  border-radius: 12px;
+
+  border: 1px solid rgba(147,197,253,0.25);
+  background: rgba(147,197,253,0.10);
+  color: #dbeafe;
+
+  cursor: pointer;
+}
+
+.notif-mark:hover {
+  background: rgba(147,197,253,0.14);
+}
+
+.notif-item-msg {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(229,231,235,0.78);
+}
+
+.notif-item-meta {
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(229,231,235,0.55);
+}
+
+/* ======================================================
+   ✅ MOBILE MENU GLASS PANEL (so menu looks premium)
+   Works with [class.show]="isMenuOpen"
+   ====================================================== */
+@media (max-width: 991.98px) {
+  .collapse.navbar-collapse {
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 16px;
+
+    background: rgba(10, 20, 40, 0.55);
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .app-nav-links .nav-link {
+    margin-right: 0;
+    padding: 12px 12px;
+  }
+
+  .notif-wrap {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .notif-panel {
+    right: 0;
+    left: auto;
   }
 }

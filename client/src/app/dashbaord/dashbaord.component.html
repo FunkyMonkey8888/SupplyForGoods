@@ -2,12 +2,38 @@
   <div class="sog-bg"></div>
   <div class="sog-overlay"></div>
 
-  <div class="sog-wrap">
+  <div class="sog-wrap" [class.landing]="!isLoggedIn">
     <div class="sog-grid" [class.no-right]="isLoggedIn">
 
-      <div class="sog-left" [class.logged]="isLoggedIn">
+      <div class="sog-left">
 
-        <div class="sog-kicker">
+        <!-- =========================
+             LOGGED-IN HEADER + MODE TABS
+             ========================= -->
+        <div class="dash-top" *ngIf="isLoggedIn">
+          <div class="dash-top-left">
+            <div class="dash-title">Dashboard</div>
+            <div class="dash-sub">
+              <span class="dash-welcome">Welcome, {{ username || 'user' }}!</span>
+              <span class="dash-pill">{{ role }}</span>
+            </div>
+          </div>
+
+          <div class="mode-tabs">
+            <button type="button"
+                    class="mode-tab"
+                    *ngFor="let m of statModes"
+                    [class.active]="statMode === m.key"
+                    (click)="setStatMode(m.key)">
+              {{ m.label }}
+            </button>
+          </div>
+        </div>
+
+        <!-- =========================
+             LOGGED-OUT HERO
+             ========================= -->
+        <div class="sog-kicker" *ngIf="!isLoggedIn">
           <span class="kicker-dot"></span>
           LOGISTICS MANAGEMENT PLATFORM
         </div>
@@ -19,82 +45,80 @@
           </ng-container>
 
           <ng-container *ngIf="isLoggedIn">
-            Welcome, <span class="sog-accent">{{ role }}</span>
+            <span class="sog-accent">Supply‑Of‑Goods</span> Overview
           </ng-container>
         </h1>
 
-        <p class="sog-subtitle" [class.wide]="isLoggedIn">
+        <p class="sog-subtitle">
           Logistics today is complex and demanding. Our platform empowers seamless
           supply‑chain operations with speed and reliability.
         </p>
 
-        <p class="sog-hint" [class.wide]="isLoggedIn">
-          Use the navigation bar above to manage your operations
-        </p>
-
-        <div *ngIf="isLoggedIn" class="stats-row full">
-          <div class="stat-card" *ngIf="role === 'MANUFACTURER'">
-            <div class="stat-label">Products</div>
-            <div class="stat-value">{{ products.length || 0 }}</div>
-          </div>
-
-          <div class="stat-card" *ngIf="role === 'WHOLESALER'">
-            <div class="stat-label">Inventory</div>
-            <div class="stat-value">{{ inventories.length || 0 }}</div>
-          </div>
-
-          <div class="stat-card" *ngIf="role === 'WHOLESALER'">
-            <div class="stat-label">Orders</div>
-            <div class="stat-value">{{ wholesalerOrders.length || 0 }}</div>
-          </div>
-
-          <div class="stat-card" *ngIf="role === 'CONSUMER'">
-            <div class="stat-label">Orders</div>
-            <div class="stat-value">{{ consumerOrders.length || 0 }}</div>
-          </div>
-
-          <div class="stat-card" *ngIf="role === 'CONSUMER'">
-            <div class="stat-label">Wishlist</div>
-            <div class="stat-value">{{ wishlistCount || 0 }}</div>
-          </div>
-
-          <div class="stat-card" *ngIf="role === 'CONSUMER'">
-            <div class="stat-label">Cart</div>
-            <div class="stat-value">{{ cartCount || 0 }}</div>
-          </div>
-
-          <div class="stat-card ok" *ngIf="analytics && (role === 'MANUFACTURER' || role === 'WHOLESALER')">
-            <div class="stat-label">Confirmed</div>
-            <div class="stat-value">{{ analytics.confirmedOrders || 0 }}</div>
-          </div>
-
-          <div class="stat-card warn" *ngIf="analytics && (role === 'MANUFACTURER' || role === 'WHOLESALER')">
-            <div class="stat-label">Pending</div>
-            <div class="stat-value">{{ analytics.pendingOrders || 0 }}</div>
-          </div>
-
-          <div class="stat-card bad" *ngIf="analytics && (role === 'MANUFACTURER' || role === 'WHOLESALER')">
-            <div class="stat-label">Cancelled</div>
-            <div class="stat-value">{{ analytics.cancelledOrders || 0 }}</div>
+        <!-- =========================
+             KPI CARDS (ALL LOGGED-IN ROLES)
+             ========================= -->
+        <div class="kpi-row" *ngIf="isLoggedIn">
+          <div class="kpi-card"
+               *ngFor="let k of kpis; trackBy: trackByKpi"
+               [class.purple]="k.tone === 'purple'"
+               [class.blue]="k.tone === 'blue'"
+               [class.orange]="k.tone === 'orange'"
+               [class.pink]="k.tone === 'pink'">
+            <div class="kpi-label">{{ k.title }}</div>
+            <div class="kpi-value">{{ k.value }}</div>
+            <svg class="kpi-wave" viewBox="0 0 240 60" preserveAspectRatio="none">
+              <path fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="3" stroke-linecap="round"
+                    d="M0,40 C24,30 44,48 68,40 C92,32 112,50 136,40 C160,30 180,48 204,40 C220,35 232,45 240,40" />
+            </svg>
           </div>
         </div>
 
-        <div *ngIf="isLoggedIn && !analytics && (role === 'MANUFACTURER' || role === 'WHOLESALER')" class="stats-note">
-          Analytics currently unavailable. Showing basic stats.
+        <!-- =========================
+             CONSUMER: SHOW AVAILABLE PRODUCTS IN DASHBOARD
+             ========================= -->
+        <div *ngIf="isLoggedIn && role === 'CONSUMER'" class="consumer-products-wrap">
+          <div class="section-head">
+            <div class="section-title">Available Products</div>
+            <div class="section-sub">Browse products and place orders instantly</div>
+          </div>
+
+          <!-- IMPORTANT: update selector if your component selector differs -->
+          <app-view-products></app-view-products>
         </div>
 
-        <div *ngIf="isLoggedIn && analytics && (role === 'WHOLESALER' || role === 'MANUFACTURER')" class="chart-row full">
+        <!-- =========================
+             MANUFACTURER/WHOLESALER: CHARTS
+             ========================= -->
+        <div *ngIf="isLoggedIn && role !== 'CONSUMER'" class="chart-wrap">
+          <div class="chart-head" *ngIf="chartViews.length">
+            <div class="chart-head-left">
+              <div class="chart-title">Order Analytics</div>
+              <div class="chart-sub">Click to switch chart view instantly</div>
+            </div>
+
+            <div class="chart-tabs">
+              <button type="button"
+                      class="chart-tab"
+                      *ngFor="let c of chartViews"
+                      [class.active]="chartView === c.key"
+                      (click)="setChartView(c.key)">
+                {{ c.label }}
+              </button>
+            </div>
+          </div>
+
           <div class="chart-card" *ngIf="role === 'WHOLESALER'">
-            <div class="chart-title">Wholesaler Orders</div>
             <canvas id="wholesalerChart"></canvas>
           </div>
 
           <div class="chart-card" *ngIf="role === 'MANUFACTURER'">
-            <div class="chart-title">Manufacturer Orders</div>
             <canvas id="manufacturerChart"></canvas>
           </div>
         </div>
 
+        <!-- =========================
+             ALERTS
+             ========================= -->
         <div *ngIf="error" class="sog-alert danger">
           {{ error }}
         </div>
@@ -105,69 +129,92 @@
 
       </div>
 
+      <!-- =========================
+           RIGHT FLIPCARDS (ONLY LOGGED-OUT LANDING)
+           ========================= -->
       <div class="sog-right" *ngIf="!isLoggedIn">
+
+        <!-- Manufacturer -->
         <div class="flip-card">
           <div class="flip-inner">
+
             <div class="flip-front">
               <img
                 src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=60"
-                alt="Manufacturer" />
+                alt="Manufacturer"
+                loading="lazy"
+                decoding="async" />
               <div class="front-overlay"></div>
               <div class="front-label">
                 <div class="front-title">Manufacturer</div>
                 <div class="front-sub">Manage products &amp; inventory</div>
               </div>
             </div>
+
             <div class="flip-back">
               <div class="back-title">Manufacturer</div>
               <div class="back-text">
                 Create products, manage production workflows, monitor supply levels and fulfill orders efficiently.
               </div>
             </div>
+
           </div>
         </div>
 
+        <!-- Wholesaler -->
         <div class="flip-card">
           <div class="flip-inner">
+
             <div class="flip-front">
               <img
                 src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1200&q=60"
-                alt="Wholesaler" />
+                alt="Wholesaler"
+                loading="lazy"
+                decoding="async" />
               <div class="front-overlay"></div>
               <div class="front-label">
                 <div class="front-title">Wholesaler</div>
                 <div class="front-sub">Orders, inventory &amp; logistics</div>
               </div>
             </div>
+
             <div class="flip-back">
               <div class="back-title">Wholesaler</div>
               <div class="back-text">
                 Manage inventory, place bulk orders, and coordinate product distribution smoothly.
               </div>
             </div>
+
           </div>
         </div>
 
+        <!-- Consumer -->
         <div class="flip-card">
           <div class="flip-inner">
+
             <div class="flip-front">
               <img
                 src="https://images.unsplash.com/photo-1607082349566-187342175e2f?auto=format&fit=crop&w=1200&q=60"
-                alt="Consumer" />
+                alt="Consumer"
+                loading="lazy"
+                decoding="async" />
               <div class="front-overlay"></div>
               <div class="front-label">
                 <div class="front-title">Consumer</div>
                 <div class="front-sub">Place orders &amp; track status</div>
               </div>
             </div>
+
             <div class="flip-back">
               <div class="back-title">Consumer</div>
               <div class="back-text">
                 Browse products, place orders, and track purchases in real time.
               </div>
             </div>
+
           </div>
         </div>
+
       </div>
 
     </div>

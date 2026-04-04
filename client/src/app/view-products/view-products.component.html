@@ -1,9 +1,7 @@
 <div class="view-products-hero">
-
   <div class="hero-overlay"></div>
 
   <div class="view-products-container">
-
     <div class="view-products-card animate-in">
 
       <div class="view-products-header">
@@ -11,12 +9,11 @@
           <i class="bi bi-box-seam-fill"></i>
         </div>
 
-        <h3>Your Products</h3>
+        <h3>{{ role === 'MANUFACTURER' ? 'Your Products' : 'Product Catalogue' }}</h3>
         <p>Search, sort, and manage your products</p>
       </div>
 
       <div class="toolbar">
-
         <div class="search-wrap">
           <i class="bi bi-search"></i>
           <input
@@ -46,7 +43,6 @@
             </option>
           </select>
         </div>
-
       </div>
 
       <div *ngIf="loading" class="info-box">
@@ -58,24 +54,21 @@
       </div>
 
       <div *ngIf="!loading && paged.length > 0" class="product-grid">
-
         <div class="product-card" *ngFor="let p of paged">
           <div class="p-top">
             <div class="p-name">{{ p.name }}</div>
-            <div class="p-stock">Stock: {{ p.stockQuantity }}</div>
+            <div class="p-stock">Stock: {{ p.stockQuantity ?? 0 }}</div>
           </div>
 
-          <div class="p-desc">{{ p.description }}</div>
+          <div class="p-desc">{{ p.description || 'No description available' }}</div>
 
           <div class="p-meta">
-            <div class="p-price">₹{{ p.price }}</div>
+            <div class="p-price">₹{{ p.price ?? 0 }}</div>
           </div>
         </div>
-
       </div>
 
-      <div *ngIf="!loading && filtered.length > 0" class="pagination">
-
+      <div *ngIf="!loading && totalPages > 1" class="pagination">
         <button class="page-btn" type="button" (click)="prevPage()" [disabled]="currentPage === 1">
           Prev
         </button>
@@ -96,17 +89,14 @@
         <div class="page-info">
           Page {{ currentPage }} / {{ totalPages }}
         </div>
-
       </div>
 
-      <div class="add-product-action">
+      <div class="add-product-action" *ngIf="role === 'MANUFACTURER'">
         <button class="add-product-btn" routerLink="/create-product" type="button">
           + Add Products
         </button>
       </div>
 
     </div>
-
   </div>
-
 </div>

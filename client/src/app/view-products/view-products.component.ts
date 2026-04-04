@@ -10,7 +10,6 @@ type SortKey = 'name' | 'price' | 'stockQuantity';
   styleUrls: ['./view-products.component.scss']
 })
 export class ViewProductsComponent implements OnInit {
-
   products: any[] = [];
   filtered: any[] = [];
   paged: any[] = [];
@@ -27,6 +26,7 @@ export class ViewProductsComponent implements OnInit {
   totalPages = 1;
 
   pageSizes = [6, 9, 12];
+  role: string = '';
 
   constructor(
     private http: HttpService,
@@ -34,12 +34,13 @@ export class ViewProductsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.role = this.auth.getRole() || '';
     this.loadProducts();
   }
 
   private loadProducts(): void {
-    const manufacturerId = this.auth.getUserId();
-    if (!manufacturerId) {
+    const userId = this.auth.getUserId();
+    if (!userId) {
       this.message = 'Invalid user session.';
       return;
     }
@@ -47,15 +48,29 @@ export class ViewProductsComponent implements OnInit {
     this.loading = true;
     this.message = '';
 
-    this.http.getProductsByManufacturer(manufacturerId).subscribe({
+    if (this.role === 'MANUFACTURER') {
+      this.http.getProductsByManufacturer(userId).subscribe({
+        next: res => {
+          this.products = Array.isArray(res) ? res : [];
+          this.loading = false;
+          if (this.products.length === 0) this.message = 'No products found.';
+          this.applyAll();
+        },
+        error: () => {
+          this.loading = false;
+          this.message = 'Failed to load products.';
+          this.products = [];
+          this.applyAll();
+        }
+      });
+      return;
+    }
+
+    this.http.getProductsByConsumers().subscribe({
       next: res => {
         this.products = Array.isArray(res) ? res : [];
         this.loading = false;
-
-        if (this.products.length === 0) {
-          this.message = 'No products found.';
-        }
-
+        if (this.products.length === 0) this.message = 'No products found.';
         this.applyAll();
       },
       error: () => {

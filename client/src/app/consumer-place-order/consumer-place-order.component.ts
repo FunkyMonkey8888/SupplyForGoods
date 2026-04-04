@@ -69,6 +69,9 @@ export class ConsumerPlaceOrderComponent implements OnInit {
       next: res => this.products = res,
       error: () => {
         this.errorMessage = 'Failed to load products.';
+        setTimeout(() => {
+          this.errorMessage = ''
+        }, 3000);
       }
     });
   }
@@ -113,6 +116,9 @@ export class ConsumerPlaceOrderComponent implements OnInit {
  
     if (!this.selectedProduct) {
       this.errorMessage = 'Please select a product';
+      setTimeout(() => {
+          this.errorMessage = ''
+        }, 3000);
       return;
     }
  
@@ -140,6 +146,9 @@ export class ConsumerPlaceOrderComponent implements OnInit {
       error: () => {
         this.errorMessage = 'Order placement failed';
         this.loading = false;
+        setTimeout(() => {
+          this.errorMessage = ''
+        }, 3000);
       }
     });
   }

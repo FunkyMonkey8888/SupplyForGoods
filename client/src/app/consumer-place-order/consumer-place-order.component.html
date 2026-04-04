@@ -1,45 +1,126 @@
 <div class="consumer-place-order-hero">
-
   <div class="hero-overlay"></div>
 
   <div class="consumer-place-order-container">
-
     <div class="place-order-card animation-in">
 
       <!-- HEADER -->
       <div class="place-order-header">
-        <div class="icon-wrapper">
-          <i class="bi bi-cart-check-fill"></i>
+        <div class="header-left">
+          <div class="icon-wrapper">
+            <i class="bi bi-cart-check-fill"></i>
+          </div>
+
+          <div class="header-text">
+            <h3>Place Order</h3>
+            <p>Choose a product and specify quantity</p>
+          </div>
         </div>
 
-        <h3>Place Order</h3>
-        <p>Choose a product and specify quantity</p>
+        <!-- ✅ Quick counts (from TS: wishlistCount, cartCount) -->
+        <div class="header-right">
+          <div class="quick-badges">
+            <div class="quick-badge">
+              <i class="bi bi-heart-fill"></i>
+              <span>Wishlist</span>
+              <strong class="count">{{ wishlistCount || 0 }}</strong>
+            </div>
+
+            <div class="quick-badge">
+              <i class="bi bi-cart-fill"></i>
+              <span>Cart</span>
+              <strong class="count">{{ cartCount || 0 }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ UI TOAST (TS: uiMessage, uiMessageType) -->
+      <div class="ui-toast"
+           *ngIf="uiMessage"
+           [class.success]="uiMessageType === 'success'"
+           [class.danger]="uiMessageType === 'danger'"
+           [class.info]="uiMessageType === 'info'">
+        {{ uiMessage }}
       </div>
 
       <div class="content-grid">
 
         <!-- PRODUCTS -->
         <div class="products-section">
-          <h5 class="section-title">Available Products</h5>
+          <div class="section-head">
+            <h5 class="section-title">Available Products</h5>
+            <div class="section-hint">
+              Tap a product to select • Use ♥ to wishlist • 🛒 to add to cart
+            </div>
+          </div>
 
           <div class="products-grid">
             <div
               class="product-card"
               *ngFor="let product of products"
               [class.selected]="selectedProduct?.id === product.id"
+              [class.out-of-stock]="(product?.stockQuantity ?? 0) === 0"
               (click)="selectProduct(product)"
             >
               <div class="product-top">
-                <h6>{{ product.name }}</h6>
-                <span class="availability">Available</span>
+                <div class="title-wrap">
+                  <h6 class="product-name">{{ product.name }}</h6>
+
+                  <!-- ✅ Availability badge -->
+                  <span class="availability"
+                        [class.available]="(product?.stockQuantity ?? 0) > 0"
+                        [class.unavailable]="(product?.stockQuantity ?? 0) === 0">
+                    {{ (product?.stockQuantity ?? 0) > 0 ? 'Available' : 'Out of Stock' }}
+                  </span>
+                </div>
+
+                <!-- ✅ Actions: wishlist + cart (stopPropagation prevents selecting card when clicking icons) -->
+                <div class="product-actions">
+                  <button type="button"
+                          class="icon-btn wishlist-btn"
+                          (click)="$event.stopPropagation(); toggleWishlist(product)">
+                    <i class="bi"
+                       [class.bi-heart]="!isInWishlist(product)"
+                       [class.bi-heart-fill]="isInWishlist(product)"></i>
+                  </button>
+
+                  <button type="button"
+                          class="icon-btn cart-btn"
+                          [disabled]="(product?.stockQuantity ?? 0) === 0"
+                          (click)="$event.stopPropagation(); addToCart(product)">
+                    <i class="bi bi-cart-plus"></i>
+                  </button>
+                </div>
               </div>
 
               <p class="description">
                 {{ product.description || 'No description available' }}
               </p>
 
+              <div class="product-meta">
+                <div class="meta-item">
+                  <span class="meta-label">Price</span>
+                  <span class="meta-value">₹{{ product.price }}</span>
+                </div>
+
+                <div class="meta-item">
+                  <span class="meta-label">Stock</span>
+                  <span class="meta-value">
+                    {{ product?.stockQuantity ?? 0 }}
+                  </span>
+                </div>
+              </div>
+
               <div class="product-footer">
-                <span class="price">₹{{ product.price }}</span>
+                <span class="select-hint"
+                      *ngIf="selectedProduct?.id !== product.id">
+                  Click to select
+                </span>
+                <span class="selected-hint"
+                      *ngIf="selectedProduct?.id === product.id">
+                  Selected ✓
+                </span>
               </div>
             </div>
           </div>
@@ -49,8 +130,45 @@
         <div class="order-form-section">
           <h5>Order Details</h5>
 
+          <!-- ✅ Selected Product Summary -->
           <div *ngIf="selectedProduct" class="selected-info">
-            Ordering <strong>{{ selectedProduct.name }}</strong>
+            <div class="selected-row">
+              <div class="selected-name">
+                Ordering <strong>{{ selectedProduct.name }}</strong>
+              </div>
+              <div class="selected-price">
+                ₹{{ selectedProduct.price }}
+              </div>
+            </div>
+
+            <div class="selected-row subtle">
+              <span>Stock: <strong>{{ selectedProduct?.stockQuantity ?? 0 }}</strong></span>
+              <span>Status: <strong>PLACED</strong></span>
+            </div>
+
+            <div class="selected-row subtle" *ngIf="(selectedProduct?.stockQuantity ?? 0) === 0">
+              <span class="stock-warning">Out of stock — cannot place order</span>
+            </div>
+
+            <!-- ✅ Quick actions for selected product -->
+            <div class="selected-actions">
+              <button type="button"
+                      class="mini-btn"
+                      (click)="toggleWishlist(selectedProduct)">
+                <i class="bi"
+                   [class.bi-heart]="!isInWishlist(selectedProduct)"
+                   [class.bi-heart-fill]="isInWishlist(selectedProduct)"></i>
+                {{ isInWishlist(selectedProduct) ? 'Wishlisted' : 'Wishlist' }}
+              </button>
+
+              <button type="button"
+                      class="mini-btn primary"
+                      [disabled]="(selectedProduct?.stockQuantity ?? 0) === 0"
+                      (click)="addToCart(selectedProduct)">
+                <i class="bi bi-cart-plus"></i>
+                Add to Cart
+              </button>
+            </div>
           </div>
 
           <!-- ✅ SUCCESS MESSAGE -->
@@ -71,6 +189,7 @@
                 type="number"
                 formControlName="quantity"
                 placeholder="Enter quantity"
+                [disabled]="!selectedProduct || (selectedProduct?.stockQuantity ?? 0) === 0"
               />
               <small class="error-text"
                      *ngIf="orderForm.get('quantity')?.touched &&
@@ -82,16 +201,21 @@
             <button
               type="submit"
               class="submit-btn"
-              [disabled]="loading || !selectedProduct">
-              {{ loading ? 'Placing Order…' : 'Place Order' }}
+              [disabled]="loading || !selectedProduct || (selectedProduct?.stockQuantity ?? 0) === 0">
+              <span *ngIf="!loading">Place Order</span>
+              <span *ngIf="loading">Placing Order…</span>
             </button>
 
           </form>
+
+          <!-- ✅ Guidance when no selection -->
+          <div class="empty-selection" *ngIf="!selectedProduct">
+            Select a product from the left to place an order.
+          </div>
+
         </div>
 
       </div>
-
     </div>
-
   </div>
 </div>
