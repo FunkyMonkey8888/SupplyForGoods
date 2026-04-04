@@ -5,9 +5,10 @@
   <div class="sog-wrap" [class.landing]="!isLoggedIn">
     <div class="sog-grid" [class.no-right]="isLoggedIn">
 
+      <!-- LEFT -->
       <div class="sog-left">
 
-        <!-- Logged-in header -->
+        <!-- Logged-in header + mode tabs -->
         <div class="dash-top" *ngIf="isLoggedIn">
           <div class="dash-top-left">
             <div class="dash-title">Dashboard</div>
@@ -15,6 +16,17 @@
               <span class="dash-welcome">Welcome, {{ username || 'user' }}!</span>
               <span class="dash-pill">{{ role }}</span>
             </div>
+          </div>
+
+          <div class="mode-tabs">
+            <button
+              type="button"
+              class="mode-tab"
+              *ngFor="let m of statModes"
+              [class.active]="statMode === m.key"
+              (click)="setStatMode(m.key)">
+              {{ m.label }}
+            </button>
           </div>
         </div>
 
@@ -40,178 +52,57 @@
           supply‑chain operations with speed and reliability.
         </p>
 
-        <!-- Alerts -->
-        <div *ngIf="error" class="sog-alert danger">
-          {{ error }}
+        <!-- KPI Cards -->
+        <div class="kpi-row" *ngIf="isLoggedIn">
+          <div
+            class="kpi-card"
+            *ngFor="let k of kpis; trackBy: trackByKpi"
+            [class.purple]="k.tone === 'purple'"
+            [class.blue]="k.tone === 'blue'"
+            [class.orange]="k.tone === 'orange'"
+            [class.pink]="k.tone === 'pink'">
+
+            <div class="kpi-label">{{ k.title }}</div>
+            <div class="kpi-value">{{ k.value }}</div>
+
+            <svg class="kpi-wave" viewBox="0 0 240 60" preserveAspectRatio="none">
+              <path
+                fill="none"
+                stroke="rgba(255,255,255,0.78)"
+                stroke-width="3"
+                stroke-linecap="round"
+                d="M0,40 C24,30 44,48 68,40 C92,32 112,50 136,40 C160,30 180,48 204,40 C220,35 232,45 240,40" />
+            </svg>
+          </div>
         </div>
 
-        <div *ngIf="!isLoggedIn" class="sog-alert">
-          Please login to view dashboard analytics.
-        </div>
-
-        <!-- =========================
-             ✅ CONSUMER DASHBOARD
-             ========================= -->
+        <!-- Consumer: show product catalogue inside dashboard -->
         <div *ngIf="isLoggedIn && role === 'CONSUMER'" class="consumer-products-wrap">
-
           <div class="section-head">
-            <div class="section-title">Consumer Dashboard</div>
-            <div class="section-sub">
-              Wishlist: {{ wishlistCount || 0 }} • Cart Qty: {{ cartCount || 0 }}
-            </div>
-          </div>
-
-          <!-- Tabs -->
-          <div class="mode-tabs">
-            <button type="button" class="mode-tab"
-                    [class.active]="consumerPanel === 'orders'"
-                    (click)="showConsumerPanel('orders')">
-              Orders
-            </button>
-
-            <button type="button" class="mode-tab"
-                    [class.active]="consumerPanel === 'wishlist'"
-                    (click)="showConsumerPanel('wishlist')">
-              Wishlist ({{ wishlistCount || 0 }})
-            </button>
-
-            <button type="button" class="mode-tab"
-                    [class.active]="consumerPanel === 'cart'"
-                    (click)="showConsumerPanel('cart')">
-              Cart ({{ cartCount || 0 }})
-            </button>
-          </div>
-
-          <!-- ✅ Products always visible for consumer (catalogue) -->
-          <div class="section-head" style="margin-top: 14px;">
             <div class="section-title">Available Products</div>
-            <div class="section-sub">Browse and place orders instantly</div>
+            <div class="section-sub">Browse products and place orders instantly</div>
           </div>
 
           <app-view-products></app-view-products>
-
-          <!-- ===================== WISHLIST PANEL ===================== -->
-          <div *ngIf="consumerPanel === 'wishlist'" class="panel-wrap">
-            <div class="section-head">
-              <div class="section-title">♥ My Wishlist</div>
-              <div class="section-sub">Move items to cart or remove</div>
-            </div>
-
-            <div class="empty" *ngIf="wishlist.length === 0">
-              Your wishlist is empty.
-            </div>
-
-            <div class="list" *ngIf="wishlist.length > 0">
-              <div class="list-item" *ngFor="let w of wishlist">
-                <div class="li-title">{{ w.name || w.productName }}</div>
-                <div class="li-sub">
-                  <span class="pill">₹{{ w.price || 0 }}</span>
-                </div>
-
-                <div class="li-actions">
-                  <button type="button" class="btn primary" (click)="moveWishlistToCart(w)">
-                    Move to cart
-                  </button>
-                  <button type="button" class="btn danger" (click)="removeWishlistItem(w.productId || w.id)">
-                    Remove
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ===================== CART PANEL ===================== -->
-          <div *ngIf="consumerPanel === 'cart'" class="panel-wrap">
-            <div class="section-head">
-              <div class="section-title">🛒 My Cart</div>
-              <div class="section-sub">Adjust quantity and place all orders</div>
-            </div>
-
-            <div class="empty" *ngIf="cart.length === 0">
-              Your cart is empty.
-            </div>
-
-            <div class="sog-alert"
-                 *ngIf="cartMessage"
-                 [class.danger]="cartMessageType === 'danger'"
-                 [class.success]="cartMessageType === 'success'">
-              {{ cartMessage }}
-            </div>
-
-            <div class="list" *ngIf="cart.length > 0">
-              <div class="list-item" *ngFor="let c of cart">
-                <div class="li-title">{{ c.name || c.productName || ('Product #' + (c.productId || c.id)) }}</div>
-
-                <div class="li-sub">
-                  <span class="pill">₹{{ c.price || 0 }}</span>
-                  <span class="pill">Qty: {{ c.quantity || 1 }}</span>
-                </div>
-
-                <div class="qty-row">
-                  <button type="button" class="qty-btn" (click)="decQty(c)">−</button>
-
-                  <input class="qty-input"
-                         type="number"
-                         min="1"
-                         [value]="c.quantity || 1"
-                         (change)="updateQtyFromInput(c, $event)" />
-
-                  <button type="button" class="qty-btn" (click)="incQty(c)">+</button>
-
-                  <button type="button" class="btn danger" (click)="removeCartItem(c.productId || c.id)">
-                    Remove
-                  </button>
-                </div>
-              </div>
-
-              <div class="cart-summary">
-                <div class="cart-total">
-                  Total: <strong>₹{{ cartTotal() }}</strong>
-                </div>
-
-                <button type="button"
-                        class="btn primary"
-                        [disabled]="cartPlacing"
-                        (click)="placeAllCartOrders()">
-                  {{ cartPlacing ? 'Placing...' : 'Place All Orders' }}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- ===================== ORDERS PANEL ===================== -->
-          <div *ngIf="consumerPanel === 'orders'" class="panel-wrap">
-            <div class="section-head">
-              <div class="section-title">My Orders</div>
-              <div class="section-sub">Latest orders placed</div>
-            </div>
-
-            <div class="empty" *ngIf="consumerOrders.length === 0">
-              No orders yet.
-            </div>
-
-            <div class="list" *ngIf="consumerOrders.length > 0">
-              <div class="list-item" *ngFor="let o of consumerOrders">
-                <div class="li-title">Order #{{ o.id }} • {{ o.status }}</div>
-                <div class="li-sub">
-                  <span class="pill">Qty: {{ o.quantity }}</span>
-                  <span class="pill" *ngIf="o.productName">{{ o.productName }}</span>
-                  <span class="pill" *ngIf="o.createdAt">{{ o.createdAt | date:'medium' }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div>
 
-        <!-- =========================
-             ✅ MANUFACTURER / WHOLESALER CHARTS
-             ========================= -->
-        <div *ngIf="isLoggedIn && analytics && role !== 'CONSUMER'" class="chart-wrap">
-          <div class="chart-head">
+        <!-- Manufacturer / Wholesaler: modern chart area + chart view tabs -->
+        <div *ngIf="isLoggedIn && role !== 'CONSUMER'" class="chart-wrap">
+          <div class="chart-head" *ngIf="chartViews.length">
             <div class="chart-head-left">
               <div class="chart-title">Order Analytics</div>
-              <div class="chart-sub">Status distribution</div>
+              <div class="chart-sub">Click to switch chart view instantly</div>
+            </div>
+
+            <div class="chart-tabs">
+              <button
+                type="button"
+                class="chart-tab"
+                *ngFor="let c of chartViews"
+                [class.active]="chartView === c.key"
+                (click)="setChartView(c.key)">
+                {{ c.label }}
+              </button>
             </div>
           </div>
 
@@ -224,21 +115,36 @@
           </div>
         </div>
 
-      </div>
+        <!-- Alerts -->
+        <div *ngIf="error" class="sog-alert danger">
+          {{ error }}
+        </div>
 
-      <!-- Right flipcards (only logged-out) -->
+        <div *ngIf="!isLoggedIn" class="sog-alert">
+          Please login to view dashboard analytics.
+        </div>
+
+      </div>
+      <!-- /LEFT -->
+
+      <!-- RIGHT: Flipcards only for logged-out landing -->
       <div class="sog-right" *ngIf="!isLoggedIn">
+
         <div class="flip-card">
           <div class="flip-inner">
             <div class="flip-front">
-              <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=60"
-                   alt="Manufacturer" loading="lazy" decoding="async" />
+              <img
+                src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=60"
+                alt="Manufacturer"
+                loading="lazy"
+                decoding="async" />
               <div class="front-overlay"></div>
               <div class="front-label">
                 <div class="front-title">Manufacturer</div>
                 <div class="front-sub">Manage products &amp; inventory</div>
               </div>
             </div>
+
             <div class="flip-back">
               <div class="back-title">Manufacturer</div>
               <div class="back-text">
@@ -251,14 +157,18 @@
         <div class="flip-card">
           <div class="flip-inner">
             <div class="flip-front">
-              <img src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1200&q=60"
-                   alt="Wholesaler" loading="lazy" decoding="async" />
+              <img
+                src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1200&q=60"
+                alt="Wholesaler"
+                loading="lazy"
+                decoding="async" />
               <div class="front-overlay"></div>
               <div class="front-label">
                 <div class="front-title">Wholesaler</div>
                 <div class="front-sub">Orders, inventory &amp; logistics</div>
               </div>
             </div>
+
             <div class="flip-back">
               <div class="back-title">Wholesaler</div>
               <div class="back-text">
@@ -271,14 +181,18 @@
         <div class="flip-card">
           <div class="flip-inner">
             <div class="flip-front">
-              <img src="https://images.unsplash.com/photo-1607082349566-187342175e2f?auto=format&fit=crop&w=1200&q=60"
-                   alt="Consumer" loading="lazy" decoding="async" />
+              <img
+                src="https://images.unsplash.com/photo-1607082349566-187342175e2f?auto=format&fit=crop&w=1200&q=60"
+                alt="Consumer"
+                loading="lazy"
+                decoding="async" />
               <div class="front-overlay"></div>
               <div class="front-label">
                 <div class="front-title">Consumer</div>
                 <div class="front-sub">Place orders &amp; track status</div>
               </div>
             </div>
+
             <div class="flip-back">
               <div class="back-title">Consumer</div>
               <div class="back-text">
@@ -287,7 +201,9 @@
             </div>
           </div>
         </div>
+
       </div>
+      <!-- /RIGHT -->
 
     </div>
   </div>
