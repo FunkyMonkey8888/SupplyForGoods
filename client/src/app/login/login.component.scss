@@ -251,3 +251,33 @@ button:disabled {
     font-size: 16px;
   }
 }
+
+.otp-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+  gap: 10px;
+}
+
+.otp-actions .btn-link {
+  padding: 0;
+  font-weight: 800;
+  color: #93c5fd;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.otp-actions .btn-link:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Make Bootstrap muted text readable on dark glass card */
+.login-card .text-muted {
+  color: rgba(229, 231, 235, 0.78) !important;  // light gray
+}
+
+.login-card strong {
+  color: rgba(255, 255, 255, 0.92);
+}

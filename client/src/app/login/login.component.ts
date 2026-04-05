@@ -159,4 +159,13 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.timer = null;
     }
   }
+
+  onOtpInput(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  const raw = input.value || '';
+  const digitsOnly = raw.replace(/\D/g, '').slice(0, 6);
+
+  input.value = digitsOnly;
+  this.otpForm.patchValue({ otp: digitsOnly }, { emitEvent: false });
+}
 }

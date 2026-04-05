@@ -8,24 +8,17 @@
       <div class="login-icon">
         <i
           class="bi"
-          [ngClass]="
-            step === 'PASSWORD'
-              ? 'bi-shield-lock-fill'
-              : 'bi-envelope-check-fill'
-          "
+          [ngClass]="step === 'PASSWORD' ? 'bi-shield-lock-fill' : 'bi-envelope-check-fill'"
         ></i>
       </div>
 
       <!-- TITLE -->
       <h3 class="login-title">
-        {{ step === 'PASSWORD'
-          ? 'Login to Your Account'
-          : 'Two‑Factor Verification' }}
+        {{ step === 'PASSWORD' ? 'Login to Your Account' : 'Two‑Factor Verification' }}
       </h3>
+
       <p class="login-subtitle">
-        {{ step === 'PASSWORD'
-          ? 'Access your dashboard'
-          : 'Verify OTP to continue' }}
+        {{ step === 'PASSWORD' ? 'Access your dashboard' : 'Verify OTP to continue' }}
       </p>
 
       <!-- BACKEND ERROR -->
@@ -97,6 +90,7 @@
       >
         <div class="text-center text-muted mb-2 small">
           Enter the 6‑digit OTP sent to your registered email
+          <span *ngIf="otpEmail">(<strong>{{ otpEmail }}</strong>)</span>
         </div>
 
         <div class="form-group">
@@ -108,7 +102,28 @@
             inputmode="numeric"
             formControlName="otp"
             placeholder="Enter OTP"
+            (input)="onOtpInput($event)"
           />
+
+          <small
+            *ngIf="
+              otpForm.controls['otp'].touched &&
+              otpForm.controls['otp'].errors?.['required']
+            "
+            class="error-text"
+          >
+            OTP is required
+          </small>
+
+          <small
+            *ngIf="
+              otpForm.controls['otp'].touched &&
+              otpForm.controls['otp'].errors?.['pattern']
+            "
+            class="error-text"
+          >
+            OTP must be exactly 6 digits
+          </small>
         </div>
 
         <button
@@ -117,11 +132,12 @@
           (click)="verifyOtp()"
           [disabled]="otpForm.invalid || loading"
         >
-          <span *ngIf="!loading">Verify & Login</span>
+          <span *ngIf="!loading">Verify &amp; Login</span>
           <span *ngIf="loading">Verifying…</span>
         </button>
 
-        <div class="text-center mt-3">
+        <!-- Back + Resend -->
+        <div class="otp-actions">
           <button
             type="button"
             class="btn btn-link"
@@ -129,6 +145,15 @@
             [disabled]="loading"
           >
             Back to login
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-link"
+            (click)="resendOtp()"
+            [disabled]="loading || resendSeconds > 0"
+          >
+            Resend OTP <span *ngIf="resendSeconds > 0">({{ resendSeconds }}s)</span>
           </button>
         </div>
       </form>
