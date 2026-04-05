@@ -1,16 +1,16 @@
-/* Card */
+/* Reset */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
+/* ===== BACKGROUND ===== */
 .registration-hero {
   min-height: 100vh;
   padding-top: 90px;
   position: relative;
   font-family: 'Poppins', sans-serif;
-
   background:
     radial-gradient(1200px 600px at 20% 10%, rgba(124,58,237,0.35), transparent 60%),
     radial-gradient(900px 500px at 80% 15%, rgba(59,130,246,0.28), transparent 55%),
@@ -24,6 +24,7 @@
   pointer-events: none;
 }
 
+/* ===== CONTAINER ===== */
 .registration-container {
   position: relative;
   z-index: 2;
@@ -34,31 +35,28 @@
   padding: 18px;
 }
 
+/* ===== CARD ===== */
 .registration-card {
   width: 100%;
   max-width: 440px;
   padding: 26px 22px 22px;
   border-radius: 20px;
-
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.10);
   backdrop-filter: blur(16px);
-
   box-shadow: 0 24px 55px rgba(0,0,0,0.55);
   text-align: center;
-
   position: relative;
 }
 
+/* ===== ICON ===== */
 .registration-icon-wrapper {
   width: 72px;
   height: 72px;
   margin: 0 auto 12px;
   border-radius: 16px;
-
   background: linear-gradient(135deg, rgba(59,130,246,0.95), rgba(124,58,237,0.95));
   box-shadow: 0 12px 30px rgba(99,102,241,0.45);
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -70,6 +68,7 @@
   filter: brightness(0) invert(1);
 }
 
+/* ===== TITLES ===== */
 .registration-title {
   font-weight: 900;
   font-size: 20px;
@@ -84,13 +83,25 @@
   color: rgba(229,231,235,0.9);
 }
 
+/* ===== ALERT (shared with login) ===== */
+.login-alert {
+  margin: 10px 0 14px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(239,68,68,0.16);
+  border: 1px solid rgba(239,68,68,0.22);
+  color: #fee2e2;
+  font-weight: 700;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ===== FORM FIELDS ===== */
 .field {
   text-align: left;
   margin-bottom: 14px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
 }
 
-/* Inputs focus */
 .form-label {
   display: block;
   font-size: 18px;
@@ -104,13 +115,10 @@
   height: 42px;
   border-radius: 12px;
   padding: 10px 12px;
-
   font-size: 14px;
   color: #e5e7eb;
-
   background: rgba(0,0,0,0.28);
   border: 1px solid rgba(255,255,255,0.10);
-
   outline: none;
   transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
@@ -121,23 +129,16 @@
 
 .custom-input:focus {
   border-color: rgba(99,102,241,0.80);
+  background: rgba(0,0,0,0.34);
   box-shadow:
     0 0 0 4px rgba(99,102,241,0.18),
     0 0 22px rgba(99,102,241,0.25);
-  background: rgba(0,0,0,0.34);
 }
 
-/* ✅ ROLE DROPDOWN – DARK THEME */
+/* ===== SELECT (ROLE) ===== */
 select.custom-input {
   appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-
   padding-right: 38px;
-
-  background-color: rgba(0,0,0,0.28);
-  color: #e5e7eb;
-
   background-image:
     linear-gradient(45deg, transparent 50%, rgba(229,231,235,0.85) 50%),
     linear-gradient(135deg, rgba(229,231,235,0.85) 50%, transparent 50%);
@@ -148,18 +149,16 @@ select.custom-input {
   background-repeat: no-repeat;
 }
 
-/* ✅ This makes the opened dropdown list dark on browsers that allow it */
 select.custom-input option {
   background: #0b1026;
   color: #e5e7eb;
 }
 
-/* ✅ Disabled placeholder option */
 select.custom-input option[disabled] {
   color: rgba(229,231,235,0.55);
 }
 
-/* VALIDATION */
+/* ===== VALIDATION ===== */
 input.ng-invalid.ng-touched,
 select.ng-invalid.ng-touched {
   border-color: rgba(239,68,68,0.75);
@@ -174,21 +173,18 @@ select.ng-invalid.ng-touched {
   color: #fecaca;
 }
 
+/* ===== BUTTONS ===== */
 .register-btn {
   width: 100%;
   height: 44px;
-
   border-radius: 14px;
   border: none;
   cursor: pointer;
-
   font-size: 16px;
   font-weight: 800;
   color: #ffffff;
-
   background: linear-gradient(90deg, rgba(59,130,246,0.95), rgba(124,58,237,0.95));
   box-shadow: 0 14px 36px rgba(99,102,241,0.45);
-
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -199,11 +195,23 @@ select.ng-invalid.ng-touched {
     0 20px 44px rgba(99,102,241,0.55);
 }
 
-.register-btn:disabled {
+.register-btn:disabled,
+button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
+/* OTP input */
+.custom-input.text-center {
+  letter-spacing: 6px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+/* ===== FOOTER ===== */
 .login-text {
   margin-top: 18px;
   font-size: 12.5px;
@@ -221,150 +229,29 @@ select.ng-invalid.ng-touched {
   text-decoration: underline;
 }
 
+/* ===== ANIMATION ===== */
 .animate-in {
   animation: fadeUp 0.55s ease-out;
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* OTP + password text-center inputs */
-.form-control.text-center {
-  letter-spacing: 6px;
-  font-weight: 700;
-  font-size: 18px;
-  text-align: center;
-}
-
-/* Strength bar wrapper */
-.strength-wrap {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-}
-
-/* Strength bar background */
-.strength-bar {
-  flex: 1;
-  height: 8px;
-  background: #e9ecef;
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-/* Strength fill */
-.strength-fill {
-  height: 100%;
-  width: 0%;
-  transition: width 0.25s ease;
-}
-
-/* Strength colors */
-.strength-fill.weak {
-  background: #dc3545;
-}
-.strength-fill.medium {
-  background: #ffc107;
-}
-.strength-fill.strong {
-  background: #198754;
-}
-
-/* Strength label */
-.strength-text {
-  font-size: 12px;
-  color: #6c757d;
-  white-space: nowrap;
-}
-
-.strength-text .weak {
-  color: #dc3545;
-  font-weight: 700;
-}
-.strength-text .medium {
-  color: #b58900;
-  font-weight: 700;
-}
-.strength-text .strong {
-  color: #198754;
-  font-weight: 700;
-}
-
-/* Password rules list */
-.pwd-rules {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-  font-size: 13px;
-  color: #6c757d;
-}
-
-.pwd-rules li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 4px 0;
-}
-
-/* Default rule icon (not satisfied) */
-.pwd-rules li i {
-  font-size: 14px;
-  color: #dc3545;
-}
-
-/* Satisfied rule */
-.pwd-rules li.ok {
-  color: #198754;
-}
-.pwd-rules li.ok i {
-  color: #198754;
-}
-
-/* Buttons */
-.btn-primary,
-.btn-success {
-  border-radius: 10px;
-  padding: 12px;
-  font-weight: 600;
-}
-
-/* Disabled button */
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-/* Alert */
-.alert-danger {
-  border-radius: 10px;
-  font-weight: 500;
-}
-
-/* Links */
-a,
-.btn-link {
-  color: #1e90ff;
-  font-weight: 500;
-  text-decoration: none;
-}
-
-a:hover,
-.btn-link:hover {
-  text-decoration: underline;
-}
-
-/* Mobile */
+/* ===== MOBILE ===== */
 @media (max-width: 576px) {
   .registration-card {
     padding: 22px;
   }
 
-  .form-control.text-center {
+  .custom-input.text-center {
     letter-spacing: 4px;
     font-size: 16px;
   }

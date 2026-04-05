@@ -1,11 +1,10 @@
 <div class="registration-hero">
-
   <div class="registration-overlay"></div>
 
   <div class="registration-container">
-
     <div class="registration-card animate-in">
 
+      <!-- ICON -->
       <div class="registration-icon-wrapper">
         <img
           src="https://cdn-icons-png.flaticon.com/512/747/747376.png"
@@ -14,29 +13,28 @@
         />
       </div>
 
-      <h3 class="registration-title">User Registration</h3>
-      <p class="registration-subtitle">Create your account and get started</p>
+      <!-- TITLE -->
+      <h3 class="registration-title">
+        {{ step === 'FORM' ? 'User Registration' : 'Verify OTP' }}
+      </h3>
+      <p class="registration-subtitle">
+        {{ step === 'FORM'
+          ? 'Create your account and get started'
+          : 'Enter the OTP sent to your email to continue' }}
+      </p>
 
-      <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
-
-      <!-- Username -->
-      <div class="mb-3">
-        <label class="form-label fw-semibold">Username</label>
-        <input type="text"
-               class="form-control"
-               formControlName="username"
-               placeholder="Enter username">
-
-        <small class="text-danger"
-               *ngIf="itemForm.get('username')?.touched && itemForm.get('username')?.errors?.['required']">
-          Username is required.
-        </small>
-
-        <small class="text-danger"
-               *ngIf="itemForm.get('username')?.touched && itemForm.get('username')?.errors?.['minlength']">
-          Username must be at least 4 characters.
-        </small>
+      <!-- BACKEND / GENERAL MESSAGE -->
+      <div *ngIf="message" class="login-alert">
+        {{ message }}
       </div>
+
+      <!-- ================= STEP 1 : FORM (SEND OTP) ================= -->
+      <form
+        *ngIf="step === 'FORM'"
+        [formGroup]="itemForm"
+        (ngSubmit)="sendOtp()"
+      >
+        <!-- Username -->
         <div class="field">
           <label class="form-label">Username</label>
           <input
@@ -45,14 +43,29 @@
             class="custom-input"
             placeholder="Enter username"
           />
+
           <small
             class="error-text"
-            *ngIf="itemForm.get('username')?.touched &&
-                   itemForm.get('username')?.errors?.['required']">
+            *ngIf="
+              itemForm.get('username')?.touched &&
+              itemForm.get('username')?.errors?.['required']
+            "
+          >
             Username is required
+          </small>
+
+          <small
+            class="error-text"
+            *ngIf="
+              itemForm.get('username')?.touched &&
+              itemForm.get('username')?.errors?.['minlength']
+            "
+          >
+            Username must be at least 4 characters
           </small>
         </div>
 
+        <!-- Email -->
         <div class="field">
           <label class="form-label">Email</label>
           <input
@@ -61,20 +74,29 @@
             class="custom-input"
             placeholder="Enter email"
           />
+
           <small
             class="error-text"
-            *ngIf="itemForm.get('email')?.touched &&
-                   itemForm.get('email')?.errors?.['required']">
+            *ngIf="
+              itemForm.get('email')?.touched &&
+              itemForm.get('email')?.errors?.['required']
+            "
+          >
             Email is required
           </small>
+
           <small
             class="error-text"
-            *ngIf="itemForm.get('email')?.touched &&
-                   itemForm.get('email')?.errors?.['email']">
+            *ngIf="
+              itemForm.get('email')?.touched &&
+              itemForm.get('email')?.errors?.['email']
+            "
+          >
             Enter a valid email address
           </small>
         </div>
 
+        <!-- Password -->
         <div class="field">
           <label class="form-label">Password</label>
           <input
@@ -83,44 +105,189 @@
             class="custom-input"
             placeholder="Enter password"
           />
+
           <small
             class="error-text"
-            *ngIf="itemForm.get('password')?.touched &&
-                   itemForm.get('password')?.errors?.['required']">
+            *ngIf="
+              itemForm.get('password')?.touched &&
+              itemForm.get('password')?.errors?.['required']
+            "
+          >
             Password is required
           </small>
+
+          <small
+            class="error-text"
+            *ngIf="
+              itemForm.get('password')?.touched &&
+              itemForm.get('password')?.errors?.['minlength']
+            "
+          >
+            Password must be at least 8 characters
+          </small>
+
+          <small
+            class="error-text"
+            *ngIf="
+              itemForm.get('password')?.touched &&
+              itemForm.get('password')?.errors?.['pattern']
+            "
+          >
+            Must contain Upper, Lower, Number and Special character
+          </small>
+
+          <!-- Live Password Rules -->
+          <div class="mt-2">
+            <small class="d-block" [style.color]="passwordRules.minLen ? '#86efac' : '#fecaca'">
+              {{ passwordRules.minLen ? '✓' : '✗' }} Minimum 8 characters
+            </small>
+            <small class="d-block" [style.color]="passwordRules.upper ? '#86efac' : '#fecaca'">
+              {{ passwordRules.upper ? '✓' : '✗' }} One uppercase letter
+            </small>
+            <small class="d-block" [style.color]="passwordRules.lower ? '#86efac' : '#fecaca'">
+              {{ passwordRules.lower ? '✓' : '✗' }} One lowercase letter
+            </small>
+            <small class="d-block" [style.color]="passwordRules.digit ? '#86efac' : '#fecaca'">
+              {{ passwordRules.digit ? '✓' : '✗' }} One number
+            </small>
+            <small class="d-block" [style.color]="passwordRules.special ? '#86efac' : '#fecaca'">
+              {{ passwordRules.special ? '✓' : '✗' }} One special character (@$!%*?&)
+            </small>
+          </div>
+
+          <!-- Strength Bar -->
+          <div class="mt-2">
+            <div style="height: 8px; border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden;">
+              <div
+                [style.width.%]="passwordStrength"
+                [style.height.px]="8"
+                [style.borderRadius.px]="999"
+                [style.background]="passwordStrengthLabel === 'Strong'
+                  ? 'linear-gradient(90deg, #22c55e, #86efac)'
+                  : passwordStrengthLabel === 'Medium'
+                    ? 'linear-gradient(90deg, #f59e0b, #fde68a)'
+                    : 'linear-gradient(90deg, #ef4444, #fecaca)'"
+              ></div>
+            </div>
+            <small class="d-block mt-1" style="opacity: 0.9;">
+              Strength: <b>{{ passwordStrengthLabel }}</b>
+            </small>
+          </div>
         </div>
 
+        <!-- Role -->
         <div class="field">
           <label class="form-label">Role</label>
           <select formControlName="role" class="custom-input">
             <option value="" disabled>Select role</option>
             <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
           </select>
+
           <small
             class="error-text"
-            *ngIf="itemForm.get('role')?.touched &&
-                   itemForm.get('role')?.errors?.['required']">
+            *ngIf="
+              itemForm.get('role')?.touched &&
+              itemForm.get('role')?.errors?.['required']
+            "
+          >
             Role selection is required
           </small>
         </div>
 
+        <!-- SEND OTP BUTTON -->
         <button
           class="register-btn"
           type="submit"
-          [disabled]="itemForm.invalid">
-          Register
+          [disabled]="itemForm.invalid || loading"
+        >
+          <span *ngIf="!loading">Send OTP</span>
+          <span *ngIf="loading">Sending…</span>
         </button>
-
       </form>
 
-      <p class="login-text">
+      <!-- ================= STEP 2 : OTP (VERIFY + REGISTER) ================= -->
+      <form
+        *ngIf="step === 'OTP'"
+        [formGroup]="otpForm"
+      >
+        <div class="text-center text-muted mb-2 small">
+          Enter the 6‑digit OTP sent to your registered email
+        </div>
+
+        <div class="field">
+          <label class="form-label">OTP</label>
+          <input
+            type="text"
+            maxlength="6"
+            inputmode="numeric"
+            formControlName="otp"
+            class="custom-input text-center"
+            placeholder="Enter OTP"
+          />
+
+          <small
+            class="error-text"
+            *ngIf="
+              otpForm.get('otp')?.touched &&
+              otpForm.get('otp')?.errors?.['required']
+            "
+          >
+            OTP is required
+          </small>
+
+          <small
+            class="error-text"
+            *ngIf="
+              otpForm.get('otp')?.touched &&
+              otpForm.get('otp')?.errors?.['pattern']
+            "
+          >
+            OTP must be 6 digits
+          </small>
+        </div>
+
+        <button
+          class="btn btn-success w-100"
+          type="button"
+          (click)="verifyOtp()"
+          [disabled]="otpForm.invalid || loading"
+        >
+          <span *ngIf="!loading">Verify & Register</span>
+          <span *ngIf="loading">Verifying…</span>
+        </button>
+
+        <!-- Resend -->
+        <div class="text-center mt-3">
+          <button
+            class="btn btn-link"
+            type="button"
+            (click)="resendOtp()"
+            [disabled]="loading || resendSeconds > 0"
+          >
+            Resend OTP
+            <span *ngIf="resendSeconds > 0">({{ resendSeconds }}s)</span>
+          </button>
+        </div>
+
+        <!-- Back -->
+        <div class="text-center">
+          <button
+            class="btn btn-link"
+            type="button"
+            (click)="backToForm()"
+            [disabled]="loading"
+          >
+            Back to form
+          </button>
+        </div>
+      </form>
+
+      <!-- FOOTER -->
+      <p class="login-text" *ngIf="step === 'FORM'">
         Already have an account?
         <a routerLink="/login">Login here</a>
       </p>
 
     </div>
-
   </div>
-
 </div>
