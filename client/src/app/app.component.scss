@@ -1,4 +1,216 @@
-/* ===== MODERN APP NAVBAR ===== */
+/* =========================
+   GLOBAL RESET
+========================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* =========================
+   MAIN WRAPPER OFFSET FOR FIXED NAVBAR
+========================= */
+.app-main {
+  padding-top: 80px;
+  min-height: calc(100vh - 80px);
+  width: 100%;
+
+  /* ✅ Fix "blank until scroll" (content behind fixed overlays) */
+  position: relative;
+  z-index: 50;
+}
+
+/* =========================
+   PUBLIC LANDING (NOT LOGGED IN)
+========================= */
+.public-hero {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  align-items: center;
+  padding: 28px 28px 36px;
+
+  /* ✅ Ensure above any fixed backgrounds/overlays */
+  position: relative;
+  z-index: 50;
+}
+
+.public-hero-inner {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.public-left {
+  color: rgba(255,255,255,0.92);
+}
+
+.public-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: rgba(229,231,235,0.75);
+  text-transform: uppercase;
+}
+
+.kicker-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #60a5fa;
+  box-shadow: 0 0 18px rgba(96,165,250,0.7);
+}
+
+.public-title {
+  margin: 12px 0 10px;
+  font-size: 44px;
+  line-height: 1.06;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 18px 40px rgba(0,0,0,0.50);
+}
+
+.public-accent {
+  color: #93c5fd;
+}
+
+.public-subtitle {
+  margin: 0 0 16px;
+  max-width: 720px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(229,231,235,0.86);
+}
+
+.public-cta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.cta-btn {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.14);
+}
+
+.cta-btn.primary {
+  border: none;
+  color: #fff;
+  background: linear-gradient(90deg, rgba(59,130,246,0.95), rgba(124,58,237,0.95));
+  box-shadow: 0 14px 36px rgba(99,102,241,0.35);
+}
+
+.cta-btn.ghost {
+  color: rgba(229,231,235,0.92);
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.public-trust {
+  margin-top: 14px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.trust-chip {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: rgba(229,231,235,0.9);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.public-right {
+  display: grid;
+  gap: 12px;
+}
+
+.glass-card {
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 20px 55px rgba(0,0,0,0.32);
+}
+
+.glass-card.mt {
+  margin-top: 12px;
+}
+
+.glass-title {
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(229,231,235,0.92);
+  margin-bottom: 10px;
+}
+
+.glass-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.glass-item {
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(0,0,0,0.22);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.gi-title {
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(229,231,235,0.95);
+}
+
+.gi-sub {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: rgba(229,231,235,0.75);
+}
+
+.role-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.role-pill {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(147,197,253,0.14);
+  border: 1px solid rgba(147,197,253,0.28);
+  color: #dbeafe;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+/* =========================
+   NAVBAR (DASHBOARD MATCHED)
+========================= */
 .app-navbar {
   position: fixed;
   top: 0;
@@ -7,14 +219,40 @@
   height: 80px;
   z-index: 9999;
 
-  background: rgba(10, 20, 40, 0.55);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: linear-gradient(
+    180deg,
+    rgba(7, 10, 22, 0.82),
+    rgba(11, 16, 38, 0.72)
+  );
 
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border-bottom: 1px solid rgba(255,255,255,0.10);
   font-family: 'Poppins', sans-serif;
 
+  box-shadow:
+    0 16px 40px rgba(0,0,0,0.45),
+    0 1px 0 rgba(255,255,255,0.05);
+
   animation: navFadeDown 0.45s ease-out forwards;
+}
+
+/* ✅ Only ONE bottom glow (duplicate removed) */
+.app-navbar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(124,58,237,0.45),
+    rgba(59,130,246,0.45),
+    transparent
+  );
 }
 
 /* Brand */
@@ -112,42 +350,15 @@
   filter: invert(1);
 }
 
-/* Bottom glow */
-.app-navbar::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(99,102,241,0.6),
-    transparent
-  );
-}
-
 /* Animation */
 @keyframes navFadeDown {
   from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ======================================================
-   ✅ REQUIRED: MAIN WRAPPER OFFSET FOR FIXED NAVBAR
-   (prevents content hiding behind navbar)
-   ====================================================== */
-.app-main {
-  padding-top: 80px;
-  min-height: calc(100vh - 80px);
-  width: 100%;
-}
-
-/* ======================================================
-   ✅ NOTIFICATIONS (Button + Dropdown Panel)
-   Matches your glass theme + works with your TS
-   ====================================================== */
+/* =========================
+   NOTIFICATIONS (Button + Panel)
+========================= */
 .notif-wrap {
   position: relative;
   margin-right: 12px;
@@ -328,10 +539,9 @@
   color: rgba(229,231,235,0.55);
 }
 
-/* ======================================================
-   ✅ MOBILE MENU GLASS PANEL (so menu looks premium)
-   Works with [class.show]="isMenuOpen"
-   ====================================================== */
+/* =========================
+   MOBILE MENU GLASS PANEL
+========================= */
 @media (max-width: 991.98px) {
   .collapse.navbar-collapse {
     margin-top: 10px;
@@ -358,4 +568,231 @@
     right: 0;
     left: auto;
   }
+
+  .public-hero-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .public-title {
+    font-size: 34px;
+  }
 }
+
+/* =========================
+   FOOTER (PUBLIC)
+========================= */
+.app-footer {
+  position: relative;
+  z-index: 50;
+  margin-top: 28px;
+  padding: 26px 22px 18px;
+
+  background: rgba(255,255,255,0.04);
+  border-top: 1px solid rgba(255,255,255,0.10);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.footer-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1.1fr;
+  gap: 18px;
+}
+
+.footer-col {
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(0,0,0,0.16);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.footer-col.brand {
+  background: linear-gradient(
+    135deg,
+    rgba(59,130,246,0.12),
+    rgba(124,58,237,0.10)
+  );
+  border: 1px solid rgba(147,197,253,0.14);
+}
+
+.footer-brand {
+  font-size: 15px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.95);
+  letter-spacing: 0.3px;
+}
+
+.footer-tagline {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(229,231,235,0.78);
+  max-width: 520px;
+}
+
+.footer-title {
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(229,231,235,0.92);
+  margin-bottom: 10px;
+}
+
+.footer-link {
+  display: block;
+  padding: 7px 8px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: rgba(229,231,235,0.78);
+  font-size: 12px;
+  font-weight: 800;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.footer-link:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.10);
+  transform: translateY(-1px);
+  color: rgba(255,255,255,0.92);
+}
+
+/* Contact meta */
+.footer-meta {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(229,231,235,0.78);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.meta-row i {
+  width: 18px;
+  text-align: center;
+  color: rgba(147,197,253,0.9);
+}
+
+.meta-row a {
+  color: rgba(229,231,235,0.88);
+  text-decoration: none;
+}
+
+.meta-row a:hover {
+  text-decoration: underline;
+}
+
+/* Social buttons */
+.social-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.social-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(229,231,235,0.92);
+  text-decoration: none;
+
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.social-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.09);
+  box-shadow: 0 16px 34px rgba(0,0,0,0.25);
+}
+
+.social-btn i {
+  font-size: 18px;
+}
+
+/* Footer CTA */
+.footer-cta {
+  margin-top: 4px;
+}
+
+.footer-cta-btn {
+  width: 100%;
+  height: 42px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+
+  font-size: 13px;
+  font-weight: 900;
+  color: #fff;
+
+  background: linear-gradient(90deg, rgba(16,185,129,0.95), rgba(34,197,94,0.95));
+  box-shadow: 0 14px 36px rgba(34,197,94,0.25);
+}
+
+.footer-note {
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(229,231,235,0.65);
+}
+
+/* Bottom row */
+.footer-bottom {
+  max-width: 1400px;
+  margin: 14px auto 0;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.footer-copy {
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(229,231,235,0.62);
+}
+
+.footer-legal {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.footer-legal-link {
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(229,231,235,0.72);
+  text-decoration: none;
+}
+
+.footer-legal-link:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 980px) {
+  .footer-inner {
+    grid-template-columns: 1fr;
+  }
+}
+
