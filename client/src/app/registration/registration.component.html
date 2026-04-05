@@ -155,25 +155,31 @@
             </small>
           </div>
 
-          <!-- Strength Bar -->
-          <div class="mt-2">
-            <div style="height: 8px; border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden;">
+          <!-- Strength Bar (styled via SCSS classes) -->
+          <div class="mt-2 strength-wrap">
+            <div class="strength-bar">
               <div
+                class="strength-fill"
+                [class.weak]="passwordStrengthLabel === 'Weak'"
+                [class.medium]="passwordStrengthLabel === 'Medium'"
+                [class.strong]="passwordStrengthLabel === 'Strong'"
                 [style.width.%]="passwordStrength"
-                [style.height.px]="8"
-                [style.borderRadius.px]="999"
-                [style.background]="passwordStrengthLabel === 'Strong'
-                  ? 'linear-gradient(90deg, #22c55e, #86efac)'
-                  : passwordStrengthLabel === 'Medium'
-                    ? 'linear-gradient(90deg, #f59e0b, #fde68a)'
-                    : 'linear-gradient(90deg, #ef4444, #fecaca)'"
               ></div>
             </div>
-            <small class="d-block mt-1" style="opacity: 0.9;">
-              Strength: <b>{{ passwordStrengthLabel }}</b>
+
+            <small class="strength-text">
+              Strength:
+              <span
+                [class.weak]="passwordStrengthLabel === 'Weak'"
+                [class.medium]="passwordStrengthLabel === 'Medium'"
+                [class.strong]="passwordStrengthLabel === 'Strong'"
+              >
+                {{ passwordStrengthLabel }}
+              </span>
             </small>
           </div>
         </div>
+        <!-- ✅ IMPORTANT: Password .field div closed here -->
 
         <!-- Role -->
         <div class="field">

@@ -48,7 +48,65 @@
   text-align: center;
   position: relative;
 }
+/* ===== PASSWORD STRENGTH ===== */
 
+.strength-wrap {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.strength-bar {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+
+  background: rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.35);
+}
+
+.strength-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  transition: width 0.35s ease-in-out, background 0.25s ease;
+}
+
+/* Strength colors */
+.strength-fill.weak {
+  background: linear-gradient(90deg, #ef4444, #fecaca);
+}
+
+.strength-fill.medium {
+  background: linear-gradient(90deg, #f59e0b, #fde68a);
+}
+
+.strength-fill.strong {
+  background: linear-gradient(90deg, #22c55e, #86efac);
+  box-shadow: 0 0 14px rgba(34,197,94,0.55);
+}
+
+/* Text */
+.strength-text {
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(229,231,235,0.75);
+}
+
+.strength-text .weak {
+  color: #fecaca;
+}
+
+.strength-text .medium {
+  color: #fde68a;
+}
+
+.strength-text .strong {
+  color: #86efac;
+}
 /* ===== ICON ===== */
 .registration-icon-wrapper {
   width: 72px;
