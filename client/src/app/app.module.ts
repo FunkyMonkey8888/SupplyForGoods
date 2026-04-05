@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -22,6 +22,9 @@ import { ConsumerGetOrdersComponent } from './consumer-get-orders/consumer-get-o
 import { OtpLoginComponent } from './otp-login/otp-login.component';
 import { ViewProductsComponent } from './view-products/view-products.component';
 import { CommonModule } from '@angular/common';
+import { ErrorPageComponent } from './pages/error-page.component';
+import { HttpErrorInterceptor } from './http-error.interceptor';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +39,9 @@ import { CommonModule } from '@angular/common';
       AddInventoryComponent,
       ConsumerPlaceOrderComponent,
       ConsumerGetOrdersComponent,
-      ViewProductsComponent
+      ViewProductsComponent,
+      ErrorPageComponent,
+      NotFoundComponent
   ],
   imports: [
     BrowserModule,
@@ -44,9 +49,18 @@ import { CommonModule } from '@angular/common';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule ,
-    CommonModule
+    CommonModule,
   ],
-  providers: [HttpService],
+  providers: [
+    HttpService,
+    
+{
+    provide: HTTP_INTERCEPTORS,
+    useClass: HttpErrorInterceptor,
+    multi: true
+  }
+
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

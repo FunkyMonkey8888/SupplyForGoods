@@ -1,0 +1,24 @@
+<div class="error-hero">
+  <div class="error-overlay"></div>
+
+  <div class="error-container">
+    <div class="error-card animate-in">
+
+      <div class="error-code">{{ status }}</div>
+
+      <h2 class="error-title">{{ title }}</h2>
+      <p class="error-message">{{ message }}</p>
+
+      <p class="error-path" *ngIf="path">
+        <span class="label">Path:</span> {{ path }}
+      </p>
+
+      <div class="error-actions">
+        <button class="btn btn-primary" (click)="retry()">Go Back</button>
+        <button class="btn btn-outline-light" (click)="goDashboard()">Dashboard</button>
+        <button class="btn btn-outline-warning" (click)="goLogin()">Login</button>
+      </div>
+
+    </div>
+  </div>
+</div>

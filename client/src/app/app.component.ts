@@ -25,7 +25,7 @@ export class AppComponent implements OnInit, OnDestroy {
   showNotifications = false;
 
   // ✅ Public landing visibility
-  isPublicHome = true;
+  isPublicHome = false;
 
   private notifTimer: any = null;
 
