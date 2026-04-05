@@ -3,15 +3,15 @@
   <div class="card login-card shadow-lg p-4"
        style="max-width: 420px; width: 100%; border-radius: 16px;">
 
-    <!-- ✅ Icon Header -->
+    <!-- Icon -->
     <div class="text-center mb-3">
       <i class="bi"
-         [ngClass]="mode === 'PASSWORD' ? 'bi-shield-lock-fill' : 'bi-envelope-lock-fill'"
+         [ngClass]="step === 'PASSWORD' ? 'bi-shield-lock-fill' : 'bi-envelope-check-fill'"
          style="font-size: 48px; color: #0d6efd;"></i>
     </div>
 
     <h3 class="text-center mb-4 fw-bold">
-      {{ mode === 'PASSWORD' ? 'Login to Your Account' : 'OTP Login' }}
+      {{ step === 'PASSWORD' ? 'Login to Your Account' : 'Two‑Factor Verification' }}
     </h3>
 
     <!-- Error -->
@@ -19,12 +19,11 @@
       {{ message }}
     </div>
 
-    <!-- ================= PASSWORD LOGIN ================= -->
-    <form *ngIf="mode === 'PASSWORD'"
+    <!-- ================= STEP 1: PASSWORD ================= -->
+    <form *ngIf="step === 'PASSWORD'"
           [formGroup]="itemForm"
           (ngSubmit)="onSubmit()">
 
-      <!-- Username -->
       <div class="mb-3">
         <label class="form-label fw-semibold">Username</label>
         <input
@@ -34,7 +33,6 @@
           placeholder="Enter username">
       </div>
 
-      <!-- Password -->
       <div class="mb-3">
         <label class="form-label fw-semibold">Password</label>
         <input
@@ -44,7 +42,6 @@
           placeholder="Enter password">
       </div>
 
-      <!-- Submit -->
       <button
         class="btn btn-primary w-100"
         type="submit"
@@ -55,104 +52,50 @@
           Login
         </span>
 
-        <span *ngIf="loading">
-          Logging in…
-        </span>
-      </button>
-
-      <!-- OTP Login switch -->
-      <button class="btn btn-outline-dark w-100 mt-3"
-              type="button"
-              (click)="switchToOtp()"
-              [disabled]="loading">
-        Forgot password? Login with OTP
+        <span *ngIf="loading">Verifying…</span>
       </button>
 
     </form>
 
-    <!-- ================= OTP LOGIN ================= -->
-    <form *ngIf="mode === 'OTP'"
-          [formGroup]="otpForm">
+    <!-- ================= STEP 2: OTP ================= -->
+    <form *ngIf="step === 'OTP'" [formGroup]="otpForm">
 
-      <!-- Step 1: Email -->
-      <div *ngIf="otpStep === 'EMAIL'">
+      <div class="text-center text-muted mb-2 small">
+        Enter the 6‑digit OTP sent to your registered email
+      </div>
 
-        <div class="mb-3">
-          <label class="form-label fw-semibold">Email</label>
-          <input
-            class="form-control"
-            type="email"
-            formControlName="email"
-            placeholder="Enter your email">
-        </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">OTP</label>
+        <input
+          class="form-control text-center"
+          type="text"
+          maxlength="6"
+          inputmode="numeric"
+          formControlName="otp"
+          placeholder="Enter OTP">
+      </div>
 
-        <button class="btn btn-primary w-100"
+      <button
+        class="btn btn-success w-100"
+        type="button"
+        (click)="verifyOtp()"
+        [disabled]="otpForm.invalid || loading">
+
+        <span *ngIf="!loading">Verify & Login</span>
+        <span *ngIf="loading">Verifying…</span>
+      </button>
+
+      <div class="text-center mt-3">
+        <button class="btn btn-link"
                 type="button"
-                (click)="sendOtp()"
-                [disabled]="loading || otpForm.get('email')?.invalid">
-          <span *ngIf="!loading">Send OTP</span>
-          <span *ngIf="loading">Sending…</span>
-        </button>
-
-        <button class="btn btn-link w-100 mt-2"
-                type="button"
-                (click)="switchToPassword()"
+                (click)="backToPassword()"
                 [disabled]="loading">
-          Back to Password Login
+          Back to login
         </button>
       </div>
 
-      <!-- Step 2: Verify OTP -->
-      <div *ngIf="otpStep === 'VERIFY'">
-
-        <div class="mb-3">
-          <label class="form-label fw-semibold">Email</label>
-          <input
-            class="form-control"
-            type="email"
-            formControlName="email"
-            placeholder="Enter your email">
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label fw-semibold">OTP (6 digits)</label>
-          <input
-            class="form-control text-center"
-            type="text"
-            maxlength="6"
-            inputmode="numeric"
-            formControlName="otp"
-            placeholder="Enter OTP">
-        </div>
-
-        <button class="btn btn-success w-100"
-                type="button"
-                (click)="verifyOtp()"
-                [disabled]="loading || otpForm.get('otp')?.invalid">
-          <span *ngIf="!loading">Verify & Login</span>
-          <span *ngIf="loading">Verifying…</span>
-        </button>
-
-        <div class="d-flex justify-content-between align-items-center mt-3">
-          <button class="btn btn-link p-0"
-                  type="button"
-                  (click)="backToEmail()"
-                  [disabled]="loading">
-            Change Email
-          </button>
-
-          <button class="btn btn-link p-0"
-                  type="button"
-                  (click)="resendOtp()"
-                  [disabled]="loading || resendSeconds > 0">
-            Resend <span *ngIf="resendSeconds > 0">({{ resendSeconds }}s)</span>
-          </button>
-        </div>
-
-      </div>
     </form>
 
-    <!-- Register Redirect -->
     <p class="text-center mt-3 mb-0">
       Don’t have an account?
       <a routerLink="/registration" class="fw-semibold">

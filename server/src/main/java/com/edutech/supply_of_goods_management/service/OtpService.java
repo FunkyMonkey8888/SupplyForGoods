@@ -64,4 +64,44 @@ public class OtpService {
         rec.setUsed(true);
         otpRepo.save(rec);
     }
+    public Long requestOtpFor2FA(String email) {
+    String otp = String.valueOf(100000 + random.nextInt(900000));
+
+    OtpVerification rec = new OtpVerification();
+    rec.setEmail(email);
+    rec.setOtpHash(passwordEncoder.encode(otp));
+    rec.setExpiresAt(LocalDateTime.now().plusMinutes(5));
+    rec.setUsed(false);
+    rec.setAttempts(0);
+
+    OtpVerification saved = otpRepo.save(rec);
+    emailService.sendOtp(email, otp);
+
+    return saved.getId(); // ✅ otpId used as session id
+}
+
+@Transactional
+public void verifyOtpFor2FAOrThrow(Long otpId, String otp) {
+
+    OtpVerification rec = otpRepo.findByIdAndUsedFalse(otpId)
+            .orElseThrow(() -> new RuntimeException("OTP session not found"));
+
+    if (rec.getExpiresAt().isBefore(LocalDateTime.now())) {
+        throw new RuntimeException("OTP expired");
+    }
+
+    if (rec.getAttempts() >= 5) {
+        throw new RuntimeException("Too many attempts");
+    }
+
+    rec.setAttempts(rec.getAttempts() + 1);
+
+    if (!passwordEncoder.matches(otp, rec.getOtpHash())) {
+        otpRepo.save(rec);
+        throw new RuntimeException("Invalid OTP");
+    }
+
+    rec.setUsed(true);
+    otpRepo.save(rec);
+}
 }

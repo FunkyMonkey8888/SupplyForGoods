@@ -36,14 +36,14 @@
   box-shadow: 0 0 0 0.2rem rgba(78, 140, 255, 0.25);
 }
 
-/* OTP specific input */
+/* OTP input (2FA only) */
 .form-control.text-center {
   letter-spacing: 6px;
   font-weight: 700;
   font-size: 18px;
 }
 
-/* Primary button */
+/* Primary button (password step) */
 .btn-primary {
   background: linear-gradient(90deg, #4e8cff, #77b5ff);
   border: none;
@@ -59,16 +59,11 @@
   box-shadow: 0 6px 18px rgba(78, 140, 255, 0.4);
 }
 
-/* Success button (OTP verify) */
+/* OTP verify button */
 .btn-success {
   border-radius: 10px;
   padding: 12px;
-  font-weight: 600;
-}
-
-/* Outline button (OTP switch) */
-.btn-outline-dark {
-  border-radius: 10px;
+  font-size: 16px;
   font-weight: 600;
 }
 
@@ -99,12 +94,7 @@ a:hover,
   text-decoration: underline;
 }
 
-/* OTP resend / back row */
-.d-flex.justify-content-between {
-  font-size: 14px;
-}
-
-/* Icons */
+/* Icon consistency */
 .bi {
   display: inline-block;
 }

@@ -1,13 +1,156 @@
+/* Card */
 .registration-card {
   width: 100%;
   max-width: 480px;
   padding: 28px;
   border-radius: 20px;
   background: linear-gradient(135deg, #ffffff, #f4f9ff);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
 }
 
+/* Inputs focus */
 .form-control:focus,
 .form-select:focus {
   border-color: #4e8cff;
   box-shadow: 0 0 0 0.2rem rgba(78, 140, 255, 0.25);
+}
+
+/* OTP + password text-center inputs */
+.form-control.text-center {
+  letter-spacing: 6px;
+  font-weight: 700;
+  font-size: 18px;
+  text-align: center;
+}
+
+/* Strength bar wrapper */
+.strength-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Strength bar background */
+.strength-bar {
+  flex: 1;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+/* Strength fill */
+.strength-fill {
+  height: 100%;
+  width: 0%;
+  transition: width 0.25s ease;
+}
+
+/* Strength colors */
+.strength-fill.weak {
+  background: #dc3545;
+}
+.strength-fill.medium {
+  background: #ffc107;
+}
+.strength-fill.strong {
+  background: #198754;
+}
+
+/* Strength label */
+.strength-text {
+  font-size: 12px;
+  color: #6c757d;
+  white-space: nowrap;
+}
+
+.strength-text .weak {
+  color: #dc3545;
+  font-weight: 700;
+}
+.strength-text .medium {
+  color: #b58900;
+  font-weight: 700;
+}
+.strength-text .strong {
+  color: #198754;
+  font-weight: 700;
+}
+
+/* Password rules list */
+.pwd-rules {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  font-size: 13px;
+  color: #6c757d;
+}
+
+.pwd-rules li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+/* Default rule icon (not satisfied) */
+.pwd-rules li i {
+  font-size: 14px;
+  color: #dc3545;
+}
+
+/* Satisfied rule */
+.pwd-rules li.ok {
+  color: #198754;
+}
+.pwd-rules li.ok i {
+  color: #198754;
+}
+
+/* Buttons */
+.btn-primary,
+.btn-success {
+  border-radius: 10px;
+  padding: 12px;
+  font-weight: 600;
+}
+
+/* Disabled button */
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Alert */
+.alert-danger {
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+/* Links */
+a,
+.btn-link {
+  color: #1e90ff;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+a:hover,
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .registration-card {
+    padding: 22px;
+  }
+
+  .form-control.text-center {
+    letter-spacing: 4px;
+    font-size: 16px;
+  }
 }

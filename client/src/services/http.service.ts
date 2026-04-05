@@ -417,4 +417,43 @@ verifyOtp(email: string, otp: string) {
     { headers: { 'Content-Type': 'application/json' } }
   );
 }
+      login2fa(details: { username: string; password: string }) {
+  return this.http.post<any>(
+    `${this.serverName}/api/auth/2fa/login`,
+    details,
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+}
+
+verify2fa(details: { username: string; otp: string }) {
+  return this.http.post<any>(
+    `${this.serverName}/api/auth/2fa/verify`,
+    details,
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+}
+resendOtp(email: string) {
+  return this.http.post<any>(
+    `${this.serverName}/api/auth/request-otp`,
+    { email },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+}
+
+requestRegisterOtp(email: string) {
+  return this.http.post<any>(
+    `${this.serverName}/api/auth/register/request-otp`,
+    { email },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+}
+
+verifyRegisterOtp(email: string, otp: string) {
+  return this.http.post<any>(
+    `${this.serverName}/api/auth/register/verify-otp`,
+    { email, otp },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+}
+
 }

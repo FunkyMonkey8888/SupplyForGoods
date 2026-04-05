@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpService } from '../../services/http.service';
@@ -11,17 +11,16 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LoginComponent implements OnInit, OnDestroy {
 
-  // password login form
   itemForm!: FormGroup;
-
-  // otp login form
   otpForm!: FormGroup;
 
   message = '';
   loading = false;
 
-  mode: 'PASSWORD' | 'OTP' = 'PASSWORD';
-  otpStep: 'EMAIL' | 'VERIFY' = 'EMAIL';
+  step: 'PASSWORD' | 'OTP' = 'PASSWORD';
+
+  otpEmail: string = '';
+  otpUsername: string = '';
 
   resendSeconds = 0;
   private timer: any = null;
@@ -40,19 +39,15 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
 
     this.otpForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
       otp: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]]
     });
-
-    this.otpForm.get('otp')?.disable();
   }
 
   ngOnDestroy(): void {
     if (this.timer) clearInterval(this.timer);
   }
 
-  // ---------------- PASSWORD LOGIN ----------------
-
+  // ✅ STEP 1: username/password -> OTP sent
   onSubmit(): void {
     if (this.itemForm.invalid) {
       this.message = 'Please fill all fields.';
@@ -62,87 +57,32 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.message = '';
 
-    this.http.Login(this.itemForm.value).subscribe({
+    const payload = {
+      username: this.itemForm.value.username,
+      password: this.itemForm.value.password
+    };
+
+    this.http.login2fa(payload).subscribe({
       next: (res) => {
-        const id = res?.id ?? res?.userId ?? res?.user?.id;
-        const role = res?.role ?? res?.user?.role;
-        const username = res?.username ?? res?.user?.username;
-        const token = res?.token;
-
-        this.auth.saveLoginData(token, role, String(id), username);
         this.loading = false;
-        this.router.navigate(['/dashboard']);
-      },
-      error: () => {
-        this.message = 'Invalid username or password.';
-        this.loading = false;
-      }
-    });
-  }
 
-  // ---------------- OTP LOGIN ----------------
+        this.step = 'OTP';
+        this.otpEmail = res?.email || '';
+        this.otpUsername = res?.username || payload.username;
 
-  switchToOtp(): void {
-    this.mode = 'OTP';
-    this.otpStep = 'EMAIL';
-    this.message = '';
-    this.loading = false;
-
-    this.otpForm.reset();
-    this.otpForm.get('otp')?.disable();
-
-    this.stopTimer();
-  }
-
-  switchToPassword(): void {
-    this.mode = 'PASSWORD';
-    this.message = '';
-    this.loading = false;
-
-    this.stopTimer();
-  }
-
-  sendOtp(): void {
-    const emailCtrl = this.otpForm.get('email');
-    if (!emailCtrl || emailCtrl.invalid) {
-      this.message = 'Enter a valid email.';
-      return;
-    }
-
-    this.loading = true;
-    this.message = '';
-
-    const email = String(emailCtrl.value).trim();
-
-    this.http.requestOtp(email).subscribe({
-      next: () => {
-        this.loading = false;
-        this.otpStep = 'VERIFY';
-
-        this.otpForm.get('otp')?.enable();
-        this.otpForm.get('otp')?.reset();
-
+        this.otpForm.reset();
         this.startResendTimer(30);
       },
       error: () => {
         this.loading = false;
-        this.message = 'Failed to send OTP. Try again.';
+        this.message = 'Invalid username or password.';
       }
     });
   }
 
+  // ✅ STEP 2: verify OTP -> JWT issued
   verifyOtp(): void {
-    const emailCtrl = this.otpForm.get('email');
-    const otpCtrl = this.otpForm.get('otp');
-
-    if (!emailCtrl || !otpCtrl) return;
-
-    if (emailCtrl.invalid) {
-      this.message = 'Enter a valid email.';
-      return;
-    }
-
-    if (otpCtrl.invalid) {
+    if (this.otpForm.invalid) {
       this.message = 'Enter a valid 6-digit OTP.';
       return;
     }
@@ -150,11 +90,13 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.message = '';
 
-    const email = String(emailCtrl.value).trim();
-    const otp = String(otpCtrl.value).trim();
+    const payload = {
+      username: this.otpUsername || this.itemForm.value.username,
+      otp: String(this.otpForm.value.otp).trim()
+    };
 
-    this.http.verifyOtp(email, otp).subscribe({
-      next: (res: any) => {
+    this.http.verify2fa(payload).subscribe({
+      next: (res) => {
         const id = res?.id ?? res?.userId ?? res?.user?.id;
         const role = res?.role ?? res?.user?.role;
         const username = res?.username ?? res?.user?.username;
@@ -172,17 +114,29 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Optional resend (uses /api/auth/request-otp with email)
   resendOtp(): void {
-    if (this.resendSeconds > 0 || this.loading) return;
-    this.sendOtp();
+    if (this.resendSeconds > 0 || this.loading || !this.otpEmail) return;
+
+    this.loading = true;
+    this.message = '';
+
+    this.http.resendOtp(this.otpEmail).subscribe({
+      next: () => {
+        this.loading = false;
+        this.startResendTimer(30);
+      },
+      error: () => {
+        this.loading = false;
+        this.message = 'Failed to resend OTP.';
+      }
+    });
   }
 
-  backToEmail(): void {
-    this.otpStep = 'EMAIL';
+  backToPassword(): void {
+    this.step = 'PASSWORD';
     this.message = '';
-    this.otpForm.get('otp')?.disable();
-    this.otpForm.get('otp')?.reset();
-
+    this.otpForm.reset();
     this.stopTimer();
   }
 

@@ -5,13 +5,22 @@
 
     <!-- ✅ Icon Header -->
     <div class="text-center mb-3">
-      <i class="bi bi-person-plus-fill"
+      <i class="bi"
+         [ngClass]="step === 'FORM' ? 'bi-person-plus-fill' : 'bi-envelope-check-fill'"
          style="font-size: 48px; color: #0d6efd;"></i>
     </div>
 
-    <h3 class="text-center mb-4 fw-bold">Create Your Account</h3>
+    <h3 class="text-center mb-4 fw-bold">
+      {{ step === 'FORM' ? 'Create Your Account' : 'Verify Email (OTP)' }}
+    </h3>
 
-    <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+    <!-- ✅ Global / Server Error -->
+    <div *ngIf="message" class="alert alert-danger text-center">
+      {{ message }}
+    </div>
+
+    <!-- ====================== STEP 1: REGISTRATION FORM ====================== -->
+    <form *ngIf="step === 'FORM'" [formGroup]="itemForm" novalidate>
 
       <!-- Username -->
       <div class="mb-3">
@@ -20,10 +29,15 @@
                class="form-control"
                formControlName="username"
                placeholder="Enter username">
+
         <small class="text-danger"
-               *ngIf="itemForm.controls['username'].touched &&
-                       itemForm.controls['username'].invalid">
-          Username must be at least 3 characters
+               *ngIf="itemForm.get('username')?.touched && itemForm.get('username')?.errors?.['required']">
+          Username is required.
+        </small>
+
+        <small class="text-danger"
+               *ngIf="itemForm.get('username')?.touched && itemForm.get('username')?.errors?.['minlength']">
+          Username must be at least 4 characters.
         </small>
       </div>
 
@@ -34,10 +48,15 @@
                class="form-control"
                formControlName="email"
                placeholder="Enter email">
+
         <small class="text-danger"
-               *ngIf="itemForm.controls['email'].touched &&
-                       itemForm.controls['email'].invalid">
-          Enter a valid email address
+               *ngIf="itemForm.get('email')?.touched && itemForm.get('email')?.errors?.['required']">
+          Email is required.
+        </small>
+
+        <small class="text-danger"
+               *ngIf="itemForm.get('email')?.touched && itemForm.get('email')?.errors?.['email']">
+          Enter a valid email address.
         </small>
       </div>
 
@@ -48,10 +67,78 @@
                class="form-control"
                formControlName="password"
                placeholder="Enter password">
+
+        <!-- Strength bar -->
+        <div class="strength-wrap mt-2">
+          <div class="strength-bar">
+            <div class="strength-fill"
+                 [class.weak]="passwordStrengthLabel === 'Weak'"
+                 [class.medium]="passwordStrengthLabel === 'Medium'"
+                 [class.strong]="passwordStrengthLabel === 'Strong'"
+                 [style.width.%]="passwordStrength">
+            </div>
+          </div>
+
+          <div class="strength-text">
+            Strength:
+            <span [class.weak]="passwordStrengthLabel === 'Weak'"
+                  [class.medium]="passwordStrengthLabel === 'Medium'"
+                  [class.strong]="passwordStrengthLabel === 'Strong'">
+              {{ passwordStrengthLabel }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Live rule checklist -->
+        <ul class="pwd-rules mt-2">
+          <li [class.ok]="passwordRules.minLen">
+            <i class="bi"
+               [ngClass]="passwordRules.minLen ? 'bi-check-circle-fill' : 'bi-x-circle'"></i>
+            Minimum 8 characters
+          </li>
+
+          <li [class.ok]="passwordRules.upper">
+            <i class="bi"
+               [ngClass]="passwordRules.upper ? 'bi-check-circle-fill' : 'bi-x-circle'"></i>
+            At least 1 uppercase letter (A-Z)
+          </li>
+
+          <li [class.ok]="passwordRules.lower">
+            <i class="bi"
+               [ngClass]="passwordRules.lower ? 'bi-check-circle-fill' : 'bi-x-circle'"></i>
+            At least 1 lowercase letter (a-z)
+          </li>
+
+          <li [class.ok]="passwordRules.digit">
+            <i class="bi"
+               [ngClass]="passwordRules.digit ? 'bi-check-circle-fill' : 'bi-x-circle'"></i>
+            At least 1 number (0-9)
+          </li>
+
+          <li [class.ok]="passwordRules.special">
+            <i class="bi"
+               [ngClass]="passwordRules.special ? 'bi-check-circle-fill' : 'bi-x-circle'"></i>
+            At least 1 special character (@ $ ! % * ? &)
+          </li>
+        </ul>
+
+        <small class="text-muted d-block mt-1">
+          Example: <strong>Abcd@123</strong>
+        </small>
+
         <small class="text-danger"
-               *ngIf="itemForm.controls['password'].touched &&
-                       itemForm.controls['password'].invalid">
-          Password must be at least 6 characters
+               *ngIf="itemForm.get('password')?.touched && itemForm.get('password')?.errors?.['required']">
+          Password is required.
+        </small>
+
+        <small class="text-danger"
+               *ngIf="itemForm.get('password')?.touched && itemForm.get('password')?.errors?.['minlength']">
+          Password must be at least 8 characters.
+        </small>
+
+        <small class="text-danger"
+               *ngIf="itemForm.get('password')?.touched && itemForm.get('password')?.errors?.['pattern']">
+          Password must include at least 1 uppercase, 1 lowercase, 1 number, and 1 special character (@$!%*?&).
         </small>
       </div>
 
@@ -60,39 +147,96 @@
         <label class="form-label fw-semibold">Select Role</label>
         <select formControlName="role" class="form-select">
           <option value="" disabled>Select Role</option>
-          <option *ngFor="let r of roles" [value]="r">
-            {{ r }}
-          </option>
+          <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
         </select>
-      </div>
 
-      <!-- Error -->
-      <div *ngIf="message" class="alert alert-danger text-center">
-        {{ message }}
+        <small class="text-danger"
+               *ngIf="itemForm.get('role')?.touched && itemForm.get('role')?.errors?.['required']">
+          Please select a role.
+        </small>
       </div>
 
       <!-- Submit -->
       <button class="btn btn-primary w-100"
-              type="submit"
+              type="button"
+              (click)="sendOtp()"
               [disabled]="itemForm.invalid || loading">
+
         <span *ngIf="!loading">
-          <i class="bi bi-person-check-fill me-1"></i>
-          Register
+          <i class="bi bi-envelope-arrow-up me-1"></i>
+          Send OTP & Continue
         </span>
+
         <span *ngIf="loading">
-          Registering...
+          Sending…
         </span>
       </button>
 
+      <!-- Login link -->
+      <p class="text-center mt-3 mb-0">
+        Already have an account?
+        <a routerLink="/login" class="fw-semibold">Login here</a>
+      </p>
+
     </form>
 
-    <!-- Login Link -->
-    <p class="text-center mt-3 mb-0">
-      Already have an account?
-      <a routerLink="/login" class="fw-semibold">
-        Login here
-      </a>
-    </p>
+    <!-- ====================== STEP 2: OTP VERIFICATION ====================== -->
+    <form *ngIf="step === 'OTP'" [formGroup]="otpForm" novalidate>
+
+      <div class="text-center text-muted mb-2 small">
+        OTP sent to <strong>{{ itemForm.value.email }}</strong>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold">OTP (6 digits)</label>
+        <input type="text"
+               class="form-control text-center"
+               formControlName="otp"
+               maxlength="6"
+               inputmode="numeric"
+               placeholder="Enter OTP">
+
+        <small class="text-danger"
+               *ngIf="otpForm.get('otp')?.touched && otpForm.get('otp')?.errors?.['required']">
+          OTP is required.
+        </small>
+
+        <small class="text-danger"
+               *ngIf="otpForm.get('otp')?.touched && otpForm.get('otp')?.errors?.['pattern']">
+          OTP must be exactly 6 digits.
+        </small>
+      </div>
+
+      <button class="btn btn-success w-100"
+              type="button"
+              (click)="verifyOtp()"
+              [disabled]="otpForm.invalid || loading">
+
+        <span *ngIf="!loading">
+          <i class="bi bi-check-circle-fill me-1"></i>
+          Verify OTP & Register
+        </span>
+
+        <span *ngIf="loading">Verifying…</span>
+      </button>
+
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <button class="btn btn-link p-0"
+                type="button"
+                (click)="backToForm()"
+                [disabled]="loading">
+          Back
+        </button>
+
+        <button class="btn btn-link p-0"
+                type="button"
+                (click)="resendOtp()"
+                [disabled]="loading || resendSeconds > 0">
+          Resend <span *ngIf="resendSeconds > 0">({{ resendSeconds }}s)</span>
+        </button>
+      </div>
+
+    </form>
 
   </div>
 </div>
