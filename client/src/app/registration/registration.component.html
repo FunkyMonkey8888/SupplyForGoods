@@ -1,9 +1,7 @@
 <div class="registration-hero">
-
   <div class="registration-overlay"></div>
 
   <div class="registration-container">
-
     <div class="registration-card animate-in">
 
       <div class="registration-icon-wrapper">
@@ -16,6 +14,11 @@
 
       <h3 class="registration-title">User Registration</h3>
       <p class="registration-subtitle">Create your account and get started</p>
+
+      <!-- ✅ MESSAGE (success / error / info) -->
+      <div *ngIf="message" class="login-alert">
+        {{ message }}
+      </div>
 
       <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
 
@@ -30,8 +33,16 @@
           <small
             class="error-text"
             *ngIf="itemForm.get('username')?.touched &&
-                   itemForm.get('username')?.errors?.['required']">
+                   itemForm.get('username')?.errors?.['required']"
+          >
             Username is required
+          </small>
+          <small
+            class="error-text"
+            *ngIf="itemForm.get('username')?.touched &&
+                   itemForm.get('username')?.errors?.['minlength']"
+          >
+            Username must be at least 4 characters
           </small>
         </div>
 
@@ -46,13 +57,15 @@
           <small
             class="error-text"
             *ngIf="itemForm.get('email')?.touched &&
-                   itemForm.get('email')?.errors?.['required']">
+                   itemForm.get('email')?.errors?.['required']"
+          >
             Email is required
           </small>
           <small
             class="error-text"
             *ngIf="itemForm.get('email')?.touched &&
-                   itemForm.get('email')?.errors?.['email']">
+                   itemForm.get('email')?.errors?.['email']"
+          >
             Enter a valid email address
           </small>
         </div>
@@ -68,9 +81,48 @@
           <small
             class="error-text"
             *ngIf="itemForm.get('password')?.touched &&
-                   itemForm.get('password')?.errors?.['required']">
+                   itemForm.get('password')?.errors?.['required']"
+          >
             Password is required
           </small>
+          <small
+            class="error-text"
+            *ngIf="itemForm.get('password')?.touched &&
+                   itemForm.get('password')?.errors?.['minlength']"
+          >
+            Password must be at least 8 characters
+          </small>
+          <small
+            class="error-text"
+            *ngIf="itemForm.get('password')?.touched &&
+                   itemForm.get('password')?.errors?.['pattern']"
+          >
+            Must contain Upper, Lower, Number and Special character
+          </small>
+
+          <!-- ✅ PASSWORD STRENGTH (uses your TS: passwordStrength/passwordStrengthLabel) -->
+          <div class="mt-2 strength-wrap">
+            <div class="strength-bar">
+              <div
+                class="strength-fill"
+                [style.width.%]="passwordStrength"
+                [class.weak]="passwordStrengthLabel === 'Weak'"
+                [class.medium]="passwordStrengthLabel === 'Medium'"
+                [class.strong]="passwordStrengthLabel === 'Strong'"
+              ></div>
+            </div>
+
+            <small class="strength-text">
+              Strength:
+              <span
+                [class.weak]="passwordStrengthLabel === 'Weak'"
+                [class.medium]="passwordStrengthLabel === 'Medium'"
+                [class.strong]="passwordStrengthLabel === 'Strong'"
+              >
+                {{ passwordStrengthLabel }}
+              </span>
+            </small>
+          </div>
         </div>
 
         <div class="field">
@@ -82,7 +134,8 @@
           <small
             class="error-text"
             *ngIf="itemForm.get('role')?.touched &&
-                   itemForm.get('role')?.errors?.['required']">
+                   itemForm.get('role')?.errors?.['required']"
+          >
             Role selection is required
           </small>
         </div>
@@ -90,8 +143,10 @@
         <button
           class="register-btn"
           type="submit"
-          [disabled]="itemForm.invalid">
-          Register
+          [disabled]="itemForm.invalid || loading"
+        >
+          <span *ngIf="!loading">Register</span>
+          <span *ngIf="loading">Registering…</span>
         </button>
 
       </form>
@@ -102,7 +157,5 @@
       </p>
 
     </div>
-
   </div>
-
 </div>
