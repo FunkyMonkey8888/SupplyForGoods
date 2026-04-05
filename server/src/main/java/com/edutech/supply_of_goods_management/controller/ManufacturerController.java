@@ -10,20 +10,23 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// REST controller for manufacturer operations
 @RestController
 @RequestMapping("/api/manufacturers")
 public class ManufacturerController {
 
+    // Service dependencies
     private final ProductService productService;
     private final OrderService orderService;
 
+    // Constructor-based dependency injection
     public ManufacturerController(ProductService productService,
                                   OrderService orderService) {
         this.productService = productService;
         this.orderService = orderService;
     }
 
-
+    // Create a new product
     @PostMapping("/product")
     @PreAuthorize("hasAuthority('MANUFACTURER')")
     public ResponseEntity<Product> createProduct(
@@ -34,6 +37,7 @@ public class ManufacturerController {
         );
     }
 
+    // Update existing product
     @PutMapping("/product/{id}")
     @PreAuthorize("hasAuthority('MANUFACTURER')")
     public ResponseEntity<Product> updateProduct(
@@ -45,6 +49,7 @@ public class ManufacturerController {
         );
     }
 
+    // Delete a product
     @PreAuthorize("hasAuthority('MANUFACTURER')")
     public ResponseEntity<Void> deleteProduct(
             @PathVariable Long id) {
@@ -53,6 +58,7 @@ public class ManufacturerController {
         return ResponseEntity.noContent().build();
     }
 
+    // Get all products of a manufacturer
     @GetMapping("/products")
     @PreAuthorize("hasAuthority('MANUFACTURER')")
     public ResponseEntity<List<Product>> getManufacturerProducts(
@@ -63,7 +69,7 @@ public class ManufacturerController {
         );
     }
 
-
+    // Get all orders for manufacturer
     @GetMapping("/orders")
     @PreAuthorize("hasAuthority('MANUFACTURER')")
     public ResponseEntity<List<Order>> getOrdersForManufacturer(
@@ -74,6 +80,7 @@ public class ManufacturerController {
         );
     }
 
+    // Update order status
     @PutMapping("/orders/{id}")
     public ResponseEntity<Order> updateOrderStatus(@PathVariable Long id,
                                                    @RequestParam String status) {

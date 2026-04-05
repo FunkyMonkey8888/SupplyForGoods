@@ -15,9 +15,11 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// Service class for order-related operations
 @Service
 public class OrderService {
 
+    // Repository and service dependencies
     private final OrderRepository orderRepo;
     private final ProductRepository productRepo;
     private final UserRepository userRepo;
@@ -25,6 +27,7 @@ public class OrderService {
     private final InventoryRepository inventoryRepository;
     private final NotificationService notificationService;
 
+    // Constructor-based dependency injection
     public OrderService(OrderRepository orderRepo,
                         ProductRepository productRepo,
                         UserRepository userRepo,
@@ -40,7 +43,7 @@ public class OrderService {
         this.notificationService = ns;
     }
 
-
+    // Place a new order
     public Order placeOrder(Long productId, Long userId, Order order) {
 
         Product product = productRepo.findById(productId)
@@ -51,7 +54,6 @@ public class OrderService {
 
         order.setProduct(product);
         order.setUser(user);
-
         order.setStatus("PENDING");
 
         // Notify manufacturer of product demand
@@ -78,75 +80,44 @@ for (Inventory inv : invs) {
         return orderRepo.save(order);
     }
 
-
-    // @Transactional
-    // public Order updateOrderStatus(Long orderId, String newStatus) {
-
-    //     Order order = orderRepo.findById(orderId)
-    //             .orElseThrow(() -> new RuntimeException("Order not found"));
-
-    //     String currentStatus = order.getStatus();
-
-    //     if (currentStatus == null || currentStatus.isBlank()) {
-    //         throw new IllegalStateException("Order status is not initialized");
-    //     }
-
-    //     newStatus = newStatus.toUpperCase();
-
-    //     if (!isValidTransition(currentStatus, newStatus)) {
-    //         throw new IllegalStateException(
-    //                 "Invalid order status transition from " +
-    //                         currentStatus + " to " + newStatus
-    //         );
-    //     }
-
-    //     // ✅ Inventory hooks
-    //     if ("CONFIRMED".equals(newStatus)) {
-    //         inventoryService.reserveInventory(order);
-    //     }
-
-    //     if ("CANCELLED".equals(newStatus)) {
-    //         inventoryService.releaseInventory(order);
-    //     }
-
-    //     order.setStatus(newStatus);
-    //     return orderRepo.save(order);
-    // }
+    // Update order status
     @Transactional
-public Order updateOrderStatus(Long orderId, String status) {
+    public Order updateOrderStatus(Long orderId, String status) {
 
-    Order order = orderRepo.findById(orderId)
-            .orElseThrow(() -> new RuntimeException("Order not found"));
+        Order order = orderRepo.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
 
-    if ("CONFIRMED".equals(status)) {
-        try {
-            inventoryService.reserveInventory(order);
-        } catch (RuntimeException ex) {
+        // Reserve inventory if order is confirmed
+        if ("CONFIRMED".equals(status)) {
+            try {
+                inventoryService.reserveInventory(order);
+            } catch (RuntimeException ex) {
 
-            // ✅ Inventory issue → delete product
-            Product product = order.getProduct();
-            productRepo.deleteById(product.getId());
+                // If inventory fails, delete the product
+                Product product = order.getProduct();
+                productRepo.deleteById(product.getId());
 
-            throw new RuntimeException(
-                "Inventory unavailable. Product has been removed."
-            );
+                throw new RuntimeException(
+                        "Inventory unavailable. Product has been removed."
+                );
+            }
         }
+
+        order.setStatus(status);
+        return orderRepo.save(order);
     }
 
-    order.setStatus(status);
-    return orderRepo.save(order);
-}
-
-
+    // Get orders by user ID
     public List<Order> getOrdersByUser(Long userId) {
         return orderRepo.findByUserId(userId);
     }
 
+    // Get orders for manufacturer
     public List<Order> getOrdersByManufacturer(Long manufacturerId) {
         return orderRepo.findByProductManufacturerIdAndUserRole(manufacturerId, "WHOLESALER");
     }
 
-
+    // Check valid order status transitions
     private boolean isValidTransition(String current, String next) {
 
         switch (current) {
@@ -168,23 +139,25 @@ public Order updateOrderStatus(Long orderId, String status) {
         }
     }
 
+    // Get consumer orders for wholesaler
     public List<Order> getConsumerOrdersForWholesaler(Long wholesalerId) {
 
-    // Step 1: get all inventories of the wholesaler
-    List<Inventory> inventories =
-            inventoryRepository.findByWholesalerId(wholesalerId);
+        // Fetch inventories of wholesaler
+        List<Inventory> inventories =
+                inventoryRepository.findByWholesalerId(wholesalerId);
 
-    // Step 2: extract product IDs
-    List<Long> productIds = inventories.stream()
-            .map(inv -> inv.getProduct().getId())
-            .distinct().collect(Collectors.toList());
+        // Extract product IDs
+        List<Long> productIds = inventories.stream()
+                .map(inv -> inv.getProduct().getId())
+                .distinct()
+                .collect(Collectors.toList());
 
-    if (productIds.isEmpty()) {
-        return List.of();
+        if (productIds.isEmpty()) {
+            return List.of();
+        }
+
+        return orderRepo.findByProductIdInAndUserRole(
+                productIds, "CONSUMER"
+        );
     }
-
-    return orderRepo.findByProductIdInAndUserRole(
-            productIds, "CONSUMER"
-    );
-}
 }

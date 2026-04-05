@@ -20,6 +20,8 @@ import { AddInventoryComponent } from './add-inventory/add-inventory.component';
 import { ConsumerPlaceOrderComponent } from './consumer-place-order/consumer-place-order.component';
 import { ConsumerGetOrdersComponent } from './consumer-get-orders/consumer-get-orders.component';
 import { OtpLoginComponent } from './otp-login/otp-login.component';
+import { ViewProductsComponent } from './view-products/view-products.component';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -33,7 +35,8 @@ import { OtpLoginComponent } from './otp-login/otp-login.component';
       GetOrdersComponent,
       AddInventoryComponent,
       ConsumerPlaceOrderComponent,
-      ConsumerGetOrdersComponent
+      ConsumerGetOrdersComponent,
+      ViewProductsComponent
   ],
   imports: [
     BrowserModule,
@@ -41,6 +44,7 @@ import { OtpLoginComponent } from './otp-login/otp-login.component';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule ,
+    CommonModule
   ],
   providers: [HttpService],
   bootstrap: [AppComponent]

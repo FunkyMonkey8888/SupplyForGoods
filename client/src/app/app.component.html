@@ -1,165 +1,114 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm px-3">
-  <div class="container-fluid">
+<nav class="navbar navbar-expand-lg app-navbar app-navbar-lg px-4">
+  <a class="navbar-brand app-brand" routerLink="/">
+    Supply‑of‑Goods
+  </a>
 
-    <!-- Brand -->
-    <a class="navbar-brand fw-bold d-flex align-items-center" routerLink="/dashboard">
-      <i class="bi bi-box-seam-fill me-2" style="font-size: 1.4rem; color: #77b5ff;"></i>
-      SupplyChain Pro
-    </a>
+  <button
+    class="navbar-toggler"
+    type="button"
+    (click)="isMenuOpen = !isMenuOpen">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-    <!-- Mobile Toggle -->
-    <button class="navbar-toggler"
-            type="button"
-            (click)="isMenuOpen = !isMenuOpen">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+  <div class="collapse navbar-collapse" [class.show]="isMenuOpen">
 
-    <!-- Navbar Content -->
-    <div class="collapse navbar-collapse" [class.show]="isMenuOpen">
+    <ul class="navbar-nav me-auto app-nav-links">
 
-      <!-- LEFT: Role links -->
-      <ul class="navbar-nav me-auto" *ngIf="IsLoggin">
+      <li class="nav-item" *ngIf="role === 'MANUFACTURER'">
+        <a class="nav-link" [routerLink]="['/create-product']">Create Products</a>
+      </li>
 
-        <!-- MANUFACTURER -->
-        <li class="nav-item" *ngIf="role === 'MANUFACTURER'">
-          <a class="nav-link" routerLink="/create-product">
-            <i class="bi bi-plus-circle me-1"></i>
-            Create Product
+      <li class="nav-item" *ngIf="role === 'MANUFACTURER'">
+        <a class="nav-link" [routerLink]="['/view-products']">View Products</a>
+      </li>
+
+      <li class="nav-item" *ngIf="role === 'MANUFACTURER'">
+        <a class="nav-link" [routerLink]="['/get-orders']">Review Orders</a>
+      </li>
+
+      <li class="nav-item" *ngIf="role === 'WHOLESALER'">
+        <a class="nav-link" [routerLink]="['/get-orders']">Get Orders</a>
+      </li>
+
+      <li class="nav-item" *ngIf="role === 'WHOLESALER'">
+        <a class="nav-link" [routerLink]="['/place-product']">Place Order</a>
+      </li>
+
+      <li class="nav-item" *ngIf="role === 'WHOLESALER'">
+        <a class="nav-link" [routerLink]="['/add-inventory']">Add Inventory</a>
+      </li>
+
+      <li class="nav-item" *ngIf="role === 'CONSUMER'">
+        <a class="nav-link" [routerLink]="['/consumer-place-order']">Place Order</a>
+      </li>
+
+      <li class="nav-item" *ngIf="role === 'CONSUMER'">
+        <a class="nav-link" [routerLink]="['/consumer-get-orders']">Orders</a>
+      </li>
+
+      <li class="nav-item" *ngIf="role === 'CONSUMER'">
+          <a class="nav-link" [routerLink]="['/dashboard']" [queryParams]="{ panel: 'cart' }">
+            Cart
           </a>
-        </li>
+      </li>
 
-        <li class="nav-item" *ngIf="role === 'MANUFACTURER'">
-          <a class="nav-link" routerLink="/get-orders">
-            <i class="bi bi-receipt me-1"></i>
-            Review Orders
-          </a>
-        </li>
+    </ul>
 
-        <!-- WHOLESALER -->
-        <li class="nav-item" *ngIf="role === 'WHOLESALER'">
-          <a class="nav-link" routerLink="/add-inventory">
-            <i class="bi bi-stack me-1"></i>
-            Add Inventory
-          </a>
-        </li>
+    <ul class="navbar-nav app-nav-auth align-items-center">
 
-        <li class="nav-item" *ngIf="role === 'WHOLESALER'">
-          <a class="nav-link" routerLink="/place-product">
-            <i class="bi bi-cart-check me-1"></i>
-            Place Order
-          </a>
-        </li>
+      <!-- ✅ NOTIFICATION BUTTON (only when logged in) -->
+      <li class="nav-item notif-wrap" *ngIf="IsLoggin">
+        <button class="notif-btn" type="button" (click)="toggleNotifications()">
+          <i class="bi bi-bell"></i>
+          <span class="notif-badge" *ngIf="notifications.length">{{ notifications.length }}</span>
+        </button>
 
-        <li class="nav-item" *ngIf="role === 'WHOLESALER'">
-          <a class="nav-link" routerLink="/get-orders">
-            <i class="bi bi-truck me-1"></i>
-            My Orders
-          </a>
-        </li>
-
-        <!-- CONSUMER -->
-        <li class="nav-item" *ngIf="role === 'CONSUMER'">
-          <a class="nav-link" routerLink="/consumer-place-order">
-            <i class="bi bi-bag-check me-1"></i>
-            Browse Products
-          </a>
-        </li>
-
-        <li class="nav-item" *ngIf="role === 'CONSUMER'">
-          <a class="nav-link" routerLink="/consumer-get-orders">
-            <i class="bi bi-clock-history me-1"></i>
-            My Orders
-          </a>
-        </li>
-
-      </ul>
-
-      <!-- RIGHT: Notifications + Auth -->
-      <ul class="navbar-nav align-items-center ms-auto">
-
-        <!-- Register -->
-        <li class="nav-item" *ngIf="!IsLoggin">
-          <a class="btn btn-outline-info me-2" routerLink="/registration">
-            Get Started
-          </a>
-        </li>
-
-        <!-- Login -->
-        <li class="nav-item" *ngIf="!IsLoggin">
-          <a class="nav-link" routerLink="/login">
-            Login
-          </a>
-        </li>
-
-        <!-- 🔔 Notifications (only when logged in) -->
-        <li class="nav-item position-relative me-2" *ngIf="IsLoggin">
-
-          <button class="btn btn-dark position-relative"
-                  type="button"
-                  (click)="toggleNotifications()">
-            <i class="bi bi-bell"></i>
-
-            <span *ngIf="(notifications?.length  ?? 0)"
-                  class="badge bg-danger position-absolute top-0 start-100 translate-middle">
-              {{ notifications.length }}
-            </span>
-          </button>
-
-          <!-- Notification dropdown (must be inside <li>) -->
-          <div *ngIf="showNotifications"
-               class="card shadow-sm p-3 position-absolute"
-               style="right: 0; top: 42px; width: 320px; z-index: 2000;">
-
-            <h6 class="mb-2">Notifications</h6>
-
-            <div *ngIf="!notifications || notifications.length === 0" class="text-muted">
-              No new notifications.
-            </div>
-
-            <div *ngFor="let n of notifications" class="border-bottom py-2">
-              <div class="fw-semibold">{{ n.title }}</div>
-              <div class="text-muted small">{{ n.message }}</div>
-
-              <button class="btn btn-sm btn-link px-0"
-                      type="button"
-                      (click)="markRead(n.id)">
-                Mark as read
-              </button>
-            </div>
+        <!-- ✅ Notifications Panel -->
+        <div class="notif-panel" *ngIf="showNotifications" (click)="$event.stopPropagation()">
+          <div class="notif-head">
+            <div class="notif-title">Notifications</div>
+            <button class="notif-close" type="button" (click)="toggleNotifications()">✕</button>
           </div>
 
-        </li>
-
-        <!-- Logged-in dropdown -->
-        <li class="nav-item dropdown" *ngIf="IsLoggin">
-
-          <a class="nav-link fw-semibold d-flex align-items-center"
-             href="#"
-             (click)="toggleMenu($event)">
-            <i class="bi bi-person-circle me-1"></i>
-            {{ role }}
-          </a>
-
-          <div class="dropdown-menu dropdown-menu-end show"
-               *ngIf="showMenu">
-
-            <button class="dropdown-item text-danger"
-                    type="button"
-                    (click)="logout(); showMenu = false">
-              <i class="bi bi-box-arrow-right me-1"></i>
-              Logout
-            </button>
-
+          <div class="notif-empty" *ngIf="notifications.length === 0">
+            No new notifications.
           </div>
-        </li>
 
-      </ul>
+          <div class="notif-list" *ngIf="notifications.length > 0">
+            <div class="notif-item" *ngFor="let n of notifications">
+              <div class="notif-item-top">
+                <div class="notif-item-title">{{ n.title }}</div>
+                <button class="notif-mark" type="button" (click)="markRead(n.id)">
+                  Mark read
+                </button>
+              </div>
+              <div class="notif-item-msg">{{ n.message }}</div>
+              <div class="notif-item-meta">
+                <span *ngIf="n.createdAt">{{ n.createdAt | date:'medium' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
 
-    </div>
+      <!-- Login -->
+      <li *ngIf="!IsLoggin" class="nav-item">
+        <a class="nav-link auth-btn" [routerLink]="['/login']">Login</a>
+      </li>
+
+      <!-- Logout -->
+      <li *ngIf="IsLoggin" class="nav-item">
+        <a class="nav-link auth-btn logout"
+           (click)="logout()"
+           [routerLink]="['/login']">
+          Logout
+        </a>
+      </li>
+
+    </ul>
   </div>
 </nav>
 
-<!-- ===================== MAIN CONTENT ===================== -->
-<main class="container-fluid mt-4 px-4">
+<main class="app-main">
   <router-outlet></router-outlet>
 </main>

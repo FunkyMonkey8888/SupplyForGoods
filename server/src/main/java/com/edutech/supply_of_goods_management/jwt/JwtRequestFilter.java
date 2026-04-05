@@ -1,4 +1,3 @@
-
 package com.edutech.supply_of_goods_management.jwt;
 
 import io.jsonwebtoken.Claims;
@@ -34,13 +33,19 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
+// JWT authentication filter for every request
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-    @Autowired private JwtUtil jwtService;
-    @Autowired private UserService userService;
+    // Utility class for JWT operations
+    @Autowired 
+    private JwtUtil jwtService;
 
+    // Service to load user details
+    @Autowired 
+    private UserService userService;
+
+    // Filter logic executed for every request
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -49,6 +54,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
+        // Skip JWT check for login, register, and OPTIONS requests
         if (path.startsWith("/api/user/login") ||
             path.startsWith("/api/user/register") ||
             path.startsWith("/api/auth") ||
@@ -58,17 +64,21 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             return;
         }
 
+        // Read Authorization header
         String header = request.getHeader("Authorization");
 
+        // If token is missing or invalid format, continue request
         if (!StringUtils.hasText(header) || !header.startsWith("Bearer ")) {
-            chain.doFilter(request, response); // ← allow request to reach controller
+            chain.doFilter(request, response);
             return;
         }
 
+        // Extract token
         String token = header.substring(7);
 
         String username = null;
 
+        // Extract username from token
         try {
             username = jwtService.extractUsername(token);
         } catch (JwtException e) {
@@ -76,29 +86,32 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             return;
         }
 
+        // Authenticate user if not already authenticated
         if (username != null &&
             SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails user = userService.loadUserByUsername(username);
 
+            // Validate token
             if (jwtService.isTokenValid(token, user)) {
 
-    UsernamePasswordAuthenticationToken authToken =
-        new UsernamePasswordAuthenticationToken(
-            user, null, user.getAuthorities());
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(
+                                user, null, user.getAuthorities());
 
-    SecurityContextHolder.getContext().setAuthentication(authToken);
+                SecurityContextHolder.getContext().setAuthentication(authToken);
 
-    // ✅ ✅ CRITICAL LINE FOR TESTS
-    if (user instanceof com.edutech.supply_of_goods_management.entity.User) {
-        com.edutech.supply_of_goods_management.entity.User u =
-            (com.edutech.supply_of_goods_management.entity.User) user;
+                // Set userId in request for later use
+                if (user instanceof com.edutech.supply_of_goods_management.entity.User) {
+                    com.edutech.supply_of_goods_management.entity.User u =
+                            (com.edutech.supply_of_goods_management.entity.User) user;
 
-        request.setAttribute("userId", u.getId());
-    }
-}
+                    request.setAttribute("userId", u.getId());
+                }
+            }
         }
 
+        // Continue filter chain
         chain.doFilter(request, response);
     }
 }

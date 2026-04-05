@@ -1,96 +1,118 @@
-<div class="container py-4">
+<div class="consumer-orders-hero">
 
-  <h2 class="fw-bold mb-4">Your Orders</h2>
+  <div class="hero-overlay"></div>
 
-  <table class="table table-bordered">
-    <thead class="table-dark">
-      <tr>
-        <th>Order ID</th>
-        <th>Product</th>
-        <th>Quantity</th>
-        <th>Status</th>
-        <th>Feedback</th>
-      </tr>
-    </thead>
+  <div class="consumer-orders-container">
 
-    <tbody>
-      <ng-container *ngFor="let o of orders">
+    <div class="orders-card animate-in">
 
-        <!-- Order Row -->
-        <tr>
-          <td>{{ o.id }}</td>
-          <td>{{ o.product?.name }}</td>
-          <td>{{ o.quantity }}</td>
+      <div class="orders-header">
+        <div class="icon-wrapper">
+          <i class="bi bi-bag-check-fill"></i>
+        </div>
 
-          <td>
-            <span class="badge bg-success" *ngIf="o.status === 'CONFIRMED'">
-              CONFIRMED
-            </span>
-            <span class="badge bg-warning text-dark" *ngIf="o.status !== 'CONFIRMED'">
-              {{ o.status }}
-            </span>
-          </td>
+        <h3>Your Orders</h3>
+        <p>Track your orders and share feedback after confirmation</p>
+      </div>
 
-          <!-- Feedback column -->
-          <td>
+      <div *ngIf="orders.length === 0" class="empty-state">
+        <i class="bi bi-inbox"></i>
+        <p>No orders found yet.</p>
+      </div>
 
-            <!-- ✅ If feedback already submitted → VIEW -->
-            <div *ngIf="submittedFeedback[o.id]">
+      <div *ngIf="orders.length > 0" class="table-responsive">
+        <table class="orders-table">
 
-              <div class="mb-1">
-                <i class="bi bi-star-fill me-1"
-                   *ngFor="let s of [1,2,3,4,5]"
-                   [class.text-warning]="submittedFeedback[o.id].rating >= s"
-                   [class.text-muted]="submittedFeedback[o.id].rating < s">
-                </i>
-              </div>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Product</th>
+              <th>Qty</th>
+              <th>Status</th>
+              <th>Feedback</th>
+            </tr>
+          </thead>
 
-              <small class="text-muted fst-italic">
-                "{{ submittedFeedback[o.id].comment }}"
-              </small>
-            </div>
+          <tbody>
+            <ng-container *ngFor="let o of orders">
 
-            <!-- ✅ Else → Give Feedback -->
-            <button *ngIf="
-                o.status === 'CONFIRMED' &&
-                !submittedFeedback[o.id]
-              "
-              class="btn btn-sm btn-warning"
-              (click)="openFeedback(o.id)">
-              Give Feedback
-            </button>
-          </td>
-        </tr>
+              <tr [class.resolved]="o.status === 'CONFIRMED'">
+                <td>#{{ o.id }}</td>
+                <td>{{ o.product?.name }}</td>
+                <td>{{ o.quantity }}</td>
 
-        <!-- Feedback Form -->
-        <tr *ngIf="activeOrderId === o.id">
-          <td colspan="5">
+                <td>
+                  <span *ngIf="o.status === 'CONFIRMED'" class="status confirmed">
+                    Confirmed
+                  </span>
+                  <span *ngIf="o.status !== 'CONFIRMED'" class="status pending">
+                    {{ o.status }}
+                  </span>
+                </td>
 
-            <div class="mb-2">
-              <i class="bi bi-star-fill me-1"
-                 *ngFor="let s of [1,2,3,4,5]"
-                 (click)="setRating(o.id, s)"
-                 [class.text-warning]="ratings[o.id] >= s"
-                 [class.text-muted]="ratings[o.id] < s"
-                 style="cursor:pointer;">
-              </i>
-            </div>
+                <td>
+                  <div *ngIf="submittedFeedback[o.id]" class="feedback-view">
 
-            <textarea class="form-control mb-2"
-              rows="2"
-              placeholder="Write your review..."
-              [(ngModel)]="comments[o.id]"></textarea>
+                    <div class="stars">
+                      <i class="bi bi-star-fill"
+                         *ngFor="let s of [1,2,3,4,5]"
+                         [class.filled]="submittedFeedback[o.id].rating >= s">
+                      </i>
+                    </div>
 
-            <button class="btn btn-success btn-sm"
-              (click)="submitFeedback(o.id)">
-              Submit Feedback
-            </button>
+                    <small>“{{ submittedFeedback[o.id].comment }}”</small>
+                  </div>
 
-          </td>
-        </tr>
+                  <button
+                    *ngIf="o.status === 'CONFIRMED' && !submittedFeedback[o.id]"
+                    class="btn-feedback"
+                    (click)="openFeedback(o.id)">
+                    Give Feedback
+                  </button>
 
-      </ng-container>
-    </tbody>
+                  <span *ngIf="o.status !== 'CONFIRMED'" class="pending-text">
+                    Pending confirmation
+                  </span>
+                </td>
+              </tr>
 
-  </table>
+              <tr *ngIf="activeOrderId === o.id" class="feedback-row">
+                <td colspan="5">
+
+                  <div class="feedback-box">
+
+                    <div class="stars mb-2">
+                      <i class="bi bi-star-fill"
+                         *ngFor="let s of [1,2,3,4,5]"
+                         (click)="setRating(o.id, s)"
+                         [class.filled]="ratings[o.id] >= s">
+                      </i>
+                    </div>
+
+                    <textarea
+                      class="feedback-input"
+                      rows="2"
+                      placeholder="Write your review..."
+                      [(ngModel)]="comments[o.id]">
+                    </textarea>
+
+                    <button class="btn-submit" (click)="submitFeedback(o.id)">
+                      Submit Feedback
+                    </button>
+
+                  </div>
+
+                </td>
+              </tr>
+
+            </ng-container>
+          </tbody>
+
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
 </div>

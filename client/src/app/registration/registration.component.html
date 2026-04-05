@@ -1,26 +1,23 @@
-<div class="container d-flex justify-content-center align-items-center min-vh-100">
+<div class="registration-hero">
 
-  <div class="card registration-card shadow-lg p-4"
-       style="max-width: 420px; width: 100%; border-radius: 16px;">
+  <div class="registration-overlay"></div>
 
-    <!-- ✅ Icon Header -->
-    <div class="text-center mb-3">
-      <i class="bi"
-         [ngClass]="step === 'FORM' ? 'bi-person-plus-fill' : 'bi-envelope-check-fill'"
-         style="font-size: 48px; color: #0d6efd;"></i>
-    </div>
+  <div class="registration-container">
 
-    <h3 class="text-center mb-4 fw-bold">
-      {{ step === 'FORM' ? 'Create Your Account' : 'Verify Email (OTP)' }}
-    </h3>
+    <div class="registration-card animate-in">
 
-    <!-- ✅ Global / Server Error -->
-    <div *ngIf="message" class="alert alert-danger text-center">
-      {{ message }}
-    </div>
+      <div class="registration-icon-wrapper">
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/747/747376.png"
+          alt="User Registration"
+          class="registration-icon"
+        />
+      </div>
 
-    <!-- ====================== STEP 1: REGISTRATION FORM ====================== -->
-    <form *ngIf="step === 'FORM'" [formGroup]="itemForm" novalidate>
+      <h3 class="registration-title">User Registration</h3>
+      <p class="registration-subtitle">Create your account and get started</p>
+
+      <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
 
       <!-- Username -->
       <div class="mb-3">
@@ -40,203 +37,90 @@
           Username must be at least 4 characters.
         </small>
       </div>
-
-      <!-- Email -->
-      <div class="mb-3">
-        <label class="form-label fw-semibold">Email</label>
-        <input type="email"
-               class="form-control"
-               formControlName="email"
-               placeholder="Enter email">
-
-        <small class="text-danger"
-               *ngIf="itemForm.get('email')?.touched && itemForm.get('email')?.errors?.['required']">
-          Email is required.
-        </small>
-
-        <small class="text-danger"
-               *ngIf="itemForm.get('email')?.touched && itemForm.get('email')?.errors?.['email']">
-          Enter a valid email address.
-        </small>
-      </div>
-
-      <!-- Password -->
-      <div class="mb-3">
-        <label class="form-label fw-semibold">Password</label>
-        <input type="password"
-               class="form-control"
-               formControlName="password"
-               placeholder="Enter password">
-
-        <!-- Strength bar -->
-        <div class="strength-wrap mt-2">
-          <div class="strength-bar">
-            <div class="strength-fill"
-                 [class.weak]="passwordStrengthLabel === 'Weak'"
-                 [class.medium]="passwordStrengthLabel === 'Medium'"
-                 [class.strong]="passwordStrengthLabel === 'Strong'"
-                 [style.width.%]="passwordStrength">
-            </div>
-          </div>
-
-          <div class="strength-text">
-            Strength:
-            <span [class.weak]="passwordStrengthLabel === 'Weak'"
-                  [class.medium]="passwordStrengthLabel === 'Medium'"
-                  [class.strong]="passwordStrengthLabel === 'Strong'">
-              {{ passwordStrengthLabel }}
-            </span>
-          </div>
+        <div class="field">
+          <label class="form-label">Username</label>
+          <input
+            type="text"
+            formControlName="username"
+            class="custom-input"
+            placeholder="Enter username"
+          />
+          <small
+            class="error-text"
+            *ngIf="itemForm.get('username')?.touched &&
+                   itemForm.get('username')?.errors?.['required']">
+            Username is required
+          </small>
         </div>
 
-        <!-- Live rule checklist -->
-        <ul class="pwd-rules mt-2">
-          <li [class.ok]="passwordRules.minLen">
-            <i class="bi"
-               [ngClass]="passwordRules.minLen ? 'bi-check-circle-fill' : 'bi-x-circle'"></i>
-            Minimum 8 characters
-          </li>
+        <div class="field">
+          <label class="form-label">Email</label>
+          <input
+            type="email"
+            formControlName="email"
+            class="custom-input"
+            placeholder="Enter email"
+          />
+          <small
+            class="error-text"
+            *ngIf="itemForm.get('email')?.touched &&
+                   itemForm.get('email')?.errors?.['required']">
+            Email is required
+          </small>
+          <small
+            class="error-text"
+            *ngIf="itemForm.get('email')?.touched &&
+                   itemForm.get('email')?.errors?.['email']">
+            Enter a valid email address
+          </small>
+        </div>
 
-          <li [class.ok]="passwordRules.upper">
-            <i class="bi"
-               [ngClass]="passwordRules.upper ? 'bi-check-circle-fill' : 'bi-x-circle'"></i>
-            At least 1 uppercase letter (A-Z)
-          </li>
+        <div class="field">
+          <label class="form-label">Password</label>
+          <input
+            type="password"
+            formControlName="password"
+            class="custom-input"
+            placeholder="Enter password"
+          />
+          <small
+            class="error-text"
+            *ngIf="itemForm.get('password')?.touched &&
+                   itemForm.get('password')?.errors?.['required']">
+            Password is required
+          </small>
+        </div>
 
-          <li [class.ok]="passwordRules.lower">
-            <i class="bi"
-               [ngClass]="passwordRules.lower ? 'bi-check-circle-fill' : 'bi-x-circle'"></i>
-            At least 1 lowercase letter (a-z)
-          </li>
+        <div class="field">
+          <label class="form-label">Role</label>
+          <select formControlName="role" class="custom-input">
+            <option value="" disabled>Select role</option>
+            <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+          </select>
+          <small
+            class="error-text"
+            *ngIf="itemForm.get('role')?.touched &&
+                   itemForm.get('role')?.errors?.['required']">
+            Role selection is required
+          </small>
+        </div>
 
-          <li [class.ok]="passwordRules.digit">
-            <i class="bi"
-               [ngClass]="passwordRules.digit ? 'bi-check-circle-fill' : 'bi-x-circle'"></i>
-            At least 1 number (0-9)
-          </li>
+        <button
+          class="register-btn"
+          type="submit"
+          [disabled]="itemForm.invalid">
+          Register
+        </button>
 
-          <li [class.ok]="passwordRules.special">
-            <i class="bi"
-               [ngClass]="passwordRules.special ? 'bi-check-circle-fill' : 'bi-x-circle'"></i>
-            At least 1 special character (@ $ ! % * ? &)
-          </li>
-        </ul>
+      </form>
 
-        <small class="text-muted d-block mt-1">
-          Example: <strong>Abcd@123</strong>
-        </small>
-
-        <small class="text-danger"
-               *ngIf="itemForm.get('password')?.touched && itemForm.get('password')?.errors?.['required']">
-          Password is required.
-        </small>
-
-        <small class="text-danger"
-               *ngIf="itemForm.get('password')?.touched && itemForm.get('password')?.errors?.['minlength']">
-          Password must be at least 8 characters.
-        </small>
-
-        <small class="text-danger"
-               *ngIf="itemForm.get('password')?.touched && itemForm.get('password')?.errors?.['pattern']">
-          Password must include at least 1 uppercase, 1 lowercase, 1 number, and 1 special character (@$!%*?&).
-        </small>
-      </div>
-
-      <!-- Role -->
-      <div class="mb-3">
-        <label class="form-label fw-semibold">Select Role</label>
-        <select formControlName="role" class="form-select">
-          <option value="" disabled>Select Role</option>
-          <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
-        </select>
-
-        <small class="text-danger"
-               *ngIf="itemForm.get('role')?.touched && itemForm.get('role')?.errors?.['required']">
-          Please select a role.
-        </small>
-      </div>
-
-      <!-- Submit -->
-      <button class="btn btn-primary w-100"
-              type="button"
-              (click)="sendOtp()"
-              [disabled]="itemForm.invalid || loading">
-
-        <span *ngIf="!loading">
-          <i class="bi bi-envelope-arrow-up me-1"></i>
-          Send OTP & Continue
-        </span>
-
-        <span *ngIf="loading">
-          Sending…
-        </span>
-      </button>
-
-      <!-- Login link -->
-      <p class="text-center mt-3 mb-0">
+      <p class="login-text">
         Already have an account?
-        <a routerLink="/login" class="fw-semibold">Login here</a>
+        <a routerLink="/login">Login here</a>
       </p>
 
-    </form>
-
-    <!-- ====================== STEP 2: OTP VERIFICATION ====================== -->
-    <form *ngIf="step === 'OTP'" [formGroup]="otpForm" novalidate>
-
-      <div class="text-center text-muted mb-2 small">
-        OTP sent to <strong>{{ itemForm.value.email }}</strong>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label fw-semibold">OTP (6 digits)</label>
-        <input type="text"
-               class="form-control text-center"
-               formControlName="otp"
-               maxlength="6"
-               inputmode="numeric"
-               placeholder="Enter OTP">
-
-        <small class="text-danger"
-               *ngIf="otpForm.get('otp')?.touched && otpForm.get('otp')?.errors?.['required']">
-          OTP is required.
-        </small>
-
-        <small class="text-danger"
-               *ngIf="otpForm.get('otp')?.touched && otpForm.get('otp')?.errors?.['pattern']">
-          OTP must be exactly 6 digits.
-        </small>
-      </div>
-
-      <button class="btn btn-success w-100"
-              type="button"
-              (click)="verifyOtp()"
-              [disabled]="otpForm.invalid || loading">
-
-        <span *ngIf="!loading">
-          <i class="bi bi-check-circle-fill me-1"></i>
-          Verify OTP & Register
-        </span>
-
-        <span *ngIf="loading">Verifying…</span>
-      </button>
-
-      <div class="d-flex justify-content-between align-items-center mt-3">
-        <button class="btn btn-link p-0"
-                type="button"
-                (click)="backToForm()"
-                [disabled]="loading">
-          Back
-        </button>
-
-        <button class="btn btn-link p-0"
-                type="button"
-                (click)="resendOtp()"
-                [disabled]="loading || resendSeconds > 0">
-          Resend <span *ngIf="resendSeconds > 0">({{ resendSeconds }}s)</span>
-        </button>
-      </div>
-
-    </form>
+    </div>
 
   </div>
+
 </div>

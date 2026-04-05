@@ -3,21 +3,21 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment.development';
 import { AuthService } from './auth.service';
-
+ 
 @Injectable({
   providedIn: 'root'
 })
 export class HttpService {
-
+ 
   public serverName = environment.apiUrl;
-
+ 
   constructor(
     private http: HttpClient,
     private auth: AuthService
   ) {}
-
+ 
   /* ================= COMMON HEADERS ================= */
-
+ 
   private getHeaders() {
     const token = this.auth.getToken();
     return {
@@ -27,30 +27,30 @@ export class HttpService {
       }
     };
   }
-
+ 
   /* ================= PRODUCT APIs ================= */
-
+ 
   getProductsByWholesaler(): Observable<any[]> {
     return this.http.get<any[]>(
       `${this.serverName}/api/wholesalers/products`,
       this.getHeaders()
     );
   }
-
+ 
   getProductsByConsumers(): Observable<any[]> {
     return this.http.get<any[]>(
       `${this.serverName}/api/consumers/products`,
       this.getHeaders()
     );
   }
-
+ 
   getProductsByManufacturer(manufacturerId: number | string): Observable<any[]> {
     return this.http.get<any[]>(
       `${this.serverName}/api/manufacturers/products?manufacturerId=${manufacturerId}`,
       this.getHeaders()
     );
   }
-
+ 
   createProduct(details: any): Observable<any> {
     return this.http.post(
       `${this.serverName}/api/manufacturers/product`,
@@ -87,9 +87,9 @@ export class HttpService {
       this.getHeaders()
     );
   }
-
+ 
   /* ================= INVENTORY APIs ================= */
-
+ 
   addInventory(details: any, productId: any): Observable<any> {
     return this.http.post(
       `${this.serverName}/api/wholesalers/inventories?productId=${productId}`,
@@ -97,7 +97,7 @@ export class HttpService {
       this.getHeaders()
     );
   }
-
+ 
   updateInventory(stockQuantity: any, inventoryId: any): Observable<any> {
     return this.http.put(
       `${this.serverName}/api/wholesalers/inventories/${inventoryId}?stockQuantity=${stockQuantity}`,
@@ -105,16 +105,16 @@ export class HttpService {
       this.getHeaders()
     );
   }
-
+ 
   getInventoryByWholesalers(wholesalerId: any): Observable<any[]> {
     return this.http.get<any[]>(
       `${this.serverName}/api/wholesalers/inventories?wholesalerId=${wholesalerId}`,
       this.getHeaders()
     );
   }
-
+ 
   /* ================= ORDER APIs ================= */
-
+ 
   placeOrder(details: any, productId: any, userId: any): Observable<any> {
     return this.http.post(
       `${this.serverName}/api/wholesalers/order?productId=${productId}&userId=${userId}`,
@@ -122,7 +122,7 @@ export class HttpService {
       this.getHeaders()
     );
   }
-
+ 
   consumerPlaceOrder(details: any, productId: any, userId: any): Observable<any> {
     return this.http.post(
       `${this.serverName}/api/consumers/order?productId=${productId}&userId=${userId}`,
@@ -130,28 +130,28 @@ export class HttpService {
       this.getHeaders()
     );
   }
-
+ 
   getOrderByWholesalers(userId: any): Observable<any[]> {
     return this.http.get<any[]>(
       `${this.serverName}/api/wholesalers/orders?userId=${userId}`,
       this.getHeaders()
     );
   }
-
+ 
   getOrderConsumer(userId: any): Observable<any[]> {
     return this.http.get<any[]>(
       `${this.serverName}/api/consumers/orders?userId=${userId}`,
       this.getHeaders()
     );
   }
-
+ 
   getOrdersByManufacturer(manufacturerId: any): Observable<any[]> {
     return this.http.get<any[]>(
       `${this.serverName}/api/manufacturers/orders?manufacturerId=${manufacturerId}`,
       this.getHeaders()
     );
   }
-
+ 
   // ✅ Unified order-status update (WORKS FOR BOTH ROLES)
   updateOrderStatus(orderId: any, status: string): Observable<any> {
     return this.http.put(
@@ -160,7 +160,7 @@ export class HttpService {
       this.getHeaders()
     );
   }
-
+ 
   // ✅ ✅ FIXED: manufacturer endpoint (plural "orders")
   updateOrderStatusByManufacturer(orderId: any, status: string): Observable<any> {
     return this.http.put(
@@ -169,9 +169,9 @@ export class HttpService {
       this.getHeaders()
     );
   }
-
+ 
   /* ================= AUTH APIs ================= */
-
+ 
   Login(details: any): Observable<any> {
     return this.http.post(
       `${this.serverName}/api/user/login`,
@@ -181,7 +181,7 @@ export class HttpService {
       }
     );
   }
-
+ 
   registerUser(details: any): Observable<any> {
     return this.http.post(
       `${this.serverName}/api/user/register`,
@@ -191,7 +191,7 @@ export class HttpService {
       }
     );
   }
-
+ 
   addConsumerFeedBack(orderId: any, userId: any, feedback: any) {
     return this.http.post<any>(
       `${this.serverName}/api/consumers/order/${orderId}/feedback?userId=${userId}`,
@@ -199,15 +199,15 @@ export class HttpService {
       this.getHeaders()
     );
   }
-
+ 
   getConsumerOrdersForWholesaler(wholesalerId: any): Observable<any[]> {
     return this.http.get<any[]>(
       `${this.serverName}/api/wholesalers/consumer-orders?wholesalerId=${wholesalerId}`,
       this.getHeaders()
     );
   }
-
-
+ 
+ 
   /* ================= ANALYTICS APIs ================= */
 
   getWholesalerAnalytics(wholesalerId: number) {

@@ -14,14 +14,17 @@ import com.edutech.supply_of_goods_management.service.ProductService;
 
 import java.util.List;
 
+// REST controller for wholesaler operations
 @RestController
 @RequestMapping("/api/wholesalers")
 public class WholesalerController {
 
+    // Service dependencies
     private final ProductService productService;
     private final OrderService orderService;
     private final InventoryService inventoryService;
 
+    // Constructor-based dependency injection
     public WholesalerController(ProductService productService,
                                 OrderService orderService,
                                 InventoryService inventoryService) {
@@ -30,13 +33,13 @@ public class WholesalerController {
         this.inventoryService = inventoryService;
     }
 
-    // ✅ Browse Products
+    // View all available products
     @GetMapping("/products")
     public ResponseEntity<List<Product>> browseProducts() {
         return ResponseEntity.ok(productService.getAllProducts());
     }
 
-    // ✅ Place Order
+    // Place a new order
     @PostMapping("/order")
     public ResponseEntity<Order> placeOrder(@RequestParam Long productId,
                                             @RequestParam Long userId,
@@ -44,47 +47,47 @@ public class WholesalerController {
         return ResponseEntity.ok(orderService.placeOrder(productId, userId, order));
     }
 
-    // ✅ Update Order Status
+    // Update order status
     @PutMapping("/order/{id}")
     public ResponseEntity<Order> updateOrderStatus(@PathVariable Long id,
                                                    @RequestParam String status) {
         return ResponseEntity.ok(orderService.updateOrderStatus(id, status));
     }
 
-    // ✅ Get All Orders
+    // Get all orders of the wholesaler
     @GetMapping("/orders")
     public ResponseEntity<List<Order>> getAllOrders(@RequestParam Long userId) {
         return ResponseEntity.ok(orderService.getOrdersByUser(userId));
     }
 
-    // ✅ Add Inventory
+    // Add inventory details
     @PostMapping("/inventories")
     public ResponseEntity<Inventory> addInventory(@RequestParam Long productId,
                                                   @RequestBody Inventory inventory) {
         return ResponseEntity.ok(inventoryService.addInventory(productId, inventory));
     }
 
-    // ✅ Update Inventory
+    // Update inventory stock
     @PutMapping("/inventories/{id}")
     public ResponseEntity<Inventory> updateInventory(@PathVariable Long id,
                                                      @RequestParam int stockQuantity) {
         return ResponseEntity.ok(inventoryService.updateInventory(id, stockQuantity));
     }
 
-    // ✅ Get All Inventories
+    // Get all inventories of the wholesaler
     @GetMapping("/inventories")
     public ResponseEntity<List<Inventory>> getAllInventories(@RequestParam Long wholesalerId) {
         return ResponseEntity.ok(inventoryService.getInventoriesByWholesaler(wholesalerId));
     }
 
-
+    // Get consumer orders for wholesaler
     @GetMapping("/consumer-orders")
     @PreAuthorize("hasAuthority('WHOLESALER')")
-public ResponseEntity<List<Order>> getConsumerOrdersForWholesaler(
-        @RequestParam Long wholesalerId) {
+    public ResponseEntity<List<Order>> getConsumerOrdersForWholesaler(
+            @RequestParam Long wholesalerId) {
 
-    return ResponseEntity.ok(
-            orderService.getConsumerOrdersForWholesaler(wholesalerId)
-    );
-}
+        return ResponseEntity.ok(
+                orderService.getConsumerOrdersForWholesaler(wholesalerId)
+        );
+    }
 }

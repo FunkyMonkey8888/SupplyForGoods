@@ -1,5 +1,5 @@
 package com.edutech.supply_of_goods_management.service;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import com.edutech.supply_of_goods_management.entity.Inventory;
@@ -26,6 +26,7 @@ public class ProductService {
         this.notificationService = ns;
     }
 
+    // Create a new product
     public Product createProduct(Product product) {
         if(product.getPrice() <=0 || product.getStockQuantity() <=0) throw new IllegalArgumentException("Price or quantity cannot be less than 0");
 

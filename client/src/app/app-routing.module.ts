@@ -15,6 +15,7 @@ import { AddInventoryComponent } from './add-inventory/add-inventory.component';
 import { ConsumerPlaceOrderComponent } from './consumer-place-order/consumer-place-order.component';
 import { ConsumerGetOrdersComponent } from './consumer-get-orders/consumer-get-orders.component';
 import { OtpLoginComponent } from './otp-login/otp-login.component';
+import { ViewProductsComponent } from './view-products/view-products.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -27,6 +28,10 @@ const routes: Routes = [
  { path: 'consumer-place-order', component: ConsumerPlaceOrderComponent }, 
  { path: 'consumer-get-orders', component: ConsumerGetOrdersComponent }, 
  { path: 'otp-login', component: OtpLoginComponent },
+ {
+  path: 'view-products',
+  component: ViewProductsComponent
+},
  
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
 

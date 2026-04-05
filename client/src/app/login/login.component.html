@@ -1,107 +1,144 @@
-<div class="container d-flex justify-content-center align-items-center min-vh-100">
+<div class="login-hero">
+  <div class="login-overlay"></div>
 
-  <div class="card login-card shadow-lg p-4"
-       style="max-width: 420px; width: 100%; border-radius: 16px;">
+  <div class="login-container">
+    <div class="login-card animate-in">
 
-    <!-- Icon -->
-    <div class="text-center mb-3">
-      <i class="bi"
-         [ngClass]="step === 'PASSWORD' ? 'bi-shield-lock-fill' : 'bi-envelope-check-fill'"
-         style="font-size: 48px; color: #0d6efd;"></i>
-    </div>
-
-    <h3 class="text-center mb-4 fw-bold">
-      {{ step === 'PASSWORD' ? 'Login to Your Account' : 'Two‑Factor Verification' }}
-    </h3>
-
-    <!-- Error -->
-    <div *ngIf="message" class="alert alert-danger text-center">
-      {{ message }}
-    </div>
-
-    <!-- ================= STEP 1: PASSWORD ================= -->
-    <form *ngIf="step === 'PASSWORD'"
-          [formGroup]="itemForm"
-          (ngSubmit)="onSubmit()">
-
-      <div class="mb-3">
-        <label class="form-label fw-semibold">Username</label>
-        <input
-          class="form-control"
-          type="text"
-          formControlName="username"
-          placeholder="Enter username">
+      <!-- ICON -->
+      <div class="login-icon">
+        <i
+          class="bi"
+          [ngClass]="
+            step === 'PASSWORD'
+              ? 'bi-shield-lock-fill'
+              : 'bi-envelope-check-fill'
+          "
+        ></i>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label fw-semibold">Password</label>
-        <input
-          class="form-control"
-          type="password"
-          formControlName="password"
-          placeholder="Enter password">
+      <!-- TITLE -->
+      <h3 class="login-title">
+        {{ step === 'PASSWORD'
+          ? 'Login to Your Account'
+          : 'Two‑Factor Verification' }}
+      </h3>
+      <p class="login-subtitle">
+        {{ step === 'PASSWORD'
+          ? 'Access your dashboard'
+          : 'Verify OTP to continue' }}
+      </p>
+
+      <!-- BACKEND ERROR -->
+      <div *ngIf="message" class="login-alert">
+        {{ message }}
       </div>
 
-      <button
-        class="btn btn-primary w-100"
-        type="submit"
-        [disabled]="itemForm.invalid || loading">
+      <!-- ================= STEP 1 : PASSWORD ================= -->
+      <form
+        *ngIf="step === 'PASSWORD'"
+        [formGroup]="itemForm"
+        (ngSubmit)="onSubmit()"
+      >
+        <!-- Username -->
+        <div class="form-group">
+          <label>Username</label>
+          <input
+            type="text"
+            class="custom-input"
+            formControlName="username"
+            placeholder="Enter username"
+          />
+          <small
+            *ngIf="
+              itemForm.controls['username'].touched &&
+              itemForm.controls['username'].errors?.['required']
+            "
+            class="error-text"
+          >
+            Username is required
+          </small>
+        </div>
 
-        <span *ngIf="!loading">
-          <i class="bi bi-box-arrow-in-right me-1"></i>
-          Login
-        </span>
+        <!-- Password -->
+        <div class="form-group">
+          <label>Password</label>
+          <input
+            type="password"
+            class="custom-input"
+            formControlName="password"
+            placeholder="Enter password"
+          />
+          <small
+            *ngIf="
+              itemForm.controls['password'].touched &&
+              itemForm.controls['password'].errors?.['required']
+            "
+            class="error-text"
+          >
+            Password is required
+          </small>
+        </div>
 
-        <span *ngIf="loading">Verifying…</span>
-      </button>
-
-    </form>
-
-    <!-- ================= STEP 2: OTP ================= -->
-    <form *ngIf="step === 'OTP'" [formGroup]="otpForm">
-
-      <div class="text-center text-muted mb-2 small">
-        Enter the 6‑digit OTP sent to your registered email
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label fw-semibold">OTP</label>
-        <input
-          class="form-control text-center"
-          type="text"
-          maxlength="6"
-          inputmode="numeric"
-          formControlName="otp"
-          placeholder="Enter OTP">
-      </div>
-
-      <button
-        class="btn btn-success w-100"
-        type="button"
-        (click)="verifyOtp()"
-        [disabled]="otpForm.invalid || loading">
-
-        <span *ngIf="!loading">Verify & Login</span>
-        <span *ngIf="loading">Verifying…</span>
-      </button>
-
-      <div class="text-center mt-3">
-        <button class="btn btn-link"
-                type="button"
-                (click)="backToPassword()"
-                [disabled]="loading">
-          Back to login
+        <!-- BUTTON -->
+        <button
+          type="submit"
+          class="login-btn"
+          [disabled]="itemForm.invalid || loading"
+        >
+          <span *ngIf="!loading">Login</span>
+          <span *ngIf="loading">Verifying…</span>
         </button>
-      </div>
+      </form>
 
-    </form>
+      <!-- ================= STEP 2 : OTP ================= -->
+      <form
+        *ngIf="step === 'OTP'"
+        [formGroup]="otpForm"
+      >
+        <div class="text-center text-muted mb-2 small">
+          Enter the 6‑digit OTP sent to your registered email
+        </div>
 
-    <p class="text-center mt-3 mb-0">
-      Don’t have an account?
-      <a routerLink="/registration" class="fw-semibold">
-        Register here
-      </a>
-    </p>
+        <div class="form-group">
+          <label>OTP</label>
+          <input
+            class="custom-input text-center"
+            type="text"
+            maxlength="6"
+            inputmode="numeric"
+            formControlName="otp"
+            placeholder="Enter OTP"
+          />
+        </div>
 
+        <button
+          type="button"
+          class="btn btn-success w-100"
+          (click)="verifyOtp()"
+          [disabled]="otpForm.invalid || loading"
+        >
+          <span *ngIf="!loading">Verify & Login</span>
+          <span *ngIf="loading">Verifying…</span>
+        </button>
+
+        <div class="text-center mt-3">
+          <button
+            type="button"
+            class="btn btn-link"
+            (click)="backToPassword()"
+            [disabled]="loading"
+          >
+            Back to login
+          </button>
+        </div>
+      </form>
+
+      <!-- FOOTER -->
+      <p class="login-footer">
+        Don’t have an account?
+        <a routerLink="/registration">Register here</a>
+      </p>
+
+    </div>
   </div>
 </div>
