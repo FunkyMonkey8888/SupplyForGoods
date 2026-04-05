@@ -242,7 +242,7 @@ export class DashbaordComponent implements OnInit, OnDestroy {
         this.kpis = [
           { title: 'My Orders', value: myOrders, tone: 'blue' },
           { title: 'Inventory Items', value: inv, tone: 'pink' },
-          { title: 'Low Stock', value: this.analytics?.lowStockCount ?? '-', tone: 'orange' },
+          { title: 'Low Stock', value: this.analytics?.lowStock ?? '-', tone: 'orange' },
           { title: 'Total Stock', value: this.analytics?.totalStock ?? '-', tone: 'purple' }
         ];
         return;
