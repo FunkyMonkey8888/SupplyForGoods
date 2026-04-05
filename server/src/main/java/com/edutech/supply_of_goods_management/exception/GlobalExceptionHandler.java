@@ -5,7 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -39,6 +41,11 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "Validation failed", req);
     }
 
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ApiError> handleNotFound(NoHandlerFoundException ex, HttpServletRequest req) {
+        return build(HttpStatus.NOT_FOUND, "Endpoint not found", req);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiError> handleRuntime(RuntimeException ex, HttpServletRequest req) {
         return build(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
@@ -48,10 +55,4 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleAny(Exception ex, HttpServletRequest req) {
         return build(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong", req);
     }
-    import org.springframework.web.servlet.NoHandlerFoundException;
-
-@ExceptionHandler(NoHandlerFoundException.class)
-public ResponseEntity<ApiError> handleNotFound(NoHandlerFoundException ex, HttpServletRequest req) {
-    return build(HttpStatus.NOT_FOUND, "Endpoint not found", req);
-}
 }

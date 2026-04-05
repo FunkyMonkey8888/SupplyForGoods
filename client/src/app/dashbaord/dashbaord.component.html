@@ -115,6 +115,132 @@
           </div>
         </div>
 
+        <!-- ✅ Advanced Analytics Panel (uses ALL controller analytics) -->
+        <div *ngIf="isLoggedIn && role !== 'CONSUMER'" class="consumer-products-wrap" style="margin-top: 18px;">
+          <div class="section-head">
+            <div class="section-title">Advanced Insights</div>
+            <div class="section-sub">Role-specific metrics computed from orders and inventory</div>
+          </div>
+
+          <div class="kpi-row" style="margin-top: 10px;">
+            <!-- Total Orders -->
+            <div class="kpi-card purple">
+              <div class="kpi-label">Total Orders</div>
+              <div class="kpi-value">{{ analytics?.totalOrders ?? 0 }}</div>
+              <svg class="kpi-wave" viewBox="0 0 240 60" preserveAspectRatio="none">
+                <path fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="3" stroke-linecap="round"
+                  d="M0,40 C24,30 44,48 68,40 C92,32 112,50 136,40 C160,30 180,48 204,40 C220,35 232,45 240,40" />
+              </svg>
+            </div>
+
+            <!-- Cancelled Orders -->
+            <div class="kpi-card orange">
+              <div class="kpi-label">Cancelled Orders</div>
+              <div class="kpi-value">{{ analytics?.cancelledOrders ?? 0 }}</div>
+              <svg class="kpi-wave" viewBox="0 0 240 60" preserveAspectRatio="none">
+                <path fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="3" stroke-linecap="round"
+                  d="M0,40 C24,30 44,48 68,40 C92,32 112,50 136,40 C160,30 180,48 204,40 C220,35 232,45 240,40" />
+              </svg>
+            </div>
+
+            <!-- Cancellation Rate -->
+            <div class="kpi-card blue">
+              <div class="kpi-label">Cancellation Rate</div>
+              <div class="kpi-value">
+                {{ (analytics?.cancellationRate != null) ? (analytics.cancellationRate + '%') : '0%' }}
+              </div>
+              <svg class="kpi-wave" viewBox="0 0 240 60" preserveAspectRatio="none">
+                <path fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="3" stroke-linecap="round"
+                  d="M0,40 C24,30 44,48 68,40 C92,32 112,50 136,40 C160,30 180,48 204,40 C220,35 232,45 240,40" />
+              </svg>
+            </div>
+
+            <!-- Avg Order Qty -->
+            <div class="kpi-card pink">
+              <div class="kpi-label">Avg Order Quantity</div>
+              <div class="kpi-value">{{ analytics?.avgOrderQuantity ?? 0 }}</div>
+              <svg class="kpi-wave" viewBox="0 0 240 60" preserveAspectRatio="none">
+                <path fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="3" stroke-linecap="round"
+                  d="M0,40 C24,30 44,48 68,40 C92,32 112,50 136,40 C160,30 180,48 204,40 C220,35 232,45 240,40" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- Unique Partners + Inventory metrics -->
+          <div class="kpi-row" style="margin-top: 10px;">
+            <div class="kpi-card purple" *ngIf="role === 'MANUFACTURER'">
+              <div class="kpi-label">Unique Wholesalers</div>
+              <div class="kpi-value">{{ analytics?.uniqueWholesalers ?? 0 }}</div>
+              <svg class="kpi-wave" viewBox="0 0 240 60" preserveAspectRatio="none">
+                <path fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="3" stroke-linecap="round"
+                  d="M0,40 C24,30 44,48 68,40 C92,32 112,50 136,40 C160,30 180,48 204,40 C220,35 232,45 240,40" />
+              </svg>
+            </div>
+
+            <div class="kpi-card purple" *ngIf="role === 'WHOLESALER'">
+              <div class="kpi-label">Unique Consumers</div>
+              <div class="kpi-value">{{ analytics?.uniqueConsumers ?? 0 }}</div>
+              <svg class="kpi-wave" viewBox="0 0 240 60" preserveAspectRatio="none">
+                <path fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="3" stroke-linecap="round"
+                  d="M0,40 C24,30 44,48 68,40 C92,32 112,50 136,40 C160,30 180,48 204,40 C220,35 232,45 240,40" />
+              </svg>
+            </div>
+
+            <div class="kpi-card blue" *ngIf="role === 'WHOLESALER'">
+              <div class="kpi-label">Total Stock</div>
+              <div class="kpi-value">{{ analytics?.totalStock ?? 0 }}</div>
+              <svg class="kpi-wave" viewBox="0 0 240 60" preserveAspectRatio="none">
+                <path fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="3" stroke-linecap="round"
+                  d="M0,40 C24,30 44,48 68,40 C92,32 112,50 136,40 C160,30 180,48 204,40 C220,35 232,45 240,40" />
+              </svg>
+            </div>
+
+            <!-- ✅ controller uses lowStock; template supports both keys -->
+            <div class="kpi-card orange" *ngIf="role === 'WHOLESALER'">
+              <div class="kpi-label">Low Stock Items</div>
+              <div class="kpi-value">{{ (analytics?.lowStock ?? analytics?.lowStockCount ?? 0) }}</div>
+              <svg class="kpi-wave" viewBox="0 0 240 60" preserveAspectRatio="none">
+                <path fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="3" stroke-linecap="round"
+                  d="M0,40 C24,30 44,48 68,40 C92,32 112,50 136,40 C160,30 180,48 204,40 C220,35 232,45 240,40" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- ✅ Top Products list -->
+          <div style="margin-top: 14px;">
+            <div class="section-head">
+              <div class="section-title">Top Products</div>
+              <div class="section-sub">Most ordered products based on count and quantity</div>
+            </div>
+
+            <div class="sog-alert" *ngIf="!(analytics?.topProducts?.length)">
+              No top products data available yet.
+            </div>
+
+            <div class="chart-card" *ngIf="analytics?.topProducts?.length">
+              <div style="overflow:auto; width:100%;">
+                <table style="width:100%; border-collapse: collapse;">
+                  <thead>
+                    <tr style="text-align:left; color: rgba(229,231,235,0.9);">
+                      <th style="padding: 10px 8px;">Product</th>
+                      <th style="padding: 10px 8px;">Order Count</th>
+                      <th style="padding: 10px 8px;">Total Quantity</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let p of analytics.topProducts" style="border-top: 1px solid rgba(255,255,255,0.10); color: rgba(229,231,235,0.86);">
+                      <td style="padding: 10px 8px;">{{ p.productName }}</td>
+                      <td style="padding: 10px 8px;">{{ p.orderCount }}</td>
+                      <td style="padding: 10px 8px;">{{ p.quantitySum }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
         <!-- Alerts -->
         <div *ngIf="error" class="sog-alert danger">
           {{ error }}
