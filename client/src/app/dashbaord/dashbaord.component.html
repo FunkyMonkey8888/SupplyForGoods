@@ -78,15 +78,225 @@
 
         <!-- Consumer: show product catalogue inside dashboard -->
         <div *ngIf="isLoggedIn && role === 'CONSUMER'" class="consumer-products-wrap">
+
           <div class="section-head">
             <div class="section-title">Available Products</div>
             <div class="section-sub">Browse products and place orders instantly</div>
           </div>
 
-          <app-view-products></app-view-products>
+          <!-- ✅ Consumer action buttons -->
+          <div class="mode-tabs" style="margin-top: 10px;">
+            <button
+              type="button"
+              class="mode-tab"
+              [class.active]="consumerPanel === 'orders'"
+              (click)="showConsumerPanel('orders')">
+              My Orders
+              <span style="margin-left:8px; opacity:.9;">({{ consumerOrders?.length || 0 }})</span>
+            </button>
+
+            <button
+              type="button"
+              class="mode-tab"
+              [class.active]="consumerPanel === 'wishlist'"
+              (click)="showConsumerPanel('wishlist')">
+              ♥ Wishlist
+              <span style="margin-left:8px; opacity:.9;">({{ wishlistCount }})</span>
+            </button>
+
+            <button
+              type="button"
+              class="mode-tab"
+              [class.active]="consumerPanel === 'cart'"
+              (click)="showConsumerPanel('cart')">
+              🛒 Cart
+              <span style="margin-left:8px; opacity:.9;">({{ cartCount }})</span>
+            </button>
+          </div>
+
+          <!-- ✅ FIX: show products ONLY on Orders panel -->
+          <div style="margin-top: 12px;" *ngIf="consumerPanel === 'orders'">
+            <app-view-products></app-view-products>
+          </div>
+
+          <!-- ✅ Cart/Wishlist message -->
+          <div
+            *ngIf="cartMessage"
+            class="sog-alert"
+            [class.danger]="cartMessageType === 'danger'"
+            style="margin-top: 12px;">
+            {{ cartMessage }}
+          </div>
+
+          <!-- ================= WISHLIST PANEL ================= -->
+          <div *ngIf="consumerPanel === 'wishlist'" id="wishlistPanel" style="margin-top: 14px;">
+            <div class="section-head">
+              <div class="section-title">♥ My Wishlist</div>
+              <div class="section-sub">Move items to cart or remove them</div>
+            </div>
+
+            <div class="sog-alert" *ngIf="wishlist.length === 0">
+              Your wishlist is empty. Browse products and tap ♥ to add.
+            </div>
+
+            <div class="chart-card" *ngIf="wishlist.length > 0" style="padding: 12px;">
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+                <div *ngFor="let w of wishlist" class="chart-card" style="padding: 14px;">
+                  <div style="font-weight: 800; color: rgba(229,231,235,0.92);">{{ w.name }}</div>
+                  <div style="margin-top: 6px; font-size: 12px; color: rgba(229,231,235,0.70);">
+                    {{ w.description || 'No description available' }}
+                  </div>
+
+                  <div style="margin-top: 10px; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="font-weight: 800; color: rgba(34,197,94,0.95);">₹{{ w.price }}</div>
+                    <div style="font-size: 12px; opacity: .75;">ID: {{ w.productId }}</div>
+                  </div>
+
+                  <div style="margin-top: 12px; display:flex; gap: 10px;">
+                    <button type="button" class="chart-tab active" style="flex:1;" (click)="moveWishlistToCart(w)">
+                      Move to Cart
+                    </button>
+
+                    <button type="button" class="chart-tab" style="border-color: rgba(239,68,68,0.6); color: rgba(239,68,68,0.92);"
+                      (click)="removeWishlistItem(w.productId)">
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= CART PANEL ================= -->
+          <div *ngIf="consumerPanel === 'cart'" id="cartPanel" style="margin-top: 14px;">
+            <div class="section-head">
+              <div class="section-title">🛒 My Cart</div>
+              <div class="section-sub">Adjust quantities, delete items, or place all orders</div>
+            </div>
+
+            <div class="sog-alert" *ngIf="cart.length === 0">
+              Your cart is empty.
+            </div>
+
+            <div class="chart-card" *ngIf="cart.length > 0" style="padding: 12px;">
+              <div style="overflow:auto; width:100%;">
+                <table style="width:100%; border-collapse: collapse;">
+                  <thead>
+                    <tr style="text-align:left; color: rgba(229,231,235,0.9);">
+                      <th style="padding: 10px 8px;">Product</th>
+                      <th style="padding: 10px 8px;">Price</th>
+                      <th style="padding: 10px 8px; width: 220px;">Quantity</th>
+                      <th style="padding: 10px 8px;">Subtotal</th>
+                      <th style="padding: 10px 8px;">Action</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr *ngFor="let c of cart"
+                        style="border-top: 1px solid rgba(255,255,255,0.10); color: rgba(229,231,235,0.86);">
+                      <td style="padding: 10px 8px;">
+                        <div style="font-weight: 800;">{{ c.name }}</div>
+                        <div style="font-size: 12px; opacity:.75;">ID: {{ c.productId }}</div>
+                      </td>
+
+                      <td style="padding: 10px 8px;">₹{{ c.price }}</td>
+
+                      <td style="padding: 10px 8px;">
+                        <div style="display:flex; align-items:center; gap: 8px;">
+                          <button type="button" class="chart-tab"
+                                  style="padding: 6px 10px;"
+                                  (click)="decQty(c)">−</button>
+
+                          <input type="number"
+                                 min="1"
+                                 [value]="c.quantity"
+                                 (change)="updateQtyFromInput(c, $event)"
+                                 style="width: 88px; padding: 8px 10px; border-radius: 12px;
+                                        border: 1px solid rgba(255,255,255,0.14);
+                                        background: rgba(15,23,42,0.55);
+                                        color: rgba(229,231,235,0.92);
+                                        outline: none;">
+
+                          <button type="button" class="chart-tab"
+                                  style="padding: 6px 10px;"
+                                  (click)="incQty(c)">+</button>
+                        </div>
+                      </td>
+
+                      <td style="padding: 10px 8px;">
+                        ₹{{ (c.price || 0) * (c.quantity || 0) }}
+                      </td>
+
+                      <td style="padding: 10px 8px;">
+                        <button type="button"
+                                class="chart-tab"
+                                style="border-color: rgba(239,68,68,0.6); color: rgba(239,68,68,0.92);"
+                                (click)="removeCartItem(c.productId)">
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div style="display:flex; justify-content: space-between; align-items:center; margin-top: 14px; gap: 12px;">
+                <div style="font-weight: 900; color: rgba(229,231,235,0.92);">
+                  Total: ₹{{ cartTotal() }}
+                </div>
+
+                <button type="button"
+                        class="chart-tab active"
+                        [disabled]="cartPlacing"
+                        (click)="placeAllCartOrders()">
+                  {{ cartPlacing ? 'Placing Orders…' : 'Place Order for All Items' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= ORDERS PANEL ================= -->
+          <div *ngIf="consumerPanel === 'orders'" id="ordersPanel" style="margin-top: 14px;">
+            <div class="section-head">
+              <div class="section-title">My Orders</div>
+              <div class="section-sub">Track your purchases and statuses</div>
+            </div>
+
+            <div class="sog-alert" *ngIf="consumerOrders.length === 0">
+              No orders yet. Start browsing products above.
+            </div>
+
+            <div *ngFor="let o of consumerOrders" class="chart-card" style="padding: 14px; margin-top: 10px;">
+              <div style="display:flex; justify-content:space-between; gap: 12px; flex-wrap: wrap;">
+                <div>
+                  <div style="font-weight: 800;">Order ID: <span style="opacity:.9;">{{ o.id }}</span></div>
+                  <div style="margin-top: 6px; opacity:.85;">Product: {{ o.product?.name }}</div>
+                  <div style="margin-top: 6px; opacity:.85;">Quantity: {{ o.quantity }}</div>
+                </div>
+
+                <div style="display:flex; align-items:center;">
+                  <span class="dash-pill" style="text-transform: uppercase;"
+                        [ngStyle]="{
+                          'background': o.status === 'CONFIRMED' ? 'rgba(34,197,94,0.18)' :
+                                        o.status === 'PENDING' ? 'rgba(251,191,36,0.16)' :
+                                        'rgba(239,68,68,0.16)',
+                          'border-color': o.status === 'CONFIRMED' ? 'rgba(34,197,94,0.45)' :
+                                          o.status === 'PENDING' ? 'rgba(251,191,36,0.40)' :
+                                          'rgba(239,68,68,0.45)',
+                          'color': o.status === 'CONFIRMED' ? 'rgba(34,197,94,0.92)' :
+                                   o.status === 'PENDING' ? 'rgba(251,191,36,0.92)' :
+                                   'rgba(239,68,68,0.92)'
+                        }">
+                    {{ o.status }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <!-- Manufacturer / Wholesaler: modern chart area + chart view tabs -->
+        <!-- Manufacturer / Wholesaler chart wrap -->
         <div *ngIf="isLoggedIn && role !== 'CONSUMER'" class="chart-wrap">
           <div class="chart-head" *ngIf="chartViews.length">
             <div class="chart-head-left">
@@ -113,132 +323,6 @@
           <div class="chart-card" *ngIf="role === 'MANUFACTURER'">
             <canvas id="manufacturerChart"></canvas>
           </div>
-        </div>
-
-        <!-- ✅ Advanced Analytics Panel (uses ALL controller analytics) -->
-        <div *ngIf="isLoggedIn && role !== 'CONSUMER'" class="consumer-products-wrap" style="margin-top: 18px;">
-          <div class="section-head">
-            <div class="section-title">Advanced Insights</div>
-            <div class="section-sub">Role-specific metrics computed from orders and inventory</div>
-          </div>
-
-          <div class="kpi-row" style="margin-top: 10px;">
-            <!-- Total Orders -->
-            <div class="kpi-card purple">
-              <div class="kpi-label">Total Orders</div>
-              <div class="kpi-value">{{ analytics?.totalOrders ?? 0 }}</div>
-              <svg class="kpi-wave" viewBox="0 0 240 60" preserveAspectRatio="none">
-                <path fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="3" stroke-linecap="round"
-                  d="M0,40 C24,30 44,48 68,40 C92,32 112,50 136,40 C160,30 180,48 204,40 C220,35 232,45 240,40" />
-              </svg>
-            </div>
-
-            <!-- Cancelled Orders -->
-            <div class="kpi-card orange">
-              <div class="kpi-label">Cancelled Orders</div>
-              <div class="kpi-value">{{ analytics?.cancelledOrders ?? 0 }}</div>
-              <svg class="kpi-wave" viewBox="0 0 240 60" preserveAspectRatio="none">
-                <path fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="3" stroke-linecap="round"
-                  d="M0,40 C24,30 44,48 68,40 C92,32 112,50 136,40 C160,30 180,48 204,40 C220,35 232,45 240,40" />
-              </svg>
-            </div>
-
-            <!-- Cancellation Rate -->
-            <div class="kpi-card blue">
-              <div class="kpi-label">Cancellation Rate</div>
-              <div class="kpi-value">
-                {{ (analytics?.cancellationRate != null) ? (analytics.cancellationRate + '%') : '0%' }}
-              </div>
-              <svg class="kpi-wave" viewBox="0 0 240 60" preserveAspectRatio="none">
-                <path fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="3" stroke-linecap="round"
-                  d="M0,40 C24,30 44,48 68,40 C92,32 112,50 136,40 C160,30 180,48 204,40 C220,35 232,45 240,40" />
-              </svg>
-            </div>
-
-            <!-- Avg Order Qty -->
-            <div class="kpi-card pink">
-              <div class="kpi-label">Avg Order Quantity</div>
-              <div class="kpi-value">{{ analytics?.avgOrderQuantity ?? 0 }}</div>
-              <svg class="kpi-wave" viewBox="0 0 240 60" preserveAspectRatio="none">
-                <path fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="3" stroke-linecap="round"
-                  d="M0,40 C24,30 44,48 68,40 C92,32 112,50 136,40 C160,30 180,48 204,40 C220,35 232,45 240,40" />
-              </svg>
-            </div>
-          </div>
-
-          <!-- Unique Partners + Inventory metrics -->
-          <div class="kpi-row" style="margin-top: 10px;">
-            <div class="kpi-card purple" *ngIf="role === 'MANUFACTURER'">
-              <div class="kpi-label">Unique Wholesalers</div>
-              <div class="kpi-value">{{ analytics?.uniqueWholesalers ?? 0 }}</div>
-              <svg class="kpi-wave" viewBox="0 0 240 60" preserveAspectRatio="none">
-                <path fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="3" stroke-linecap="round"
-                  d="M0,40 C24,30 44,48 68,40 C92,32 112,50 136,40 C160,30 180,48 204,40 C220,35 232,45 240,40" />
-              </svg>
-            </div>
-
-            <div class="kpi-card purple" *ngIf="role === 'WHOLESALER'">
-              <div class="kpi-label">Unique Consumers</div>
-              <div class="kpi-value">{{ analytics?.uniqueConsumers ?? 0 }}</div>
-              <svg class="kpi-wave" viewBox="0 0 240 60" preserveAspectRatio="none">
-                <path fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="3" stroke-linecap="round"
-                  d="M0,40 C24,30 44,48 68,40 C92,32 112,50 136,40 C160,30 180,48 204,40 C220,35 232,45 240,40" />
-              </svg>
-            </div>
-
-            <div class="kpi-card blue" *ngIf="role === 'WHOLESALER'">
-              <div class="kpi-label">Total Stock</div>
-              <div class="kpi-value">{{ analytics?.totalStock ?? 0 }}</div>
-              <svg class="kpi-wave" viewBox="0 0 240 60" preserveAspectRatio="none">
-                <path fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="3" stroke-linecap="round"
-                  d="M0,40 C24,30 44,48 68,40 C92,32 112,50 136,40 C160,30 180,48 204,40 C220,35 232,45 240,40" />
-              </svg>
-            </div>
-
-            <!-- ✅ controller uses lowStock; template supports both keys -->
-            <div class="kpi-card orange" *ngIf="role === 'WHOLESALER'">
-              <div class="kpi-label">Low Stock Items</div>
-              <div class="kpi-value">{{ (analytics?.lowStock ?? analytics?.lowStockCount ?? 0) }}</div>
-              <svg class="kpi-wave" viewBox="0 0 240 60" preserveAspectRatio="none">
-                <path fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="3" stroke-linecap="round"
-                  d="M0,40 C24,30 44,48 68,40 C92,32 112,50 136,40 C160,30 180,48 204,40 C220,35 232,45 240,40" />
-              </svg>
-            </div>
-          </div>
-
-          <!-- ✅ Top Products list -->
-          <div style="margin-top: 14px;">
-            <div class="section-head">
-              <div class="section-title">Top Products</div>
-              <div class="section-sub">Most ordered products based on count and quantity</div>
-            </div>
-
-            <div class="sog-alert" *ngIf="!(analytics?.topProducts?.length)">
-              No top products data available yet.
-            </div>
-
-            <div class="chart-card" *ngIf="analytics?.topProducts?.length">
-              <div style="overflow:auto; width:100%;">
-                <table style="width:100%; border-collapse: collapse;">
-                  <thead>
-                    <tr style="text-align:left; color: rgba(229,231,235,0.9);">
-                      <th style="padding: 10px 8px;">Product</th>
-                      <th style="padding: 10px 8px;">Order Count</th>
-                      <th style="padding: 10px 8px;">Total Quantity</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let p of analytics.topProducts" style="border-top: 1px solid rgba(255,255,255,0.10); color: rgba(229,231,235,0.86);">
-                      <td style="padding: 10px 8px;">{{ p.productName }}</td>
-                      <td style="padding: 10px 8px;">{{ p.orderCount }}</td>
-                      <td style="padding: 10px 8px;">{{ p.quantitySum }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
         </div>
 
         <!-- Alerts -->

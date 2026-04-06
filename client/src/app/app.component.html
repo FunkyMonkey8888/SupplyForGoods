@@ -6,8 +6,7 @@
   <button
     class="navbar-toggler"
     type="button"
-    (click)="isMenuOpen = !isMenuOpen"
-  >
+    (click)="isMenuOpen = !isMenuOpen">
     <span class="navbar-toggler-icon"></span>
   </button>
 
@@ -16,6 +15,7 @@
     <!-- ✅ LEFT LINKS: show role-links only when logged in -->
     <ul class="navbar-nav me-auto app-nav-links" *ngIf="IsLoggin">
 
+      <!-- MANUFACTURER -->
       <li class="nav-item" *ngIf="role === 'MANUFACTURER'">
         <a class="nav-link" [routerLink]="['/create-product']">Create Products</a>
       </li>
@@ -28,6 +28,7 @@
         <a class="nav-link" [routerLink]="['/get-orders']">Review Orders</a>
       </li>
 
+      <!-- WHOLESALER -->
       <li class="nav-item" *ngIf="role === 'WHOLESALER'">
         <a class="nav-link" [routerLink]="['/get-orders']">Get Orders</a>
       </li>
@@ -40,6 +41,7 @@
         <a class="nav-link" [routerLink]="['/add-inventory']">Add Inventory</a>
       </li>
 
+      <!-- ✅ CONSUMER -->
       <li class="nav-item" *ngIf="role === 'CONSUMER'">
         <a class="nav-link" [routerLink]="['/consumer-place-order']">Place Order</a>
       </li>
@@ -48,8 +50,22 @@
         <a class="nav-link" [routerLink]="['/consumer-get-orders']">Orders</a>
       </li>
 
+      <!-- ✅ Wishlist -->
       <li class="nav-item" *ngIf="role === 'CONSUMER'">
-        <a class="nav-link" [routerLink]="['/dashboard']" [queryParams]="{ panel: 'cart' }">
+        <a
+          class="nav-link"
+          [routerLink]="['/dashboard']"
+          [queryParams]="{ panel: 'wishlist' }">
+          Wishlist
+        </a>
+      </li>
+
+      <!-- ✅ Cart -->
+      <li class="nav-item" *ngIf="role === 'CONSUMER'">
+        <a
+          class="nav-link"
+          [routerLink]="['/dashboard']"
+          [queryParams]="{ panel: 'cart' }">
           Cart
         </a>
       </li>
@@ -75,11 +91,13 @@
     <!-- ✅ RIGHT SIDE -->
     <ul class="navbar-nav app-nav-auth align-items-center">
 
-      <!-- Notifications only when logged in -->
+      <!-- Notifications -->
       <li class="nav-item notif-wrap" *ngIf="IsLoggin">
         <button class="notif-btn" type="button" (click)="toggleNotifications()">
           <i class="bi bi-bell"></i>
-          <span class="notif-badge" *ngIf="notifications.length">{{ notifications.length }}</span>
+          <span class="notif-badge" *ngIf="notifications.length">
+            {{ notifications.length }}
+          </span>
         </button>
 
         <div class="notif-panel" *ngIf="showNotifications" (click)="$event.stopPropagation()">
@@ -96,7 +114,9 @@
             <div class="notif-item" *ngFor="let n of notifications">
               <div class="notif-item-top">
                 <div class="notif-item-title">{{ n.title }}</div>
-                <button class="notif-mark" type="button" (click)="markRead(n.id)">Mark read</button>
+                <button class="notif-mark" type="button" (click)="markRead(n.id)">
+                  Mark read
+                </button>
               </div>
               <div class="notif-item-msg">{{ n.message }}</div>
               <div class="notif-item-meta">
@@ -107,17 +127,18 @@
         </div>
       </li>
 
-      <!-- ✅ NOT LOGGED IN CTA (show on ALL pages when not logged in) -->
+      <!-- Login -->
       <li *ngIf="!IsLoggin" class="nav-item">
         <a class="nav-link auth-btn" [routerLink]="['/login']">Login</a>
       </li>
 
+      <!-- Register -->
       <li *ngIf="!IsLoggin" class="nav-item ms-2">
         <a
           class="nav-link auth-btn"
           [routerLink]="['/registration']"
-          style="background: linear-gradient(90deg,#10b981,#22c55e); box-shadow: 0 6px 18px rgba(34,197,94,0.35);"
-        >
+          style="background: linear-gradient(90deg,#10b981,#22c55e);
+                 box-shadow: 0 6px 18px rgba(34,197,94,0.35);">
           Get Started
         </a>
       </li>
@@ -127,8 +148,7 @@
         <a
           class="nav-link auth-btn logout"
           (click)="logout()"
-          [routerLink]="['/login']"
-        >
+          [routerLink]="['/login']">
           Logout
         </a>
       </li>
@@ -138,159 +158,5 @@
 </nav>
 
 <main class="app-main">
-
-  <!-- ✅ LANDING HERO (ONLY HOME when NOT logged in) -->
-  <section *ngIf="!IsLoggin && isPublicHome" class="public-hero">
-    <div class="public-hero-inner">
-
-      <div class="public-left">
-        <div class="public-kicker">
-          <span class="kicker-dot"></span>
-          SUPPLY CHAIN MANAGEMENT PLATFORM
-        </div>
-
-        <h1 class="public-title">
-          Track. Fulfill. Scale.<br />
-          <span class="public-accent">One platform</span> for manufacturers, wholesalers &amp; consumers.
-        </h1>
-
-        <p class="public-subtitle">
-          Streamline inventory, orders, and delivery coordination with secure access, real‑time notifications,
-          and role‑based dashboards.
-        </p>
-
-        <div class="public-cta">
-          <a class="cta-btn primary" [routerLink]="['/registration']">Create account</a>
-          <a class="cta-btn ghost" [routerLink]="['/login']">Sign in</a>
-        </div>
-
-        <div class="public-trust">
-          <div class="trust-chip">Role‑based access</div>
-          <div class="trust-chip">Order tracking</div>
-          <div class="trust-chip">Inventory control</div>
-          <div class="trust-chip">Notifications</div>
-        </div>
-      </div>
-
-      <div class="public-right">
-        <div class="glass-card" id="features">
-          <div class="glass-title">What you get</div>
-          <div class="glass-grid">
-            <div class="glass-item">
-              <div class="gi-title">Inventory &amp; Stock</div>
-              <div class="gi-sub">Control availability and prevent overselling.</div>
-            </div>
-            <div class="glass-item">
-              <div class="gi-title">Order Flow</div>
-              <div class="gi-sub">Place, review, approve and fulfill in one flow.</div>
-            </div>
-            <div class="glass-item">
-              <div class="gi-title">Analytics</div>
-              <div class="gi-sub">Track KPIs and performance per role.</div>
-            </div>
-            <div class="glass-item" id="security">
-              <div class="gi-title">Secure Auth</div>
-              <div class="gi-sub">OTP &amp; JWT-based session security.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="glass-card mt" id="roles">
-          <div class="glass-title">Built for every role</div>
-          <div class="role-row">
-            <div class="role-pill">Manufacturer</div>
-            <div class="role-pill">Wholesaler</div>
-            <div class="role-pill">Consumer</div>
-          </div>
-          <div class="gi-sub" id="how">
-            Choose your role during registration and get a tailored dashboard &amp; features.
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ✅ Routed pages -->
   <router-outlet></router-outlet>
-
-  <!-- ✅ FOOTER (ONLY HOME when NOT logged in) -->
-  <footer class="app-footer" *ngIf="!IsLoggin && isPublicHome">
-    <div class="footer-inner">
-
-      <div class="footer-col brand">
-        <div class="footer-brand">Supply‑of‑Goods</div>
-        <div class="footer-tagline">
-          Professional supply chain management for manufacturers, wholesalers and consumers.
-        </div>
-
-        <div class="footer-meta">
-          <div class="meta-row">
-            <i class="bi bi-geo-alt"></i>
-            <span>Chennai • Hyderabad • Remote</span>
-          </div>
-          <div class="meta-row">
-            <i class="bi bi-envelope"></i>
-            <a href="mailto:support@supplyofgoods.com">support@supplyofgoods.com</a>
-          </div>
-          <div class="meta-row">
-            <i class="bi bi-telephone"></i>
-            <a href="tel:+911234567890">+91 12345 67890</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="footer-col">
-        <div class="footer-title">Product</div>
-        <a class="footer-link" href="#features">Features</a>
-        <a class="footer-link" href="#roles">Roles</a>
-        <a class="footer-link" href="#security">Security</a>
-        <a class="footer-link" href="#how">How it works</a>
-      </div>
-
-      <div class="footer-col">
-        <div class="footer-title">Support</div>
-        <a class="footer-link" href="#" (click)="$event.preventDefault()">Help Center</a>
-        <a class="footer-link" href="#" (click)="$event.preventDefault()">Raise a Ticket</a>
-        <a class="footer-link" href="#" (click)="$event.preventDefault()">System Status</a>
-        <a class="footer-link" [routerLink]="['/login']">Sign in</a>
-      </div>
-
-      <div class="footer-col">
-        <div class="footer-title">Social</div>
-        <div class="social-row">
-          <a class="social-btn" href="#" (click)="$event.preventDefault()" aria-label="LinkedIn">
-            <i class="bi bi-linkedin"></i>
-          </a>
-          <a class="social-btn" href="#" (click)="$event.preventDefault()" aria-label="Twitter">
-            <i class="bi bi-twitter-x"></i>
-          </a>
-          <a class="social-btn" href="#" (click)="$event.preventDefault()" aria-label="GitHub">
-            <i class="bi bi-github"></i>
-          </a>
-          <a class="social-btn" href="#" (click)="$event.preventDefault()" aria-label="YouTube">
-            <i class="bi bi-youtube"></i>
-          </a>
-        </div>
-
-        <div class="footer-cta">
-          <a class="footer-cta-btn" [routerLink]="['/registration']">Get Started</a>
-          <div class="footer-note">Need help? Email us anytime.</div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="footer-bottom">
-      <div class="footer-copy">
-        © 2026 Supply‑of‑Goods. All rights reserved.
-      </div>
-      <div class="footer-legal">
-        <a class="footer-legal-link" href="#" (click)="$event.preventDefault()">Privacy</a>
-        <a class="footer-legal-link" href="#" (click)="$event.preventDefault()">Terms</a>
-        <a class="footer-legal-link" href="#" (click)="$event.preventDefault()">Cookies</a>
-      </div>
-    </div>
-  </footer>
-
 </main>
