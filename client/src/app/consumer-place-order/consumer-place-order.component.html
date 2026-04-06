@@ -15,11 +15,11 @@
 
           <div class="header-text">
             <h3>Place Order</h3>
-            <p>Choose a product and specify quantity</p>
+            <p>Choose a product, set quantity, and add to cart or order</p>
           </div>
         </div>
 
-        <!-- ✅ Quick counts -->
+        <!-- Quick counts -->
         <div class="header-right">
           <div class="quick-badges">
             <div class="quick-badge">
@@ -36,7 +36,7 @@
         </div>
       </div>
 
-      <!-- ✅ Toast -->
+      <!-- Toast -->
       <div class="ui-toast"
            *ngIf="uiMessage"
            [class.success]="uiMessageType === 'success'"
@@ -45,125 +45,88 @@
         {{ uiMessage }}
       </div>
 
-      <div class="content-grid">
+      <!-- PRODUCTS -->
+      <div class="products-section">
+        <h5 class="section-title">Available Products</h5>
 
-        <!-- PRODUCTS -->
-        <div class="products-section">
-          <h5 class="section-title">Available Products</h5>
-
-          <div class="products-grid">
-            <div
-              class="product-card"
-              *ngFor="let product of products"
-              [class.selected]="selectedProduct?.id === product.id"
-              (click)="selectProduct(product)"
-            >
-              <div class="product-top">
-                <div class="title-wrap">
-                  <h6 class="product-name">{{ product.name }}</h6>
-                  <!-- ✅ No stock shown -->
-                  <span class="availability">In Catalog</span>
-                </div>
-
-                <!-- ✅ ACTION BUTTONS -->
-                <div class="product-actions">
-                  <button type="button"
-                          class="icon-btn wishlist-btn"
-                          (click)="$event.stopPropagation(); toggleWishlist(product)"
-                          aria-label="Wishlist">
-                    <i class="bi"
-                       [class.bi-heart]="!isInWishlist(product)"
-                       [class.bi-heart-fill]="isInWishlist(product)"></i>
-                  </button>
-
-                  <button type="button"
-                          class="icon-btn cart-btn"
-                          (click)="$event.stopPropagation(); addToCart(product)"
-                          aria-label="Add to cart">
-                    <i class="bi bi-cart-plus"></i>
-                  </button>
-                </div>
+        <div class="products-grid">
+          <div
+            class="product-card"
+            *ngFor="let product of products"
+            [class.selected]="selectedProduct?.id === product.id"
+            (click)="selectProduct(product)"
+          >
+            <div class="product-top">
+              <div class="title-wrap">
+                <h6 class="product-name">{{ product.name }}</h6>
+                <span class="availability">In Catalog</span>
               </div>
 
-              <p class="description">
-                {{ product.description || 'No description available' }}
-              </p>
-
-              <div class="product-footer">
-                <span class="price">₹{{ product.price }}</span>
-                <span class="select-hint" *ngIf="selectedProduct?.id !== product.id">Click to select</span>
-                <span class="selected-hint" *ngIf="selectedProduct?.id === product.id">Selected ✓</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ORDER FORM -->
-        <div class="order-form-section">
-          <h5>Order Details</h5>
-
-          <div *ngIf="selectedProduct" class="selected-info">
-            Ordering <strong>{{ selectedProduct.name }}</strong> •
-            <strong>₹{{ selectedProduct.price }}</strong>
-          </div>
-
-          <div *ngIf="successMessage" class="alert-success">
-            ✅ {{ successMessage }}
-          </div>
-
-          <div *ngIf="errorMessage" class="alert-error">
-            {{ errorMessage }}
-          </div>
-
-          <form [formGroup]="orderForm" (ngSubmit)="placeOrder()">
-
-            <!-- ✅ QUANTITY STEPPER (− / value / +) -->
-            <div class="form-group quantity-group">
-              <label>Quantity</label>
-
-              <div class="qty-stepper">
-                <button
-                  type="button"
-                  class="qty-btn"
-                  (click)="decrementQty()"
-                  [disabled]="loading || (orderForm.value.quantity || 1) <= 1">
-                  −
-                </button>
-
-                <span class="qty-value">
-                  {{ orderForm.value.quantity || 1 }}
-                </span>
-
-                <button
-                  type="button"
-                  class="qty-btn"
-                  (click)="incrementQty()"
-                  [disabled]="loading">
-                  +
+              <!-- Wishlist icon -->
+              <div class="product-actions">
+                <button type="button"
+                        class="icon-btn wishlist-btn"
+                        (click)="$event.stopPropagation(); toggleWishlist(product)"
+                        aria-label="Wishlist">
+                  <i class="bi"
+                     [class.bi-heart]="!isInWishlist(product)"
+                     [class.bi-heart-fill]="isInWishlist(product)"></i>
                 </button>
               </div>
-
-              <small class="qty-hint">Minimum quantity is 1</small>
             </div>
 
-            <!-- Optional total preview -->
-            <div *ngIf="selectedProduct" class="price-summary">
-              Total:
-              <strong>
-                ₹{{ selectedProduct.price * (orderForm.value.quantity || 1) }}
-              </strong>
+            <p class="description">
+              {{ product.description || 'No description available' }}
+            </p>
+
+            <!-- Quantity stepper per product -->
+            <div class="card-qty">
+              <button type="button"
+                      class="qty-btn"
+                      (click)="$event.stopPropagation(); decProductQty(product)"
+                      [disabled]="loading || getProductQty(product) <= 1">
+                −
+              </button>
+
+              <span class="qty-value">
+                {{ getProductQty(product) }}
+              </span>
+
+              <button type="button"
+                      class="qty-btn"
+                      (click)="$event.stopPropagation(); incProductQty(product)"
+                      [disabled]="loading">
+                +
+              </button>
+
+              <span class="qty-mini">Qty</span>
             </div>
 
-            <button
-              type="submit"
-              class="submit-btn"
-              [disabled]="loading || !selectedProduct">
-              {{ loading ? 'Placing Order…' : 'Place Order' }}
-            </button>
+            <!-- Footer: Price + CTA buttons -->
+            <div class="product-footer">
+              <span class="price">₹{{ product.price }}</span>
 
-          </form>
+              <div class="card-actions">
+                <button type="button"
+                        class="mini-btn cart"
+                        (click)="$event.stopPropagation(); addToCartWithQty(product)"
+                        [disabled]="loading">
+                  <i class="bi bi-cart-plus"></i>
+                  Add to Cart
+                </button>
+
+                <button type="button"
+                        class="mini-btn order"
+                        (click)="$event.stopPropagation(); placeOrderForProduct(product)"
+                        [disabled]="loading">
+                  <i class="bi bi-lightning-charge-fill"></i>
+                  Place Order
+                </button>
+              </div>
+            </div>
+
+          </div>
         </div>
-
       </div>
 
     </div>

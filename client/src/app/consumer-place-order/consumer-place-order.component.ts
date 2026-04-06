@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { HttpService } from '../../services/http.service';
 import { AuthService } from '../../services/auth.service';
 
@@ -28,6 +28,9 @@ export class ConsumerPlaceOrderComponent implements OnInit {
   uiMessage = '';
   uiMessageType: 'success' | 'danger' | 'info' = 'info';
 
+  // ✅ per-product quantity store
+  productQty: Record<number, number> = {};
+
   constructor(
     private fb: FormBuilder,
     private http: HttpService,
@@ -55,8 +58,8 @@ export class ConsumerPlaceOrderComponent implements OnInit {
   }
 
   private buildForm(): void {
+    // ✅ quantity removed from flow (per-product qty is used in UI)
     this.orderForm = this.fb.group({
-      quantity: ['', [Validators.required, Validators.min(1)]],
       status: ['PENDING']
     });
   }
@@ -64,6 +67,11 @@ export class ConsumerPlaceOrderComponent implements OnInit {
   private refreshCounts(): void {
     this.wishlistCount = this.http.getWishlistCount(this.userId);
     this.cartCount = this.http.getCartCount(this.userId);
+  }
+
+  private clearMessages(): void {
+    this.successMessage = '';
+    this.errorMessage = '';
   }
 
   private showUiMessage(msg: string, type: 'success' | 'danger' | 'info' = 'info'): void {
@@ -74,17 +82,12 @@ export class ConsumerPlaceOrderComponent implements OnInit {
     }, 1800);
   }
 
-  private clearMessages(): void {
-    this.successMessage = '';
-    this.errorMessage = '';
-  }
-
   private loadProducts(): void {
     this.http.getProductsByConsumers().subscribe({
       next: res => this.products = res || [],
       error: () => {
         this.errorMessage = 'Failed to load products.';
-        setTimeout(() => this.errorMessage = '', 3000);
+        setTimeout(() => (this.errorMessage = ''), 3000);
       }
     });
   }
@@ -96,7 +99,10 @@ export class ConsumerPlaceOrderComponent implements OnInit {
   selectProduct(product: any): void {
     this.selectedProduct = product;
     this.clearMessages();
-    this.orderForm.patchValue({ quantity: '' });
+
+    // ✅ ensure qty is initialized for this product
+    const id = Number(product?.id);
+    if (id && !this.productQty[id]) this.productQty[id] = 1;
   }
 
   /* ===================== ✅ WISHLIST ===================== */
@@ -112,8 +118,30 @@ export class ConsumerPlaceOrderComponent implements OnInit {
     this.showUiMessage(nowIn ? 'Added to wishlist ♥' : 'Removed from wishlist', nowIn ? 'success' : 'info');
   }
 
+  /* ===================== ✅ PER-PRODUCT QTY ===================== */
+
+  getProductQty(product: any): number {
+    const id = Number(product?.id);
+    if (!id) return 1;
+    if (!this.productQty[id]) this.productQty[id] = 1;
+    return this.productQty[id];
+  }
+
+  incProductQty(product: any): void {
+    const id = Number(product?.id);
+    if (!id) return;
+    this.productQty[id] = this.getProductQty(product) + 1;
+  }
+
+  decProductQty(product: any): void {
+    const id = Number(product?.id);
+    if (!id) return;
+    this.productQty[id] = Math.max(1, this.getProductQty(product) - 1);
+  }
+
   /* ===================== ✅ CART ===================== */
 
+  // old method kept (adds 1)
   addToCart(product: any): void {
     const stock = Number(product?.stockQuantity ?? 0);
     if (!isNaN(stock) && stock === 0) {
@@ -126,7 +154,21 @@ export class ConsumerPlaceOrderComponent implements OnInit {
     this.showUiMessage('Added to cart 🛒', 'success');
   }
 
-  /* ===================== ✅ PLACE ORDER (uses extra APIs) ===================== */
+  // ✅ new method (adds selected qty)
+  addToCartWithQty(product: any): void {
+    const stock = Number(product?.stockQuantity ?? 0);
+    if (!isNaN(stock) && stock === 0) {
+      this.showUiMessage('Out of stock — cannot add to cart', 'danger');
+      return;
+    }
+
+    const qty = this.getProductQty(product);
+    this.http.addToCart(this.userId, product, qty);
+    this.refreshCounts();
+    this.showUiMessage(`Added ${qty} to cart 🛒`, 'success');
+  }
+
+  /* ===================== ✅ PLACE ORDER (uses per-product qty + stock verify API) ===================== */
 
   placeOrder(): void {
     this.clearMessages();
@@ -138,16 +180,13 @@ export class ConsumerPlaceOrderComponent implements OnInit {
 
     if (!this.selectedProduct) {
       this.errorMessage = 'Please select a product';
-      setTimeout(() => this.errorMessage = '', 3000);
+      setTimeout(() => (this.errorMessage = ''), 3000);
       return;
     }
 
-    if (this.orderForm.invalid) {
-      this.orderForm.markAllAsTouched();
-      return;
-    }
+    const productId = Number(this.selectedProduct?.id);
+    const qty = this.getProductQty(this.selectedProduct);
 
-    const qty = Number(this.orderForm.value.quantity);
     if (!qty || qty < 1) {
       this.errorMessage = 'Quantity must be at least 1';
       return;
@@ -155,9 +194,7 @@ export class ConsumerPlaceOrderComponent implements OnInit {
 
     this.loading = true;
 
-    const productId = Number(this.selectedProduct?.id);
-
-    // ✅ Extra feature: fetch latest product details (stock) before placing order
+    // ✅ verify latest stock before placing order
     this.http.getProductByConsumerById(productId).subscribe({
       next: (latest: any) => {
         const latestStock = Number(latest?.stockQuantity ?? 0);
@@ -176,51 +213,39 @@ export class ConsumerPlaceOrderComponent implements OnInit {
           return;
         }
 
-        // ✅ Use PENDING to match backend (backend sets PENDING anyway)
         this.http.consumerPlaceOrder(
-          {
-            quantity: qty,
-            status: 'PENDING'
-          },
+          { quantity: qty, status: 'PENDING' },
           productId,
           this.userId
         ).subscribe({
           next: () => {
-            this.successMessage = 'Order placed successfully';
+            this.successMessage = `Order placed successfully (Qty: ${qty})`;
             this.loading = false;
 
-            this.orderForm.reset({ status: 'PENDING', quantity: '' });
             this.selectedProduct = null;
 
-            // refresh UI data
             this.refreshCounts();
             this.loadProducts();
+
+            setTimeout(() => (this.successMessage = ''), 2500);
           },
           error: (err) => {
             this.errorMessage = err?.error?.message || 'Order placement failed';
             this.loading = false;
-            setTimeout(() => this.errorMessage = '', 3000);
+            setTimeout(() => (this.errorMessage = ''), 3000);
           }
         });
       },
       error: () => {
         this.errorMessage = 'Unable to verify latest stock. Please try again.';
         this.loading = false;
-        setTimeout(() => this.errorMessage = '', 3000);
+        setTimeout(() => (this.errorMessage = ''), 3000);
       }
     });
   }
 
-  incrementQty(): void {
-  const current = Number(this.orderForm.value.quantity || 1);
-  this.orderForm.patchValue({ quantity: current + 1 });
+  placeOrderForProduct(product: any): void {
+  this.selectProduct(product);
+  this.placeOrder();
 }
-
-decrementQty(): void {
-  const current = Number(this.orderForm.value.quantity || 1);
-  if (current > 1) {
-    this.orderForm.patchValue({ quantity: current - 1 });
-  }
-}
-
 }
