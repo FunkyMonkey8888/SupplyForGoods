@@ -91,7 +91,7 @@
   }
 }
 
-/* ===== NEW: TOOLBAR (FILTER + REFRESH) ===== */
+/* ===== TOOLBAR (FILTER + REFRESH) ===== */
 .orders-toolbar {
   margin-top: 14px;
   padding: 12px 12px;
@@ -162,6 +162,56 @@
     font-size: 14px;
     vertical-align: -1px;
   }
+}
+
+/* =========================================================
+   ✅ WHOLESALER VIEW TOGGLE (My Orders / Consumer Orders)
+   Add these classes to your toolbar HTML:
+   .view-tabs .view-tab + active class
+   ========================================================= */
+.view-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.view-tab {
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: rgba(229,231,235,0.88);
+
+  padding: 8px 12px;
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 900;
+
+  cursor: pointer;
+  user-select: none;
+
+  transition: transform 0.12s ease, background 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+}
+
+.view-tab:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.09);
+  box-shadow: 0 14px 26px rgba(0,0,0,0.28);
+  border-color: rgba(255,255,255,0.20);
+}
+
+.view-tab.active {
+  background: rgba(99,102,241,0.18);
+  border-color: rgba(99,102,241,0.34);
+  color: #e0e7ff;
+  box-shadow: 0 16px 34px rgba(99,102,241,0.20);
+}
+
+.view-tab:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 /* ===== ALERTS ===== */
@@ -331,7 +381,7 @@
   box-shadow: none;
 }
 
-/* ===== NEW: STATUS SELECT (per row) ===== */
+/* ===== STATUS SELECT (per row) ===== */
 .status-select {
   padding: 6px 10px;
   border-radius: 12px;
@@ -365,7 +415,7 @@
   color: rgba(229,231,235,0.75);
 }
 
-/* ===== NEW: DETAILS DRAWER ===== */
+/* ===== DETAILS DRAWER ===== */
 .order-drawer {
   position: fixed;
   inset: 0;
@@ -488,5 +538,14 @@
 
   .detail-row {
     grid-template-columns: 120px 1fr;
+  }
+
+  .view-tabs {
+    width: 100%;
+  }
+
+  .view-tab {
+    flex: 1;
+    text-align: center;
   }
 }

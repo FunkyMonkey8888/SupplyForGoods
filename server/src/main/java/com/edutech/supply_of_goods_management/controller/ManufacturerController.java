@@ -126,7 +126,6 @@ public ResponseEntity<List<Order>> getOrdersByProduct(@PathVariable Long product
 }
 
 @PatchMapping("/orders/{id}/cancel")
-@PreAuthorize("hasAuthority('MANUFACTURER')")
 public ResponseEntity<Order> cancelOrder(@PathVariable Long id) {
     return ResponseEntity.ok(orderService.cancelOrder(id));
 }

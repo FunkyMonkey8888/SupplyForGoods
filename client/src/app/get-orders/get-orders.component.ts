@@ -3,6 +3,7 @@ import { HttpService } from '../../services/http.service';
 import { AuthService } from '../../services/auth.service';
 
 type Role = 'MANUFACTURER' | 'WHOLESALER' | string;
+type WholesalerView = 'MY_ORDERS' | 'CONSUMER_ORDERS';
 
 @Component({
   selector: 'app-get-orders',
@@ -28,6 +29,16 @@ export class GetOrdersComponent implements OnInit {
   selectedOrder: any | null = null;
   detailsLoading = false;
 
+  wholesalerView: WholesalerView = 'MY_ORDERS';
+
+  private readonly transitionMap: Record<string, string[]> = {
+    PENDING: ['CONFIRMED', 'CANCELLED', 'SHIPPED'],
+    CONFIRMED: ['SHIPPED', 'CANCELLED'],
+    SHIPPED: ['DELIVERED'],
+    DELIVERED: [],
+    CANCELLED: []
+  };
+
   constructor(
     private http: HttpService,
     private auth: AuthService
@@ -47,6 +58,10 @@ export class GetOrdersComponent implements OnInit {
       return;
     }
 
+    if (this.role === 'WHOLESALER') {
+      this.wholesalerView = 'MY_ORDERS';
+    }
+
     this.loadOrders();
   }
 
@@ -58,6 +73,13 @@ export class GetOrdersComponent implements OnInit {
     this.loadOrders();
   }
 
+  setWholesalerView(view: WholesalerView): void {
+    this.wholesalerView = view;
+    this.statusFilter = 'ALL';
+    this.selectedOrder = null;
+    this.loadOrders();
+  }
+
   private loadOrders(): void {
     this.loading = true;
     this.message = '';
@@ -66,6 +88,33 @@ export class GetOrdersComponent implements OnInit {
     const status = (this.statusFilter || 'ALL').toUpperCase();
 
     if (this.role === 'WHOLESALER') {
+
+      if (this.wholesalerView === 'MY_ORDERS') {
+        const call$ =
+          status === 'ALL'
+            ? this.http.getOrderByWholesalers(this.userId)
+            : this.http.getOrdersByWholesalerAndStatus(this.userId, status);
+
+        call$.subscribe({
+          next: (res: any[]) => {
+            this.orders = res || [];
+            this.initRowState();
+            this.loading = false;
+            if (!this.orders.length) {
+              this.message = status === 'ALL'
+                ? 'No orders placed by you yet.'
+                : `No orders found with status ${status}.`;
+            }
+          },
+          error: () => {
+            this.message = 'Failed to load your orders.';
+            this.loading = false;
+          }
+        });
+
+        return;
+      }
+
       const call$ =
         status === 'ALL'
           ? this.http.getConsumerOrdersForWholesaler(this.userId)
@@ -76,13 +125,18 @@ export class GetOrdersComponent implements OnInit {
           this.orders = res || [];
           this.initRowState();
           this.loading = false;
-          if (!this.orders.length) this.message = status === 'ALL' ? 'No consumer orders found.' : `No orders found with status ${status}.`;
+          if (!this.orders.length) {
+            this.message = status === 'ALL'
+              ? 'No consumer orders found.'
+              : `No consumer orders found with status ${status}.`;
+          }
         },
         error: () => {
           this.message = 'Failed to load consumer orders.';
           this.loading = false;
         }
       });
+
       return;
     }
 
@@ -97,7 +151,11 @@ export class GetOrdersComponent implements OnInit {
           this.orders = res || [];
           this.initRowState();
           this.loading = false;
-          if (!this.orders.length) this.message = status === 'ALL' ? 'No manufacturer orders found.' : `No orders found with status ${status}.`;
+          if (!this.orders.length) {
+            this.message = status === 'ALL'
+              ? 'No manufacturer orders found.'
+              : `No orders found with status ${status}.`;
+          }
         },
         error: () => {
           this.message = 'Failed to load manufacturer orders.';
@@ -119,19 +177,49 @@ export class GetOrdersComponent implements OnInit {
     }
   }
 
+  private currentStatusOf(orderId: number): string {
+    const o = this.orders.find(x => Number(x?.id) === Number(orderId));
+    return (o?.status || 'PENDING').toUpperCase();
+  }
+
+  getAllowedNextStatuses(currentStatus: string | null | undefined): string[] {
+    const current = (currentStatus || 'PENDING').toUpperCase();
+    return this.transitionMap[current] || [];
+  }
+
+  getStatusDropdownOptions(currentStatus: string | null | undefined): string[] {
+    const current = (currentStatus || 'PENDING').toUpperCase();
+    const allowed = this.getAllowedNextStatuses(current);
+    return [current, ...allowed.filter(s => s !== current)];
+  }
+
+  isTerminalStatus(currentStatus: string | null | undefined): boolean {
+    const s = (currentStatus || 'PENDING').toUpperCase();
+    return s === 'DELIVERED' || s === 'CANCELLED';
+  }
+
   updateStatus(orderId: number): void {
     if (this.role !== 'MANUFACTURER' && this.role !== 'WHOLESALER') return;
 
-    const status = (this.pendingStatus[orderId] || '').toUpperCase();
-    if (!status || status === 'ALL') return;
+    if (this.role === 'WHOLESALER' && this.wholesalerView === 'MY_ORDERS') return;
+
+    const next = (this.pendingStatus[orderId] || '').toUpperCase();
+    if (!next || next === 'ALL') return;
+
+    const current = this.currentStatusOf(orderId);
+
+    if (next !== current) {
+      const allowed = this.getAllowedNextStatuses(current);
+      if (!allowed.includes(next)) return;
+    }
 
     this.actionBusy[orderId] = true;
     this.message = '';
 
     const apiCall =
       this.role === 'MANUFACTURER'
-        ? this.http.updateOrderStatusByManufacturer(orderId, status)
-        : this.http.updateOrderStatus(orderId, status);
+        ? this.http.updateOrderStatusByManufacturer(orderId, next)
+        : this.http.updateOrderStatus(orderId, next);
 
     apiCall.subscribe({
       next: () => {
@@ -152,6 +240,8 @@ export class GetOrdersComponent implements OnInit {
 
   cancelOrder(orderId: number, status?: string): void {
     if (!this.canCancel(status)) return;
+
+    if (this.role === 'WHOLESALER' && this.wholesalerView === 'MY_ORDERS') return;
 
     this.actionBusy[orderId] = true;
     this.message = '';

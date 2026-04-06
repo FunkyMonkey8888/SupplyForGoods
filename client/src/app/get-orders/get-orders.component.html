@@ -17,7 +17,30 @@
         </h3>
         <p>Review and manage order requests</p>
 
-        <!-- NEW: FILTER + REFRESH (only for wholesaler/manufacturer) -->
+        <!-- WHOLESALER VIEW TOGGLE -->
+        <div class="orders-toolbar view-toggle" *ngIf="role === 'WHOLESALER'">
+          <div class="toolbar-left">
+            <span class="toolbar-label">View</span>
+
+            <div class="view-tabs">
+              <button class="view-tab"
+                      type="button"
+                      [class.active]="wholesalerView === 'MY_ORDERS'"
+                      (click)="setWholesalerView('MY_ORDERS')">
+                My Orders (to Manufacturer)
+              </button>
+
+              <button class="view-tab"
+                      type="button"
+                      [class.active]="wholesalerView === 'CONSUMER_ORDERS'"
+                      (click)="setWholesalerView('CONSUMER_ORDERS')">
+                Consumer Orders (to Fulfill)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILTER + REFRESH -->
         <div class="orders-toolbar" *ngIf="role === 'MANUFACTURER' || role === 'WHOLESALER'">
           <div class="toolbar-left">
             <label class="toolbar-label">Filter Status</label>
@@ -31,6 +54,7 @@
 
           <div class="toolbar-right">
             <button class="btn refresh"
+                    type="button"
                     (click)="refresh()"
                     [disabled]="loading">
               <i class="bi bi-arrow-clockwise"></i>
@@ -53,7 +77,6 @@
       <!-- TABLE -->
       <div *ngIf="orders.length > 0 && !loading" class="table-responsive">
         <table class="orders-table">
-
           <thead>
             <tr>
               <th>Order ID</th>
@@ -61,11 +84,7 @@
               <th>Product</th>
               <th>Quantity</th>
               <th>Status</th>
-
-              <!-- NEW: view + update + cancel -->
-              <th *ngIf="role === 'MANUFACTURER' || role === 'WHOLESALER'">
-                Actions
-              </th>
+              <th *ngIf="role === 'MANUFACTURER' || role === 'WHOLESALER'">Actions</th>
             </tr>
           </thead>
 
@@ -78,91 +97,76 @@
               <td>{{ o.quantity }}</td>
 
               <td>
-                <span class="status confirmed" *ngIf="(o.status || '').toUpperCase() === 'CONFIRMED'">
-                  Confirmed
-                </span>
-
-                <span class="status pending" *ngIf="(o.status || '').toUpperCase() === 'PENDING'">
-                  Pending
-                </span>
-
-                <span class="status shipped" *ngIf="(o.status || '').toUpperCase() === 'SHIPPED'">
-                  Shipped
-                </span>
-
-                <span class="status delivered" *ngIf="(o.status || '').toUpperCase() === 'DELIVERED'">
-                  Delivered
-                </span>
-
-                <span class="status cancelled" *ngIf="(o.status || '').toUpperCase() === 'CANCELLED'">
-                  Cancelled
-                </span>
-
-                <span class="status pending" *ngIf="!o.status">
-                  Pending
-                </span>
+                <span class="status confirmed" *ngIf="(o.status || '').toUpperCase() === 'CONFIRMED'">Confirmed</span>
+                <span class="status pending" *ngIf="(o.status || '').toUpperCase() === 'PENDING'">Pending</span>
+                <span class="status shipped" *ngIf="(o.status || '').toUpperCase() === 'SHIPPED'">Shipped</span>
+                <span class="status delivered" *ngIf="(o.status || '').toUpperCase() === 'DELIVERED'">Delivered</span>
+                <span class="status cancelled" *ngIf="(o.status || '').toUpperCase() === 'CANCELLED'">Cancelled</span>
+                <span class="status pending" *ngIf="!o.status">Pending</span>
               </td>
 
               <!-- ACTIONS -->
               <td *ngIf="role === 'MANUFACTURER' || role === 'WHOLESALER'">
 
-                <!-- NEW: View -->
-                <button
-                  class="btn view"
-                  (click)="viewOrder(o.id)"
-                  [disabled]="actionBusy[o.id]">
+                <!-- VIEW (always allowed) -->
+                <button class="btn view"
+                        type="button"
+                        (click)="viewOrder(o.id)"
+                        [disabled]="actionBusy[o.id]">
                   View
                 </button>
 
-                <!-- NEW: Status dropdown -->
-                <select class="status-select"
-                        [(ngModel)]="pendingStatus[o.id]"
-                        [disabled]="actionBusy[o.id] || !canCancel(o.status)">
-                  <option *ngFor="let s of statuses"
-                          [value]="s"
-                          [disabled]="s === 'ALL'">
-                    {{ s }}
-                  </option>
-                </select>
+                <!-- UPDATE + CANCEL (transition-based)
+                     - Manufacturer: allowed
+                     - Wholesaler: ONLY when fulfilling consumer orders -->
+                <ng-container
+                  *ngIf="role === 'MANUFACTURER' || (role === 'WHOLESALER' && wholesalerView === 'CONSUMER_ORDERS')">
 
-                <!-- NEW: Update -->
-                <button
-                  class="btn approve"
-                  (click)="updateStatus(o.id)"
-                  [disabled]="actionBusy[o.id] || !canCancel(o.status)">
-                  Update
-                </button>
+                  <!-- ✅ Transition-based dropdown (current + allowed next statuses only) -->
+                  <select class="status-select"
+                          [(ngModel)]="pendingStatus[o.id]"
+                          [disabled]="actionBusy[o.id] || isTerminalStatus(o.status)">
+                    <option *ngFor="let s of getStatusDropdownOptions(o.status)" [value]="s">
+                      {{ s }}
+                    </option>
+                  </select>
 
-                <!-- NEW: Cancel -->
-                <button
-                  class="btn reject"
-                  (click)="cancelOrder(o.id, o.status)"
-                  [disabled]="actionBusy[o.id] || !canCancel(o.status)">
-                  Cancel
-                </button>
+                  <button class="btn approve"
+                          type="button"
+                          (click)="updateStatus(o.id)"
+                          [disabled]="actionBusy[o.id] || isTerminalStatus(o.status)">
+                    Update
+                  </button>
+
+                  <button class="btn reject"
+                          type="button"
+                          (click)="cancelOrder(o.id, o.status)"
+                          [disabled]="actionBusy[o.id] || !canCancel(o.status)">
+                    Cancel
+                  </button>
+
+                </ng-container>
 
               </td>
 
             </tr>
           </tbody>
-
         </table>
       </div>
 
       <!-- EMPTY -->
-      <div *ngIf="orders.length === 0 && !loading && !message"
-           class="empty-state">
+      <div *ngIf="orders.length === 0 && !loading && !message" class="empty-state">
         No orders found.
       </div>
 
     </div>
 
-    <!-- NEW: DETAILS DRAWER / PANEL -->
+    <!-- DETAILS DRAWER -->
     <div class="order-drawer" *ngIf="detailsLoading || selectedOrder">
       <div class="drawer-card">
         <div class="drawer-head">
           <h4>Order Details</h4>
-          <button class="btn close" (click)="closeDetails()">
+          <button class="btn close" type="button" (click)="closeDetails()">
             <i class="bi bi-x-lg"></i>
           </button>
         </div>
