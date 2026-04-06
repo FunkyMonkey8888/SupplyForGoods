@@ -10,4 +10,7 @@ public interface OtpVerificationRepository extends JpaRepository<OtpVerification
     Optional<OtpVerification> findTopByEmailAndUsedFalseOrderByCreatedAtDesc(String email);
 
     Optional<OtpVerification> findByIdAndUsedFalse(Long id);
+
+    Optional<OtpVerification> findTopByEmailOrderByCreatedAtDesc(String email);
+
 }

@@ -86,4 +86,49 @@ public class ManufacturerController {
                                                    @RequestParam String status) {
         return ResponseEntity.ok(orderService.updateOrderStatus(id, status));
     }
+
+@GetMapping("/product/{id}")
+@PreAuthorize("hasAuthority('MANUFACTURER')")
+public ResponseEntity<Product> getProduct(@PathVariable Long id) {
+    return ResponseEntity.ok(productService.getProductById(id));
+}
+
+@GetMapping("/products/search")
+@PreAuthorize("hasAuthority('MANUFACTURER')")
+public ResponseEntity<List<Product>> searchProducts(@RequestParam String query) {
+    return ResponseEntity.ok(productService.searchProducts(query));
+}
+
+@GetMapping("/products/low-stock")
+@PreAuthorize("hasAuthority('MANUFACTURER')")
+public ResponseEntity<List<Product>> lowStockForManufacturer(@RequestParam Long manufacturerId,
+                                                             @RequestParam(defaultValue = "10") int threshold) {
+    return ResponseEntity.ok(productService.getLowStockProductsByManufacturer(manufacturerId, threshold));
+}
+
+@GetMapping("/orders/{orderId}")
+@PreAuthorize("hasAuthority('MANUFACTURER')")
+public ResponseEntity<Order> getOrderById(@PathVariable Long orderId) {
+    return ResponseEntity.ok(orderService.getOrderById(orderId));
+}
+
+@GetMapping("/orders/status")
+@PreAuthorize("hasAuthority('MANUFACTURER')")
+public ResponseEntity<List<Order>> getOrdersForManufacturerByStatus(@RequestParam Long manufacturerId,
+                                                                    @RequestParam String status) {
+    return ResponseEntity.ok(orderService.getOrdersByManufacturerAndStatus(manufacturerId, status));
+}
+
+@GetMapping("/orders/product/{productId}")
+@PreAuthorize("hasAuthority('MANUFACTURER')")
+public ResponseEntity<List<Order>> getOrdersByProduct(@PathVariable Long productId) {
+    return ResponseEntity.ok(orderService.getOrdersByProduct(productId));
+}
+
+@PatchMapping("/orders/{id}/cancel")
+@PreAuthorize("hasAuthority('MANUFACTURER')")
+public ResponseEntity<Order> cancelOrder(@PathVariable Long id) {
+    return ResponseEntity.ok(orderService.cancelOrder(id));
+}
+
 }

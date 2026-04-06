@@ -16,6 +16,28 @@
           {{ role === 'MANUFACTURER' ? 'Incoming Orders' : 'Orders' }}
         </h3>
         <p>Review and manage order requests</p>
+
+        <!-- NEW: FILTER + REFRESH (only for wholesaler/manufacturer) -->
+        <div class="orders-toolbar" *ngIf="role === 'MANUFACTURER' || role === 'WHOLESALER'">
+          <div class="toolbar-left">
+            <label class="toolbar-label">Filter Status</label>
+
+            <select class="toolbar-select"
+                    [(ngModel)]="statusFilter"
+                    (change)="onFilterChange()">
+              <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+            </select>
+          </div>
+
+          <div class="toolbar-right">
+            <button class="btn refresh"
+                    (click)="refresh()"
+                    [disabled]="loading">
+              <i class="bi bi-arrow-clockwise"></i>
+              Refresh
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- LOADING -->
@@ -39,8 +61,10 @@
               <th>Product</th>
               <th>Quantity</th>
               <th>Status</th>
+
+              <!-- NEW: view + update + cancel -->
               <th *ngIf="role === 'MANUFACTURER' || role === 'WHOLESALER'">
-                Action
+                Actions
               </th>
             </tr>
           </thead>
@@ -49,42 +73,74 @@
             <tr *ngFor="let o of orders">
 
               <td>#{{ o.id }}</td>
-              <td>{{ o.user?.username }}</td>
-              <td>{{ o.product?.name }}</td>
+              <td>{{ o.user?.username || '-' }}</td>
+              <td>{{ o.product?.name || '-' }}</td>
               <td>{{ o.quantity }}</td>
 
               <td>
-                <span class="status confirmed" *ngIf="o.status === 'CONFIRMED'">
+                <span class="status confirmed" *ngIf="(o.status || '').toUpperCase() === 'CONFIRMED'">
                   Confirmed
                 </span>
 
-                <span class="status pending" *ngIf="o.status === 'PENDING'">
+                <span class="status pending" *ngIf="(o.status || '').toUpperCase() === 'PENDING'">
                   Pending
                 </span>
 
-                <span class="status shipped" *ngIf="o.status === 'SHIPPED'">
+                <span class="status shipped" *ngIf="(o.status || '').toUpperCase() === 'SHIPPED'">
                   Shipped
                 </span>
 
-                <span class="status cancelled" *ngIf="o.status === 'CANCELLED'">
+                <span class="status delivered" *ngIf="(o.status || '').toUpperCase() === 'DELIVERED'">
+                  Delivered
+                </span>
+
+                <span class="status cancelled" *ngIf="(o.status || '').toUpperCase() === 'CANCELLED'">
                   Cancelled
+                </span>
+
+                <span class="status pending" *ngIf="!o.status">
+                  Pending
                 </span>
               </td>
 
+              <!-- ACTIONS -->
               <td *ngIf="role === 'MANUFACTURER' || role === 'WHOLESALER'">
+
+                <!-- NEW: View -->
                 <button
-                  class="btn approve"
-                  (click)="updateStatus(o.id, 'CONFIRMED')"
-                  [disabled]="o.status !== 'PENDING'">
-                  Approve
+                  class="btn view"
+                  (click)="viewOrder(o.id)"
+                  [disabled]="actionBusy?.[o.id]">
+                  View
                 </button>
 
+                <!-- NEW: Status dropdown -->
+                <select class="status-select"
+                        [(ngModel)]="pendingStatus[o.id]"
+                        [disabled]="actionBusy?.[o.id] || !canCancel(o.status)">
+                  <option *ngFor="let s of statuses"
+                          [value]="s"
+                          [disabled]="s === 'ALL'">
+                    {{ s }}
+                  </option>
+                </select>
+
+                <!-- NEW: Update -->
+                <button
+                  class="btn approve"
+                  (click)="updateStatus(o.id)"
+                  [disabled]="actionBusy?.[o.id] || !canCancel(o.status)">
+                  Update
+                </button>
+
+                <!-- NEW: Cancel -->
                 <button
                   class="btn reject"
-                  (click)="updateStatus(o.id, 'CANCELLED')"
-                  [disabled]="o.status !== 'PENDING'">
-                  Reject
+                  (click)="cancelOrder(o.id, o.status)"
+                  [disabled]="actionBusy?.[o.id] || !canCancel(o.status)">
+                  Cancel
                 </button>
+
               </td>
 
             </tr>
@@ -99,6 +155,56 @@
         No orders found.
       </div>
 
+    </div>
+
+    <!-- NEW: DETAILS DRAWER / PANEL -->
+    <div class="order-drawer" *ngIf="detailsLoading || selectedOrder">
+      <div class="drawer-card">
+        <div class="drawer-head">
+          <h4>Order Details</h4>
+          <button class="btn close" (click)="closeDetails()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <div *ngIf="detailsLoading" class="alert-info-box">
+          Loading details...
+        </div>
+
+        <div *ngIf="selectedOrder && !detailsLoading" class="drawer-body">
+
+          <div class="detail-row">
+            <div class="k">Order ID</div>
+            <div class="v">#{{ selectedOrder?.id }}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="k">Status</div>
+            <div class="v">{{ (selectedOrder?.status || 'PENDING') }}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="k">Product</div>
+            <div class="v">{{ selectedOrder?.product?.name || '-' }}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="k">Quantity</div>
+            <div class="v">{{ selectedOrder?.quantity || '-' }}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="k">Ordered By</div>
+            <div class="v">{{ selectedOrder?.user?.username || '-' }}</div>
+          </div>
+
+          <div class="detail-row" *ngIf="selectedOrder?.product?.manufacturerId">
+            <div class="k">Manufacturer ID</div>
+            <div class="v">{{ selectedOrder?.product?.manufacturerId }}</div>
+          </div>
+
+        </div>
+      </div>
     </div>
 
   </div>

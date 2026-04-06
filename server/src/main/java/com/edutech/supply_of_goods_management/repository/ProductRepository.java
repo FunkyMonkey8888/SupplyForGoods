@@ -13,4 +13,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // Find products by manufacturer ID
     List<Product> findByManufacturerId(Long manufacturerId);
+
+    List<Product> findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String name, String description);
+List<Product> findByStockQuantityLessThanEqual(int threshold);
+List<Product> findByManufacturerIdAndStockQuantityLessThanEqual(Long manufacturerId, int threshold);
 }

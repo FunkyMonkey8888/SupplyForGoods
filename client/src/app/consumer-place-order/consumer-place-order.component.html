@@ -117,23 +117,41 @@
 
           <form [formGroup]="orderForm" (ngSubmit)="placeOrder()">
 
-            <div class="form-group">
+            <!-- ✅ QUANTITY STEPPER (− / value / +) -->
+            <div class="form-group quantity-group">
               <label>Quantity</label>
-              <input
-                type="number"
-                formControlName="quantity"
-                placeholder="Enter quantity"
-              />
-              <small class="error-text"
-                     *ngIf="orderForm.get('quantity')?.touched &&
-                            orderForm.get('quantity')?.invalid">
-                Please enter a valid quantity (minimum 1)
-              </small>
+
+              <div class="qty-stepper">
+                <button
+                  type="button"
+                  class="qty-btn"
+                  (click)="decrementQty()"
+                  [disabled]="loading || (orderForm.value.quantity || 1) <= 1">
+                  −
+                </button>
+
+                <span class="qty-value">
+                  {{ orderForm.value.quantity || 1 }}
+                </span>
+
+                <button
+                  type="button"
+                  class="qty-btn"
+                  (click)="incrementQty()"
+                  [disabled]="loading">
+                  +
+                </button>
+              </div>
+
+              <small class="qty-hint">Minimum quantity is 1</small>
             </div>
 
             <!-- Optional total preview -->
-            <div *ngIf="selectedProduct && orderForm.value.quantity" class="price-summary">
-              Total: <strong>₹{{ selectedProduct.price * orderForm.value.quantity }}</strong>
+            <div *ngIf="selectedProduct" class="price-summary">
+              Total:
+              <strong>
+                ₹{{ selectedProduct.price * (orderForm.value.quantity || 1) }}
+              </strong>
             </div>
 
             <button

@@ -12,15 +12,46 @@
         </div>
 
         <h3>Your Orders</h3>
-        <p>Track your orders and share feedback after confirmation</p>
+        <p>Track your orders and share feedback after delivery</p>
+
+        <!-- NEW: toolbar -->
+        <div class="orders-toolbar">
+          <div class="toolbar-left">
+            <label class="toolbar-label">Filter Status</label>
+            <select class="toolbar-select"
+                    [(ngModel)]="statusFilter"
+                    (change)="onFilterChange()">
+              <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+            </select>
+          </div>
+
+          <div class="toolbar-right">
+            <button class="btn refresh" (click)="refresh()" [disabled]="loading">
+              <i class="bi bi-arrow-clockwise"></i>
+              Refresh
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div *ngIf="orders.length === 0" class="empty-state">
+      <!-- LOADING -->
+      <div *ngIf="loading" class="alert-info-box">
+        Loading orders...
+      </div>
+
+      <!-- MESSAGE -->
+      <div *ngIf="message && !loading" class="alert-warning-box">
+        {{ message }}
+      </div>
+
+      <!-- EMPTY -->
+      <div *ngIf="!loading && orders.length === 0 && !message" class="empty-state">
         <i class="bi bi-inbox"></i>
         <p>No orders found yet.</p>
       </div>
 
-      <div *ngIf="orders.length > 0" class="table-responsive">
+      <!-- TABLE -->
+      <div *ngIf="!loading && orders.length > 0" class="table-responsive">
         <table class="orders-table">
 
           <thead>
@@ -29,6 +60,7 @@
               <th>Product</th>
               <th>Qty</th>
               <th>Status</th>
+              <th class="actions-col">Actions</th>
               <th>Feedback</th>
             </tr>
           </thead>
@@ -36,50 +68,87 @@
           <tbody>
             <ng-container *ngFor="let o of orders">
 
-              <tr [class.resolved]="o.status === 'CONFIRMED'">
+              <tr [class.resolved]="(o.status || '').toUpperCase() === 'DELIVERED'">
+
                 <td>#{{ o.id }}</td>
-                <td>{{ o.product?.name }}</td>
+                <td>{{ o.product?.name || '-' }}</td>
                 <td>{{ o.quantity }}</td>
 
                 <td>
-                  <span *ngIf="o.status === 'CONFIRMED'" class="status confirmed">
+                  <span *ngIf="(o.status || '').toUpperCase() === 'DELIVERED'" class="status delivered">
+                    Delivered
+                  </span>
+
+                  <span *ngIf="(o.status || '').toUpperCase() === 'CONFIRMED'" class="status confirmed">
                     Confirmed
                   </span>
-                  <span *ngIf="o.status !== 'CONFIRMED'" class="status pending">
-                    {{ o.status }}
+
+                  <span *ngIf="(o.status || '').toUpperCase() === 'SHIPPED'" class="status shipped">
+                    Shipped
+                  </span>
+
+                  <span *ngIf="(o.status || '').toUpperCase() === 'CANCELLED'" class="status cancelled">
+                    Cancelled
+                  </span>
+
+                  <span *ngIf="!o.status || (o.status || '').toUpperCase() === 'PENDING'" class="status pending">
+                    Pending
                   </span>
                 </td>
 
+                <!-- NEW: View + Cancel -->
+                <td class="actions-col">
+                  <button class="btn view"
+                          (click)="viewOrder(o.id)"
+                          [disabled]="actionBusy?.[o.id]">
+                    View
+                  </button>
+
+                  <button class="btn reject"
+                          (click)="cancelOrder(o.id, o.status)"
+                          [disabled]="actionBusy?.[o.id] || !canCancel(o.status)">
+                    Cancel
+                  </button>
+                </td>
+
+                <!-- FEEDBACK -->
                 <td>
                   <div *ngIf="submittedFeedback[o.id]" class="feedback-view">
-
                     <div class="stars">
                       <i class="bi bi-star-fill"
                          *ngFor="let s of [1,2,3,4,5]"
                          [class.filled]="submittedFeedback[o.id].rating >= s">
                       </i>
                     </div>
-
                     <small>“{{ submittedFeedback[o.id].comment }}”</small>
                   </div>
 
                   <button
-                    *ngIf="o.status === 'CONFIRMED' && !submittedFeedback[o.id]"
+                    *ngIf="canGiveFeedback(o)"
                     class="btn-feedback"
                     (click)="openFeedback(o.id)">
                     Give Feedback
                   </button>
 
-                  <span *ngIf="o.status !== 'CONFIRMED'" class="pending-text">
-                    Pending confirmation
+                  <span *ngIf="!canGiveFeedback(o) && !submittedFeedback[o.id]" class="pending-text">
+                    Feedback after delivery
                   </span>
                 </td>
+
               </tr>
 
+              <!-- FEEDBACK EDIT ROW -->
               <tr *ngIf="activeOrderId === o.id" class="feedback-row">
-                <td colspan="5">
+                <td colspan="6">
 
                   <div class="feedback-box">
+
+                    <div class="feedback-head">
+                      <strong>Feedback for #{{ o.id }}</strong>
+                      <button class="btn close" (click)="closeFeedback()">
+                        <i class="bi bi-x-lg"></i>
+                      </button>
+                    </div>
 
                     <div class="stars mb-2">
                       <i class="bi bi-star-fill"
@@ -96,8 +165,10 @@
                       [(ngModel)]="comments[o.id]">
                     </textarea>
 
-                    <button class="btn-submit" (click)="submitFeedback(o.id)">
-                      Submit Feedback
+                    <button class="btn-submit"
+                            (click)="submitFeedback(o.id)"
+                            [disabled]="actionBusy?.[o.id]">
+                      {{ actionBusy?.[o.id] ? 'Submitting...' : 'Submit Feedback' }}
                     </button>
 
                   </div>
@@ -111,6 +182,44 @@
         </table>
       </div>
 
+    </div>
+
+    <!-- NEW: Details Drawer -->
+    <div class="order-drawer" *ngIf="detailsLoading || selectedOrder">
+      <div class="drawer-card">
+        <div class="drawer-head">
+          <h4>Order Details</h4>
+          <button class="btn close" (click)="closeDetails()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <div *ngIf="detailsLoading" class="alert-info-box">
+          Loading details...
+        </div>
+
+        <div *ngIf="selectedOrder && !detailsLoading" class="drawer-body">
+          <div class="detail-row">
+            <div class="k">Order ID</div>
+            <div class="v">#{{ selectedOrder?.id }}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="k">Status</div>
+            <div class="v">{{ selectedOrder?.status || 'PENDING' }}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="k">Product</div>
+            <div class="v">{{ selectedOrder?.product?.name || '-' }}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="k">Quantity</div>
+            <div class="v">{{ selectedOrder?.quantity || '-' }}</div>
+          </div>
+        </div>
+      </div>
     </div>
 
   </div>

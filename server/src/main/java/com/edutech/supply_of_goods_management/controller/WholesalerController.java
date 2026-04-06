@@ -90,4 +90,67 @@ public class WholesalerController {
                 orderService.getConsumerOrdersForWholesaler(wholesalerId)
         );
     }
+
+    @GetMapping("/products/{id}")
+public ResponseEntity<Product> getProduct(@PathVariable Long id) {
+    return ResponseEntity.ok(productService.getProductById(id));
+}
+
+@GetMapping("/products/search")
+public ResponseEntity<List<Product>> searchProducts(@RequestParam String query) {
+    return ResponseEntity.ok(productService.searchProducts(query));
+}
+
+@GetMapping("/products/low-stock")
+public ResponseEntity<List<Product>> lowStockProducts(@RequestParam(defaultValue = "10") int threshold) {
+    return ResponseEntity.ok(productService.getLowStockProducts(threshold));
+}
+
+@PatchMapping("/order/{id}/cancel")
+public ResponseEntity<Order> cancelOrder(@PathVariable Long id) {
+    return ResponseEntity.ok(orderService.cancelOrder(id));
+}
+
+@GetMapping("/orders/{orderId}")
+public ResponseEntity<Order> getOrderById(@PathVariable Long orderId) {
+    return ResponseEntity.ok(orderService.getOrderById(orderId));
+}
+
+@GetMapping("/orders/status")
+public ResponseEntity<List<Order>> getAllOrdersByStatus(@RequestParam Long userId,
+                                                       @RequestParam String status) {
+    return ResponseEntity.ok(orderService.getOrdersByUserAndStatus(userId, status));
+}
+
+@PostMapping("/inventories/{id}/restock")
+public ResponseEntity<Inventory> restockInventory(@PathVariable Long id,
+                                                  @RequestParam int qty) {
+    return ResponseEntity.ok(inventoryService.restockInventory(id, qty));
+}
+
+@GetMapping("/inventories/{id}")
+public ResponseEntity<Inventory> getInventoryById(@PathVariable Long id) {
+    return ResponseEntity.ok(inventoryService.getInventoryById(id));
+}
+
+@GetMapping("/inventories/by-product")
+public ResponseEntity<Inventory> getInventoryByProduct(@RequestParam Long wholesalerId,
+                                                       @RequestParam Long productId) {
+    return ResponseEntity.ok(inventoryService.getInventoryByWholesalerAndProduct(wholesalerId, productId));
+}
+
+@GetMapping("/inventories/low-stock")
+public ResponseEntity<List<Inventory>> getLowStockInventories(@RequestParam Long wholesalerId,
+                                                              @RequestParam(defaultValue = "10") int threshold) {
+    return ResponseEntity.ok(inventoryService.getLowStockInventoriesByWholesaler(wholesalerId, threshold));
+}
+
+@GetMapping("/consumer-orders/status")
+@PreAuthorize("hasAuthority('WHOLESALER')")
+public ResponseEntity<List<Order>> getConsumerOrdersForWholesalerByStatus(
+        @RequestParam Long wholesalerId,
+        @RequestParam String status) {
+    return ResponseEntity.ok(orderService.getConsumerOrdersForWholesalerByStatus(wholesalerId, status));
+}
+
 }

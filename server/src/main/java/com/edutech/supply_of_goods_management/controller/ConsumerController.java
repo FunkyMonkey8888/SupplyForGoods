@@ -56,4 +56,30 @@ public class ConsumerController {
                                                     @RequestBody Feedback feedback) {
         return ResponseEntity.ok(feedbackService.giveFeedback(orderId, userId, feedback));
     }
+
+    @GetMapping("/products/{id}")
+public ResponseEntity<Product> getProduct(@PathVariable Long id) {
+    return ResponseEntity.ok(productService.getProductById(id));
+}
+
+@GetMapping("/products/search")
+public ResponseEntity<List<Product>> searchProducts(@RequestParam String query) {
+    return ResponseEntity.ok(productService.searchProducts(query));
+}
+
+@GetMapping("/orders/{orderId}")
+public ResponseEntity<Order> getOrderById(@PathVariable Long orderId) {
+    return ResponseEntity.ok(orderService.getOrderById(orderId));
+}
+
+@GetMapping("/orders/status")
+public ResponseEntity<List<Order>> getAllOrdersByStatus(@RequestParam Long userId,
+                                                       @RequestParam String status) {
+    return ResponseEntity.ok(orderService.getOrdersByUserAndStatus(userId, status));
+}
+
+@PatchMapping("/orders/{orderId}/cancel")
+public ResponseEntity<Order> cancelOrder(@PathVariable Long orderId) {
+    return ResponseEntity.ok(orderService.cancelOrder(orderId));
+}
 }

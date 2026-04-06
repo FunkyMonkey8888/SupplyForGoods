@@ -3,7 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment.development';
 import { AuthService } from './auth.service';
- 
+
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -456,4 +458,173 @@ verifyRegisterOtp(email: string, otp: string) {
   );
 }
 
+getProductByWholesalerById(productId: any): Observable<any> {
+  return this.http.get<any>(
+    `${this.serverName}/api/wholesalers/products/${productId}`,
+    this.getHeaders()
+  );
+}
+
+searchProductsByWholesaler(query: string): Observable<any[]> {
+  return this.http.get<any[]>(
+    `${this.serverName}/api/wholesalers/products/search?query=${encodeURIComponent(query)}`,
+    this.getHeaders()
+  );
+}
+
+getLowStockProductsByWholesaler(threshold: number = 10): Observable<any[]> {
+  return this.http.get<any[]>(
+    `${this.serverName}/api/wholesalers/products/low-stock?threshold=${threshold}`,
+    this.getHeaders()
+  );
+}
+
+getProductByConsumerById(productId: any): Observable<any> {
+  return this.http.get<any>(
+    `${this.serverName}/api/consumers/products/${productId}`,
+    this.getHeaders()
+  );
+}
+
+searchProductsByConsumers(query: string): Observable<any[]> {
+  return this.http.get<any[]>(
+    `${this.serverName}/api/consumers/products/search?query=${encodeURIComponent(query)}`,
+    this.getHeaders()
+  );
+}
+
+getProductByManufacturerById(productId: any): Observable<any> {
+  return this.http.get<any>(
+    `${this.serverName}/api/manufacturers/product/${productId}`,
+    this.getHeaders()
+  );
+}
+
+searchProductsByManufacturer(query: string): Observable<any[]> {
+  return this.http.get<any[]>(
+    `${this.serverName}/api/manufacturers/products/search?query=${encodeURIComponent(query)}`,
+    this.getHeaders()
+  );
+}
+
+getLowStockProductsByManufacturer(manufacturerId: any, threshold: number = 10): Observable<any[]> {
+  return this.http.get<any[]>(
+    `${this.serverName}/api/manufacturers/products/low-stock?manufacturerId=${manufacturerId}&threshold=${threshold}`,
+    this.getHeaders()
+  );
+}
+
+getInventoryById(inventoryId: any): Observable<any> {
+  return this.http.get<any>(
+    `${this.serverName}/api/wholesalers/inventories/${inventoryId}`,
+    this.getHeaders()
+  );
+}
+
+restockInventory(inventoryId: any, qty: number): Observable<any> {
+  return this.http.post<any>(
+    `${this.serverName}/api/wholesalers/inventories/${inventoryId}/restock?qty=${qty}`,
+    {},
+    this.getHeaders()
+  );
+}
+
+getInventoryByWholesalerAndProduct(wholesalerId: any, productId: any): Observable<any> {
+  return this.http.get<any>(
+    `${this.serverName}/api/wholesalers/inventories/by-product?wholesalerId=${wholesalerId}&productId=${productId}`,
+    this.getHeaders()
+  );
+}
+
+getLowStockInventoriesByWholesaler(wholesalerId: any, threshold: number = 10): Observable<any[]> {
+  return this.http.get<any[]>(
+    `${this.serverName}/api/wholesalers/inventories/low-stock?wholesalerId=${wholesalerId}&threshold=${threshold}`,
+    this.getHeaders()
+  );
+}
+
+getInventorySummaryByWholesaler(wholesalerId: any, threshold: number = 10): Observable<any> {
+  return this.http.get<any>(
+    `${this.serverName}/api/wholesalers/inventories/summary?wholesalerId=${wholesalerId}&threshold=${threshold}`,
+    this.getHeaders()
+  );
+}
+getOrderByIdForWholesaler(orderId: any): Observable<any> {
+  return this.http.get<any>(
+    `${this.serverName}/api/wholesalers/orders/${orderId}`,
+    this.getHeaders()
+  );
+}
+
+getOrdersByWholesalerAndStatus(userId: any, status: string): Observable<any[]> {
+  return this.http.get<any[]>(
+    `${this.serverName}/api/wholesalers/orders/status?userId=${userId}&status=${encodeURIComponent(status)}`,
+    this.getHeaders()
+  );
+}
+
+cancelWholesalerOrder(orderId: any): Observable<any> {
+  return this.http.patch<any>(
+    `${this.serverName}/api/wholesalers/order/${orderId}/cancel`,
+    {},
+    this.getHeaders()
+  );
+}
+
+getConsumerOrdersForWholesalerByStatus(wholesalerId: any, status: string): Observable<any[]> {
+  return this.http.get<any[]>(
+    `${this.serverName}/api/wholesalers/consumer-orders/status?wholesalerId=${wholesalerId}&status=${encodeURIComponent(status)}`,
+    this.getHeaders()
+  );
+}
+
+getOrderByIdForManufacturer(orderId: any): Observable<any> {
+  return this.http.get<any>(
+    `${this.serverName}/api/manufacturers/orders/${orderId}`,
+    this.getHeaders()
+  );
+}
+
+getOrdersByManufacturerAndStatus(manufacturerId: any, status: string): Observable<any[]> {
+  return this.http.get<any[]>(
+    `${this.serverName}/api/manufacturers/orders/status?manufacturerId=${manufacturerId}&status=${encodeURIComponent(status)}`,
+    this.getHeaders()
+  );
+}
+
+getOrdersByProduct(productId: any): Observable<any[]> {
+  return this.http.get<any[]>(
+    `${this.serverName}/api/manufacturers/orders/product/${productId}`,
+    this.getHeaders()
+  );
+}
+
+cancelManufacturerOrder(orderId: any): Observable<any> {
+  return this.http.patch<any>(
+    `${this.serverName}/api/manufacturers/orders/${orderId}/cancel`,
+    {},
+    this.getHeaders()
+  );
+}
+getOrderByIdForConsumer(orderId: any): Observable<any> {
+  return this.http.get<any>(
+    `${this.serverName}/api/consumers/orders/${orderId}`,
+    this.getHeaders()
+  );
+}
+
+getOrdersByConsumerAndStatus(userId: any, status: string): Observable<any[]> {
+  return this.http.get<any[]>(
+    `${this.serverName}/api/consumers/orders/status?userId=${userId}&status=${encodeURIComponent(status)}`,
+    this.getHeaders()
+  );
+}
+
+cancelConsumerOrder(orderId: any): Observable<any> {
+  return this.http.patch<any>(
+    `${this.serverName}/api/consumers/orders/${orderId}/cancel`,
+    {},
+    this.getHeaders()
+  );
+}
 }

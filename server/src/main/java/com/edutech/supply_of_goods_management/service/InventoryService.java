@@ -123,4 +123,34 @@ public class InventoryService {
         Inventory inventory = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Inventory not found"));
         repo.delete(inventory);
     }
+
+    public Inventory getInventoryById(Long id) {
+    return repo.findById(id).orElseThrow(() -> new RuntimeException("Inventory not found"));
+}
+
+public Inventory restockInventory(Long inventoryId, int qty) {
+    if (qty <= 0) throw new IllegalArgumentException("qty must be > 0");
+    Inventory inv = repo.findById(inventoryId).orElseThrow(() -> new RuntimeException("Inventory not found"));
+    inv.setStockQuantity(inv.getStockQuantity() + qty);
+    return repo.save(inv);
+}
+
+public Inventory getInventoryByWholesalerAndProduct(Long wholesalerId, Long productId) {
+    return repo.findByWholesalerIdAndProduct_Id(wholesalerId, productId)
+            .orElseThrow(() -> new RuntimeException("Inventory not found"));
+}
+
+public List<Inventory> getLowStockInventoriesByWholesaler(Long wholesalerId, int threshold) {
+    return repo.findByWholesalerIdAndStockQuantityLessThanEqual(wholesalerId, threshold);
+}
+
+@Transactional
+public void releaseReservedInventory(Order order) {
+    Product product = order.getProduct();
+    Inventory inventory = repo.findFirstByProduct(product)
+            .orElseThrow(() -> new RuntimeException("Inventory not found for product"));
+
+    inventory.setStockQuantity(inventory.getStockQuantity() + order.getQuantity());
+    repo.save(inventory);
+}
 }

@@ -29,8 +29,10 @@ public class OtpService {
     public void requestOtp(String email) {
         String otp = String.valueOf(100000 + random.nextInt(900000));
 
+
+
         OtpVerification rec = new OtpVerification();
-        rec.setEmail(email);
+        rec.setEmail(email.toLowerCase());
         rec.setOtpHash(passwordEncoder.encode(otp));
         rec.setExpiresAt(LocalDateTime.now().plusMinutes(5));
         rec.setUsed(false);
@@ -41,44 +43,37 @@ public class OtpService {
     }
 
     @Transactional
-    public void verifyOtpOrThrow(String email, String otp) {
+public void verifyOtpOrThrow(String email, String otp) {
 
-        OtpVerification rec = otpRepo.findTopByEmailAndUsedFalseOrderByCreatedAtDesc(email)
-                .orElseThrow(() -> new RuntimeException("OTP not requested"));
+    String e = email == null ? "" : email.trim().toLowerCase();
+    String code = otp == null ? "" : otp.trim();
 
-        if (rec.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("OTP expired");
-        }
+    OtpVerification latest = otpRepo.findTopByEmailOrderByCreatedAtDesc(e)
+            .orElseThrow(() -> new RuntimeException("OTP not requested"));
 
-        if (rec.getAttempts() >= 5) {
-            throw new RuntimeException("Too many attempts");
-        }
-
-        rec.setAttempts(rec.getAttempts() + 1);
-
-        if (!passwordEncoder.matches(otp, rec.getOtpHash())) {
-            otpRepo.save(rec);
-            throw new RuntimeException("Invalid OTP");
-        }
-
-        rec.setUsed(true);
-        otpRepo.save(rec);
+    if (latest.isUsed()) {
+        throw new RuntimeException("OTP already used. Please request a new OTP.");
     }
-    public Long requestOtpFor2FA(String email) {
-    String otp = String.valueOf(100000 + random.nextInt(900000));
 
-    OtpVerification rec = new OtpVerification();
-    rec.setEmail(email);
-    rec.setOtpHash(passwordEncoder.encode(otp));
-    rec.setExpiresAt(LocalDateTime.now().plusMinutes(5));
-    rec.setUsed(false);
-    rec.setAttempts(0);
+    if (latest.getExpiresAt().isBefore(LocalDateTime.now())) {
+        throw new RuntimeException("OTP expired");
+    }
 
-    OtpVerification saved = otpRepo.save(rec);
-    emailService.sendOtp(email, otp);
+    if (latest.getAttempts() >= 5) {
+        throw new RuntimeException("Too many attempts");
+    }
 
-    return saved.getId(); // ✅ otpId used as session id
+    latest.setAttempts(latest.getAttempts() + 1);
+
+    if (!passwordEncoder.matches(code, latest.getOtpHash())) {
+        otpRepo.save(latest);
+        throw new RuntimeException("Invalid OTP");
+    }
+
+    latest.setUsed(true);
+    otpRepo.save(latest);
 }
+
 
 @Transactional
 public void verifyOtpFor2FAOrThrow(Long otpId, String otp) {

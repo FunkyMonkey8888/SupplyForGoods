@@ -39,4 +39,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     @Query("SELECT i FROM Inventory i WHERE i.stockQuantity < 10")
     List<Inventory> lowStockItems();
 
+    Optional<Inventory> findByWholesalerIdAndProduct_Id(Long wholesalerId, Long productId);
+List<Inventory> findByWholesalerIdAndStockQuantityLessThanEqual(Long wholesalerId, int threshold);
+
 }

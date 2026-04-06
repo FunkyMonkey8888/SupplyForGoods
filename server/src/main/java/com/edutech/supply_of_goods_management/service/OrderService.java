@@ -160,4 +160,53 @@ for (Inventory inv : invs) {
                 productIds, "CONSUMER"
         );
     }
+
+    public Order getOrderById(Long orderId) {
+    return orderRepo.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+}
+
+public List<Order> getOrdersByUserAndStatus(Long userId, String status) {
+    if (status == null || status.trim().isEmpty()) return List.of();
+    return orderRepo.findByUserIdAndStatus(userId, status.trim().toUpperCase());
+}
+
+public List<Order> getOrdersByManufacturerAndStatus(Long manufacturerId, String status) {
+    if (status == null || status.trim().isEmpty()) return List.of();
+    return orderRepo.findByProductManufacturerIdAndUserRoleAndStatus(
+            manufacturerId, "WHOLESALER", status.trim().toUpperCase()
+    );
+}
+
+public List<Order> getOrdersByProduct(Long productId) {
+    return orderRepo.findByProductId(productId);
+}
+
+@Transactional
+public Order cancelOrder(Long orderId) {
+    Order order = orderRepo.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+    String current = order.getStatus() == null ? "PENDING" : order.getStatus().trim().toUpperCase();
+
+    if ("DELIVERED".equals(current) || "CANCELLED".equals(current)) {
+        throw new IllegalStateException("Cannot cancel an order in status: " + current);
+    }
+
+    if ("CONFIRMED".equals(current)) {
+        inventoryService.releaseReservedInventory(order);
+    }
+
+    order.setStatus("CANCELLED");
+    return orderRepo.save(order);
+}
+
+public List<Order> getConsumerOrdersForWholesalerByStatus(Long wholesalerId, String status) {
+    if (status == null || status.trim().isEmpty()) return List.of();
+    return orderRepo.findByProductIdInAndUserRoleAndStatus(
+            inventoryRepository.findByWholesalerId(wholesalerId).stream()
+                    .map(inv -> inv.getProduct().getId())
+                    .distinct()
+                    .collect(java.util.stream.Collectors.toList()),
+            "CONSUMER",
+            status.trim().toUpperCase()
+    );
+}
 }

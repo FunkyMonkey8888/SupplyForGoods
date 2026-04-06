@@ -80,5 +80,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         "ORDER BY COUNT(o) DESC")
     List<Object[]> topProductsForWholesaler(@Param("pids") List<Long> productIds);
 
+    List<Order> findByUserIdAndStatus(Long userId, String status);
+List<Order> findByProductManufacturerIdAndUserRoleAndStatus(Long manufacturerId, String role, String status);
+List<Order> findByProductIdInAndUserRoleAndStatus(List<Long> productIds, String role, String status);
+
 
 }

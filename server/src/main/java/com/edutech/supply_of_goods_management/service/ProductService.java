@@ -65,4 +65,23 @@ public class ProductService {
     public void deleteProduct(Long id){
         repo.deleteById(id);
     }
+
+    public Product getProductById(Long id) {
+    return repo.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
+}
+
+public List<Product> searchProducts(String query) {
+    if (query == null || query.trim().isEmpty()) return List.of();
+    String q = query.trim();
+    return repo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(q, q);
+}
+
+public List<Product> getLowStockProducts(int threshold) {
+    return repo.findByStockQuantityLessThanEqual(threshold);
+}
+
+public List<Product> getLowStockProductsByManufacturer(Long manufacturerId, int threshold) {
+    return repo.findByManufacturerIdAndStockQuantityLessThanEqual(manufacturerId, threshold);
+}
+
 }

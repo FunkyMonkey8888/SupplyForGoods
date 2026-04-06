@@ -22,10 +22,12 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   step: 'FORM' | 'OTP' = 'FORM';
   otpVerified = false;
 
+  // ✅ Store the email used to request OTP (single source of truth)
+  otpEmail = '';
+
   resendSeconds = 0;
   private timer: any = null;
 
-  // ✅ Dynamic password validation state
   passwordRules = {
     minLen: false,
     upper: false,
@@ -54,7 +56,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
         [
           Validators.required,
           Validators.minLength(8),
-          // ✅ IMPORTANT: use '&' not '&amp;' and validate whole string
+          // ✅ FIXED: in TypeScript use '&' not '&amp;'
           Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$/)
         ]
       ],
@@ -65,7 +67,6 @@ export class RegistrationComponent implements OnInit, OnDestroy {
       otp: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]]
     });
 
-    // ✅ Live password rule evaluation + strength
     this.pwdSub = this.itemForm.get('password')!.valueChanges.subscribe((val: string) => {
       const pwd = (val || '').toString();
 
@@ -85,7 +86,6 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   }
 
   private computeStrength(pwd: string): void {
-    // Basic, reliable scoring (no external libs)
     let score = 0;
 
     if (pwd.length >= 8) score += 20;
@@ -95,7 +95,6 @@ export class RegistrationComponent implements OnInit, OnDestroy {
     if (/\d/.test(pwd)) score += 15;
     if (/[@$!%*?&]/.test(pwd)) score += 15;
 
-    // small bonus for variety
     const variety = [
       /[a-z]/.test(pwd),
       /[A-Z]/.test(pwd),
@@ -104,7 +103,6 @@ export class RegistrationComponent implements OnInit, OnDestroy {
     ].filter(Boolean).length;
 
     if (variety >= 3) score += 10;
-
     if (score > 100) score = 100;
 
     this.passwordStrength = score;
@@ -116,6 +114,8 @@ export class RegistrationComponent implements OnInit, OnDestroy {
 
   // ================= STEP 1: SEND OTP =================
   sendOtp(): void {
+    if (this.loading) return;
+
     if (this.itemForm.invalid) {
       this.message = 'Please fill all fields correctly.';
       return;
@@ -124,24 +124,35 @@ export class RegistrationComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.message = '';
 
-    const email = String(this.itemForm.value.email).trim();
+    // reset otp state every time user requests OTP
+    this.otpVerified = false;
+    this.step = 'FORM';
 
-    this.http.requestRegisterOtp(email).subscribe({
+    // ✅ Lock OTP email once (prevents mismatch)
+    this.otpEmail = String(this.itemForm.value.email || '').trim().toLowerCase();
+
+    this.http.requestRegisterOtp(this.otpEmail).subscribe({
       next: () => {
         this.loading = false;
         this.step = 'OTP';
         this.otpForm.reset();
+
+        // ✅ disable email editing while OTP screen is open
+        this.itemForm.get('email')?.disable();
+
         this.startResendTimer(30);
       },
-      error: () => {
+      error: (err) => {
         this.loading = false;
-        this.message = 'Failed to send OTP. Try again.';
+        this.message = err?.error?.message || 'Failed to send OTP. Try again.';
       }
     });
   }
 
   // ================= STEP 2: VERIFY OTP =================
   verifyOtp(): void {
+    if (this.loading) return;
+
     if (this.otpForm.invalid) {
       this.message = 'Enter a valid 6-digit OTP.';
       return;
@@ -150,19 +161,19 @@ export class RegistrationComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.message = '';
 
-    const email = String(this.itemForm.value.email).trim();
-    const otp = String(this.otpForm.value.otp).trim();
+    const otp = String(this.otpForm.value.otp || '').trim();
 
-    this.http.verifyRegisterOtp(email, otp).subscribe({
+    // ✅ Use stored otpEmail (not live form email)
+    this.http.verifyRegisterOtp(this.otpEmail, otp).subscribe({
       next: () => {
         this.loading = false;
         this.otpVerified = true;
         this.message = '';
         this.registerNow();
       },
-      error: () => {
+      error: (err) => {
         this.loading = false;
-        this.message = 'Invalid / Expired OTP.';
+        this.message = err?.error?.message || 'Invalid / Expired OTP.';
       }
     });
   }
@@ -174,34 +185,76 @@ export class RegistrationComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.loading) return;
+
     this.loading = true;
     this.message = '';
 
-    this.http.registerUser(this.itemForm.value).subscribe({
+    // ✅ ensure email is included even if control is disabled
+    const payload = {
+      ...this.itemForm.getRawValue(), // includes disabled fields like email
+      email: this.otpEmail
+    };
+
+    this.http.registerUser(payload).subscribe({
       next: () => {
         this.loading = false;
         this.message = 'Registration completed successfully.';
+
+        // reset local state (optional)
+        this.resetAllState();
+
         this.router.navigate(['/login']);
-        setTimeout(() => (this.message = ''), 3000);
       },
-      error: () => {
+      error: (err) => {
         this.loading = false;
-        this.message = 'Registration failed. Try again.';
+        this.message = err?.error?.message || 'Registration failed. Try again.';
       }
     });
   }
 
   // ================= UX: RESEND / BACK =================
   resendOtp(): void {
-    if (this.resendSeconds > 0 || this.loading) return;
-    this.sendOtp();
+    if (this.loading) return;
+    if (this.resendSeconds > 0) return;
+
+    // resend should use same locked email
+    if (!this.otpEmail) {
+      this.message = 'Email missing. Please go back and try again.';
+      return;
+    }
+
+    this.loading = true;
+    this.message = '';
+
+    this.http.requestRegisterOtp(this.otpEmail).subscribe({
+      next: () => {
+        this.loading = false;
+        this.message = 'OTP resent.';
+        this.otpForm.reset();
+        this.startResendTimer(30);
+        setTimeout(() => (this.message = ''), 1500);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.message = err?.error?.message || 'Failed to resend OTP.';
+      }
+    });
   }
 
   backToForm(): void {
+    if (this.loading) return;
+
     this.step = 'FORM';
     this.message = '';
     this.otpForm.reset();
     this.stopTimer();
+
+    this.otpVerified = false;
+    this.otpEmail = '';
+
+    // ✅ allow editing email again
+    this.itemForm.get('email')?.enable();
   }
 
   private startResendTimer(seconds: number): void {
@@ -222,5 +275,27 @@ export class RegistrationComponent implements OnInit, OnDestroy {
       clearInterval(this.timer);
       this.timer = null;
     }
+  }
+
+  private resetAllState(): void {
+    this.stopTimer();
+
+    this.step = 'FORM';
+    this.otpVerified = false;
+    this.otpEmail = '';
+    this.resendSeconds = 0;
+
+    this.itemForm.reset();
+    this.itemForm.get('email')?.enable();
+
+    this.passwordStrength = 0;
+    this.passwordStrengthLabel = 'Weak';
+    this.passwordRules = {
+      minLen: false,
+      upper: false,
+      lower: false,
+      digit: false,
+      special: false
+    };
   }
 }
