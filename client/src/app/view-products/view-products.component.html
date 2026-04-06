@@ -13,38 +13,80 @@
         <p>Search, sort, and manage your products</p>
       </div>
 
+      <!-- TOOLBAR -->
       <div class="toolbar">
+
+        <!-- SEARCH -->
         <div class="search-wrap">
           <i class="bi bi-search"></i>
           <input
             type="text"
             class="search-input"
-            placeholder="Search by name, description, price, stock..."
+            [placeholder]="canSeeStock ? 'Search by name, description, price, stock...' : 'Search by name, description, price...'"
             [value]="searchTerm"
             (input)="onSearchChange(($any($event.target)).value)"
           />
         </div>
 
+        <!-- CONTROLS -->
         <div class="controls">
+
+          <!-- SORT KEY (role-based options) -->
           <select class="control-select" (change)="changeSortKey(($any($event.target)).value)">
-            <option value="name" [selected]="sortKey === 'name'">Sort: Name</option>
-            <option value="price" [selected]="sortKey === 'price'">Sort: Price</option>
-            <option value="stockQuantity" [selected]="sortKey === 'stockQuantity'">Sort: Stock</option>
+            <option *ngFor="let s of sortKeys"
+                    [value]="s.key"
+                    [selected]="sortKey === s.key">
+              Sort: {{ s.label }}
+            </option>
           </select>
 
+          <!-- SORT DIR -->
           <button class="control-btn" type="button" (click)="toggleSortDir()">
             <i class="bi" [ngClass]="sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down'"></i>
             {{ sortDir === 'asc' ? 'Asc' : 'Desc' }}
           </button>
 
+          <!-- PAGE SIZE -->
           <select class="control-select" (change)="changePageSize(($any($event.target)).value)">
             <option *ngFor="let s of pageSizes" [value]="s" [selected]="pageSize === s">
               {{ s }} / page
             </option>
           </select>
+
+          <!-- REFRESH -->
+          <button class="control-btn" type="button" (click)="refresh()" [disabled]="loading">
+            <i class="bi bi-arrow-clockwise"></i>
+            Refresh
+          </button>
+
         </div>
       </div>
 
+      <!-- LOW STOCK FILTER (MANUFACTURER + WHOLESALER only) -->
+      <div class="toolbar lowstock" *ngIf="role === 'MANUFACTURER' || role === 'WHOLESALER'">
+        <div class="controls lowstock-controls">
+
+          <label class="checkbox">
+            <input type="checkbox"
+                   [checked]="showLowStockOnly"
+                   (change)="toggleLowStock(($any($event.target)).checked)" />
+            <span>Low stock only</span>
+          </label>
+
+          <div class="threshold">
+            <span class="threshold-label">Threshold</span>
+            <input class="threshold-input"
+                   type="number"
+                   min="1"
+                   [value]="lowStockThreshold"
+                   (input)="setLowStockThreshold(($any($event.target)).value)"
+                   [disabled]="!showLowStockOnly || loading" />
+          </div>
+
+        </div>
+      </div>
+
+      <!-- LOADING / MESSAGE -->
       <div *ngIf="loading" class="info-box">
         Loading products...
       </div>
@@ -53,11 +95,22 @@
         {{ message }}
       </div>
 
+      <!-- GRID -->
       <div *ngIf="!loading && paged.length > 0" class="product-grid">
         <div class="product-card" *ngFor="let p of paged">
+
           <div class="p-top">
             <div class="p-name">{{ p.name }}</div>
-            <div class="p-stock">Stock: {{ p.stockQuantity ?? 0 }}</div>
+
+            <!-- ✅ Stock shown ONLY for manufacturer -->
+            <div class="p-stock" *ngIf="canSeeStock">
+              Stock: {{ p.stockQuantity ?? 0 }}
+            </div>
+
+            <!-- ✅ For others, show neutral badge -->
+            <div class="p-stock neutral" *ngIf="!canSeeStock">
+              In Catalog
+            </div>
           </div>
 
           <div class="p-desc">{{ p.description || 'No description available' }}</div>
@@ -65,10 +118,13 @@
           <div class="p-meta">
             <div class="p-price">₹{{ p.price ?? 0 }}</div>
           </div>
+
         </div>
       </div>
 
+      <!-- PAGINATION -->
       <div *ngIf="!loading && totalPages > 1" class="pagination">
+
         <button class="page-btn" type="button" (click)="prevPage()" [disabled]="currentPage === 1">
           Prev
         </button>
@@ -89,8 +145,10 @@
         <div class="page-info">
           Page {{ currentPage }} / {{ totalPages }}
         </div>
+
       </div>
 
+      <!-- MANUFACTURER ACTION -->
       <div class="add-product-action" *ngIf="role === 'MANUFACTURER'">
         <button class="add-product-btn" routerLink="/create-product" type="button">
           + Add Products

@@ -100,13 +100,13 @@
                 <td class="actions-col">
                   <button class="btn view"
                           (click)="viewOrder(o.id)"
-                          [disabled]="actionBusy?.[o.id]">
+                          [disabled]="actionBusy[o.id]">
                     View
                   </button>
 
                   <button class="btn reject"
                           (click)="cancelOrder(o.id, o.status)"
-                          [disabled]="actionBusy?.[o.id] || !canCancel(o.status)">
+                          [disabled]="actionBusy[o.id] || !canCancel(o.status)">
                     Cancel
                   </button>
                 </td>
@@ -167,8 +167,8 @@
 
                     <button class="btn-submit"
                             (click)="submitFeedback(o.id)"
-                            [disabled]="actionBusy?.[o.id]">
-                      {{ actionBusy?.[o.id] ? 'Submitting...' : 'Submit Feedback' }}
+                            [disabled]="actionBusy[o.id]">
+                      {{ actionBusy[o.id] ? 'Submitting...' : 'Submit Feedback' }}
                     </button>
 
                   </div>
