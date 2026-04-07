@@ -59,16 +59,16 @@
     <!-- ✅ LEFT LINKS: public section links ONLY on home when NOT logged in -->
     <ul class="navbar-nav me-auto app-nav-links" *ngIf="!IsLoggin && isPublicHome">
       <li class="nav-item">
-        <a class="nav-link" href="#features">Features</a>
+        <a class="nav-link" href="#features"></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#roles">Roles</a>
+        <a class="nav-link" href="#roles"></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#security">Security</a>
+        <a class="nav-link" href="#security"></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#how">How it works</a>
+        <a class="nav-link" href="#how"></a>
       </li>
     </ul>
 
@@ -116,7 +116,7 @@
         <a
           class="nav-link auth-btn"
           [routerLink]="['/registration']"
-          style="background: linear-gradient(90deg,#10b981,#22c55e); box-shadow: 0 6px 18px rgba(34,197,94,0.35);"
+          style="background: linear-gradient(90deg,#29b910,#22c55e); box-shadow: 0 6px 18px rgba(34,197,94,0.35);"
         >
           Get Started
         </a>
@@ -138,6 +138,7 @@
 </nav>
 
 <main class="app-main">
+  <router-outlet></router-outlet>
 
   <!-- ✅ LANDING HERO (ONLY HOME when NOT logged in) -->
   <section *ngIf="!IsLoggin && isPublicHome" class="public-hero">
@@ -212,7 +213,7 @@
   </section>
 
   <!-- ✅ Routed pages -->
-  <router-outlet></router-outlet>
+  <!-- <router-outlet></router-outlet> -->
 
   <!-- ✅ FOOTER (ONLY HOME when NOT logged in) -->
   <footer class="app-footer" *ngIf="!IsLoggin && isPublicHome">

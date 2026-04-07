@@ -795,4 +795,79 @@
     grid-template-columns: 1fr;
   }
 }
+/* =========================
+   LIVE BACKGROUND (ADD ONLY)
+   Paste at the VERY END of the file
+   Works with existing .sog-bg + .sog-overlay divs
+========================= */
 
+/* Ensure background layers don’t block clicks */
+.sog-bg,
+.sog-overlay {
+  pointer-events: none !important;
+}
+
+/* Animate the existing gradient by shifting background-position */
+.sog-bg {
+  background-size: 160% 160%, 160% 160%, 180% 180%, 100% 100% !important;
+  background-position: 0% 0%, 100% 0%, 50% 100%, 0% 0% !important;
+  animation: bgShift 12s ease-in-out infinite !important;
+  will-change: background-position;
+}
+
+/* Visible motion */
+@keyframes bgShift {
+  0%   { background-position: 0% 0%, 100% 0%, 50% 100%, 0% 0%; }
+  50%  { background-position: 30% 22%, 70% 18%, 55% 78%, 0% 0%; }
+  100% { background-position: 0% 0%, 100% 0%, 50% 100%, 0% 0%; }
+}
+
+/* Add subtle animated grid + particles on the existing overlay */
+.sog-overlay::before,
+.sog-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* grid */
+.sog-overlay::before {
+  opacity: 0.09;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.10) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.10) 1px, transparent 1px);
+  background-size: 90px 90px;
+  mask-image: radial-gradient(circle at 45% 40%, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%);
+  animation: gridMove 18s linear infinite;
+  will-change: transform;
+}
+
+@keyframes gridMove {
+  from { transform: translate3d(0,0,0); }
+  to   { transform: translate3d(90px,90px,0); }
+}
+
+/* particles */
+.sog-overlay::after {
+  opacity: 0.16;
+  background-image:
+    radial-gradient(rgba(255,255,255,0.55) 1px, transparent 1px),
+    radial-gradient(rgba(255,255,255,0.35) 1px, transparent 1px);
+  background-size: 140px 140px, 220px 220px;
+  background-position: 0 0, 70px 100px;
+  animation: dotsMove 22s linear infinite;
+  will-change: transform;
+}
+
+@keyframes dotsMove {
+  from { transform: translate3d(0,0,0); }
+  to   { transform: translate3d(-120px,80px,0); }
+}
+
+/* Accessibility: if system reduces motion, animations stop */
+@media (prefers-reduced-motion: reduce) {
+  .sog-bg { animation: none !important; }
+  .sog-overlay::before,
+  .sog-overlay::after { animation: none !important; }
+}
