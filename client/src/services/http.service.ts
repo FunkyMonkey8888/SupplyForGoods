@@ -627,4 +627,33 @@ cancelConsumerOrder(orderId: any): Observable<any> {
     this.getHeaders()
   );
 }
+
+updateManufacturerProduct(productId: number, body: any) {
+  return this.http.put<any>(
+    `${this.serverName}/api/manufacturers/product/${productId}`,
+    body,
+    this.getHeaders()
+  );
+}
+
+deleteManufacturerProduct(productId: number) {
+  return this.http.delete<any>(
+    `${this.serverName}/api/manufacturers/product/${productId}`,
+    this.getHeaders()
+  );
+}
+
+getWholesalerOrderCountForProduct(productId: number) {
+  return this.http.get<number>(
+    `${this.serverName}/api/manufacturers/products/${productId}/wholesaler-orders/count`,
+    this.getHeaders()
+  );
+}
+
+canDeleteManufacturerProduct(productId: number) {
+  return this.http.get<boolean>(
+    `${this.serverName}/api/manufacturers/products/${productId}/can-delete`,
+    this.getHeaders()
+  );
+}
 }

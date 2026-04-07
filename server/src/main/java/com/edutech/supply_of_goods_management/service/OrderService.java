@@ -209,4 +209,10 @@ public List<Order> getConsumerOrdersForWholesalerByStatus(Long wholesalerId, Str
             status.trim().toUpperCase()
     );
 }
+
+
+public long countWholesalerOrdersForProduct(Long productId) {
+    return orderRepo.countByProductIdAndUserRole(productId, "WHOLESALER");
+}
+
 }

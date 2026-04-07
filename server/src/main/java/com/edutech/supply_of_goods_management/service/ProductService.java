@@ -7,6 +7,7 @@ import com.edutech.supply_of_goods_management.entity.Product;
 import com.edutech.supply_of_goods_management.repository.InventoryRepository;
 import com.edutech.supply_of_goods_management.repository.ProductRepository;
 import com.edutech.supply_of_goods_management.service.NotificationService;
+import com.edutech.supply_of_goods_management.service.OrderService;
 import com.edutech.supply_of_goods_management.repository.UserRepository;
 import com.edutech.supply_of_goods_management.entity.User;
 
@@ -18,12 +19,15 @@ public class ProductService {
     private final InventoryRepository inventoryRepo;
     private final UserRepository userRepo;
 
+    private final OrderService orderService;
+
     private final NotificationService notificationService;
-    public ProductService(ProductRepository repo, InventoryRepository inventoryRepo, NotificationService ns, UserRepository us) {
+    public ProductService(ProductRepository repo, InventoryRepository inventoryRepo, NotificationService ns, UserRepository us, OrderService os) {
         this.repo = repo;
         this.inventoryRepo = inventoryRepo;
         this.userRepo = us;
         this.notificationService = ns;
+        this.orderService = os;
     }
 
     // Create a new product
@@ -82,6 +86,15 @@ public List<Product> getLowStockProducts(int threshold) {
 
 public List<Product> getLowStockProductsByManufacturer(Long manufacturerId, int threshold) {
     return repo.findByManufacturerIdAndStockQuantityLessThanEqual(manufacturerId, threshold);
+}
+
+
+public void deleteProductIfNoWholesalerOrders(Long productId) {
+    long cnt = orderService.countWholesalerOrdersForProduct(productId);
+    if (cnt > 0) {
+        throw new RuntimeException("Cannot delete product. Wholesaler orders exist: " + cnt);
+    }
+    repo.deleteById(productId);
 }
 
 }

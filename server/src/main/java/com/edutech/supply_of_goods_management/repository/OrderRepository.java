@@ -85,4 +85,10 @@ List<Order> findByProductManufacturerIdAndUserRoleAndStatus(Long manufacturerId,
 List<Order> findByProductIdInAndUserRoleAndStatus(List<Long> productIds, String role, String status);
 
 
+@Query("SELECT COUNT(o) FROM Order o WHERE o.product.id = :productId AND o.user.role = :role")
+    long countByProductIdAndUserRole(@Param("productId") Long productId,
+                                     @Param("role") String role);
+
+
+
 }

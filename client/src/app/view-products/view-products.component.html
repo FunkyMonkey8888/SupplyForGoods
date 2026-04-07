@@ -31,11 +31,9 @@
         <!-- CONTROLS -->
         <div class="controls">
 
-          <!-- SORT KEY (role-based options) -->
+          <!-- SORT KEY -->
           <select class="control-select" (change)="changeSortKey(($any($event.target)).value)">
-            <option *ngFor="let s of sortKeys"
-                    [value]="s.key"
-                    [selected]="sortKey === s.key">
+            <option *ngFor="let s of sortKeys" [value]="s.key" [selected]="sortKey === s.key">
               Sort: {{ s.label }}
             </option>
           </select>
@@ -54,7 +52,7 @@
           </select>
 
           <!-- REFRESH -->
-          <button class="control-btn" type="button" (click)="refresh()" [disabled]="loading">
+          <button class="control-btn" type="button" (click)="refresh()" [disabled]="loading || saving">
             <i class="bi bi-arrow-clockwise"></i>
             Refresh
           </button>
@@ -62,25 +60,30 @@
         </div>
       </div>
 
-      <!-- LOW STOCK FILTER (MANUFACTURER + WHOLESALER only) -->
+      <!-- LOW STOCK FILTER -->
       <div class="toolbar lowstock" *ngIf="role === 'MANUFACTURER' || role === 'WHOLESALER'">
         <div class="controls lowstock-controls">
 
           <label class="checkbox">
-            <input type="checkbox"
-                   [checked]="showLowStockOnly"
-                   (change)="toggleLowStock(($any($event.target)).checked)" />
+            <input
+              type="checkbox"
+              [checked]="showLowStockOnly"
+              (change)="toggleLowStock(($any($event.target)).checked)"
+              [disabled]="loading || saving"
+            />
             <span>Low stock only</span>
           </label>
 
           <div class="threshold">
             <span class="threshold-label">Threshold</span>
-            <input class="threshold-input"
-                   type="number"
-                   min="1"
-                   [value]="lowStockThreshold"
-                   (input)="setLowStockThreshold(($any($event.target)).value)"
-                   [disabled]="!showLowStockOnly || loading" />
+            <input
+              class="threshold-input"
+              type="number"
+              min="1"
+              [value]="lowStockThreshold"
+              (input)="setLowStockThreshold(($any($event.target)).value)"
+              [disabled]="!showLowStockOnly || loading || saving"
+            />
           </div>
 
         </div>
@@ -99,25 +102,121 @@
       <div *ngIf="!loading && paged.length > 0" class="product-grid">
         <div class="product-card" *ngFor="let p of paged">
 
-          <div class="p-top">
-            <div class="p-name">{{ p.name }}</div>
+          <!-- VIEW MODE -->
+          <ng-container *ngIf="editingId !== p.id; else editBlock">
 
-            <!-- ✅ Stock shown ONLY for manufacturer -->
-            <div class="p-stock" *ngIf="canSeeStock">
-              Stock: {{ p.stockQuantity ?? 0 }}
+            <div class="p-top">
+              <div class="p-name">{{ p.name }}</div>
+
+              <!-- Stock for manufacturer -->
+              <div class="p-stock" *ngIf="canSeeStock">
+                Stock: {{ p.stockQuantity ?? 0 }}
+              </div>
+
+              <!-- Others -->
+              <div class="p-stock neutral" *ngIf="!canSeeStock">
+                In Catalog
+              </div>
             </div>
 
-            <!-- ✅ For others, show neutral badge -->
-            <div class="p-stock neutral" *ngIf="!canSeeStock">
-              In Catalog
+            <div class="p-desc">{{ p.description || 'No description available' }}</div>
+
+            <div class="p-meta">
+              <div class="p-price">₹{{ p.price ?? 0 }}</div>
+
+              <!-- Manufacturer-only: wholesaler order count -->
+              <div class="p-chip" *ngIf="role === 'MANUFACTURER'">
+                Wholesaler orders: {{ wholesalerOrderCount[p.id] }}
+              </div>
             </div>
-          </div>
 
-          <div class="p-desc">{{ p.description || 'No description available' }}</div>
+            <!-- Manufacturer actions -->
+            <div class="p-actions" *ngIf="role === 'MANUFACTURER'">
+              <button class="action-btn edit" type="button" (click)="startEdit(p)" [disabled]="loading || saving">
+                <i class="bi bi-pencil-square"></i>
+                Edit
+              </button>
 
-          <div class="p-meta">
-            <div class="p-price">₹{{ p.price ?? 0 }}</div>
-          </div>
+              <button
+                class="action-btn delete"
+                type="button"
+                (click)="deleteProduct(p)"
+                [disabled]="loading || saving || !canDeleteProduct(p)"
+              >
+                <i class="bi bi-trash3"></i>
+                Delete
+              </button>
+            </div>
+
+            <div class="p-hint" *ngIf="role === 'MANUFACTURER' && !canDeleteProduct(p)">
+              Cannot delete: wholesaler orders exist.
+            </div>
+
+          </ng-container>
+
+          <!-- EDIT MODE -->
+          <ng-template #editBlock>
+            <div class="edit-wrap" [formGroup]="editForm">
+
+              <div class="p-top">
+                <div class="p-name">Edit Product</div>
+                <div class="p-stock neutral">
+                  #{{ p.id }}
+                </div>
+              </div>
+
+              <div class="edit-grid">
+                <div class="edit-field">
+                  <label>Name</label>
+                  <input class="edit-input" type="text" formControlName="name" />
+                </div>
+
+                <div class="edit-field">
+                  <label>Price</label>
+                  <input class="edit-input" type="number" formControlName="price" />
+                </div>
+
+                <div class="edit-field full">
+                  <label>Description</label>
+                  <input class="edit-input" type="text" formControlName="description" />
+                </div>
+
+                <div class="edit-field">
+                  <label>Stock</label>
+                  <input class="edit-input" type="number" formControlName="stockQuantity" />
+                </div>
+
+                <div class="edit-field full">
+                  <div class="p-chip">
+                    Wholesaler orders: {{ wholesalerOrderCount[p.id]  }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-actions">
+                <button
+                  class="action-btn save"
+                  type="button"
+                  (click)="saveEdit(p)"
+                  [disabled]="saving || loading || editForm.invalid"
+                >
+                  <i class="bi bi-check2-circle"></i>
+                  {{ saving ? 'Saving...' : 'Save' }}
+                </button>
+
+                <button
+                  class="action-btn cancel"
+                  type="button"
+                  (click)="cancelEdit()"
+                  [disabled]="saving || loading"
+                >
+                  <i class="bi bi-x-circle"></i>
+                  Cancel
+                </button>
+              </div>
+
+            </div>
+          </ng-template>
 
         </div>
       </div>
@@ -132,10 +231,11 @@
         <button
           class="page-num"
           type="button"
-          *ngFor="let p of pageNumbers"
-          (click)="goToPage(p)"
-          [class.active]="p === currentPage">
-          {{ p }}
+          *ngFor="let pg of pageNumbers"
+          (click)="goToPage(pg)"
+          [class.active]="pg === currentPage"
+        >
+          {{ pg }}
         </button>
 
         <button class="page-btn" type="button" (click)="nextPage()" [disabled]="currentPage === totalPages">

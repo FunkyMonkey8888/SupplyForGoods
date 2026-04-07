@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpService } from '../../services/http.service';
 import { AuthService } from '../../services/auth.service';
 
@@ -28,16 +29,26 @@ export class ViewProductsComponent implements OnInit {
   pageSizes = [6, 9, 12];
   role: string = '';
 
-  // ✅ new: low stock filter
+  // low stock filter
   showLowStockOnly = false;
   lowStockThreshold = 10;
 
-  // ✅ derived UI permissions
+  // manufacturer edit/delete
+  editingId: number | null = null;
+  editForm!: FormGroup;
+  saving = false;
+
+  // wholesaler orders count per product (for delete restriction)
+  wholesalerOrderCount: Record<number, number> = {};
+
   get canSeeStock(): boolean {
     return this.role === 'MANUFACTURER';
   }
 
-  // ✅ allowed sort keys based on role
+  get isManufacturer(): boolean {
+    return this.role === 'MANUFACTURER';
+  }
+
   get sortKeys(): { key: SortKey; label: string }[] {
     const base = [
       { key: 'name' as SortKey, label: 'Name' },
@@ -49,16 +60,23 @@ export class ViewProductsComponent implements OnInit {
 
   constructor(
     private http: HttpService,
-    private auth: AuthService
+    private auth: AuthService,
+    private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
     this.role = this.auth.getRole() || '';
 
-    // if role can't see stock, ensure we never sort by it
     if (!this.canSeeStock && this.sortKey === 'stockQuantity') {
       this.sortKey = 'name';
     }
+
+    this.editForm = this.fb.group({
+      name: ['', Validators.required],
+      description: [''],
+      price: [0, [Validators.required, Validators.min(1)]],
+      stockQuantity: [0, [Validators.required, Validators.min(1)]]
+    });
 
     this.loadProducts();
   }
@@ -68,7 +86,9 @@ export class ViewProductsComponent implements OnInit {
   }
 
   private loadProducts(force: boolean = false): void {
-    const userId = this.auth.getUserId();
+    const userIdRaw = this.auth.getUserId();
+    const userId = userIdRaw != null ? Number(userIdRaw) : null;
+
     if (!userId) {
       this.message = 'Invalid user session.';
       return;
@@ -77,7 +97,6 @@ export class ViewProductsComponent implements OnInit {
     this.loading = true;
     this.message = '';
 
-    // ✅ when search term exists, prefer server search
     const term = (this.searchTerm || '').trim();
 
     // Manufacturer
@@ -94,7 +113,6 @@ export class ViewProductsComponent implements OnInit {
         this.http.searchProductsByManufacturer(term).subscribe({
           next: res => this.onLoaded(res),
           error: () => {
-            // fallback to full list + local filter
             this.http.getProductsByManufacturer(userId).subscribe({
               next: res2 => this.onLoaded(res2, true),
               error: () => this.onError()
@@ -114,11 +132,9 @@ export class ViewProductsComponent implements OnInit {
     // Wholesaler
     if (this.role === 'WHOLESALER') {
       if (this.showLowStockOnly) {
-        // low-stock endpoint exists for wholesaler products list
         this.http.getLowStockProductsByWholesaler(this.lowStockThreshold).subscribe({
           next: res => this.onLoaded(res),
           error: () => {
-            // fallback: normal list
             this.http.getProductsByWholesaler().subscribe({
               next: res2 => this.onLoaded(res2, true),
               error: () => this.onError()
@@ -153,7 +169,6 @@ export class ViewProductsComponent implements OnInit {
       this.http.searchProductsByConsumers(term).subscribe({
         next: res => this.onLoaded(res),
         error: () => {
-          // fallback to full list + local filter
           this.http.getProductsByConsumers().subscribe({
             next: res2 => this.onLoaded(res2, true),
             error: () => this.onError()
@@ -179,26 +194,141 @@ export class ViewProductsComponent implements OnInit {
       this.message = '';
     }
 
-    // If role cannot see stock, we ensure any accidental stock sorting is avoided
     if (!this.canSeeStock && this.sortKey === 'stockQuantity') {
       this.sortKey = 'name';
     }
 
-    // If API search was used, local filter is not required,
-    // but we keep it available if we loaded full list due to fallback.
-    if (applyLocalFilterAfterLoad) {
-      this.applyAll();
-    } else {
-      // Still apply sorting + paging (filter is basically "no-op" if term empty)
-      this.applyAll();
+    // Manufacturer-only: fetch wholesaler order counts to control delete button
+    if (this.isManufacturer) {
+      this.wholesalerOrderCount = {};
+      this.fetchWholesalerOrderCounts();
     }
+
+    this.applyAll();
   }
 
   private onError(): void {
     this.loading = false;
     this.message = 'Failed to load products.';
     this.products = [];
-    this.applyAll();
+    this.filtered = [];
+    this.paged = [];
+    this.totalPages = 1;
+    this.currentPage = 1;
+  }
+
+  // ===== Manufacturer: Delete constraint & Edit =====
+
+  private fetchWholesalerOrderCounts(): void {
+    for (const p of this.products) {
+      const pid = Number(p?.id);
+      if (!pid) continue;
+
+      // expects HttpService.getWholesalerOrderCountForProduct(productId)
+      this.http.getWholesalerOrderCountForProduct(pid).subscribe({
+        next: (cnt: number) => (this.wholesalerOrderCount[pid] = Number(cnt || 0)),
+        error: () => (this.wholesalerOrderCount[pid] = 0)
+      });
+    }
+  }
+
+  canDeleteProduct(product: any): boolean {
+    if (!this.isManufacturer) return false;
+    const pid = Number(product?.id);
+    const cnt = Number(this.wholesalerOrderCount[pid] ?? 0);
+    return cnt === 0;
+  }
+
+  deleteProduct(product: any): void {
+    if (!this.isManufacturer) return;
+
+    const pid = Number(product?.id);
+    if (!pid) return;
+
+    const cnt = Number(this.wholesalerOrderCount[pid] ?? 0);
+    if (cnt > 0) {
+      this.message = `Cannot delete product. Wholesaler orders exist: ${cnt}`;
+      return;
+    }
+
+    this.loading = true;
+    this.message = '';
+
+    // expects HttpService.deleteManufacturerProduct(productId)
+    this.http.deleteManufacturerProduct(pid).subscribe({
+      next: () => {
+        this.loading = false;
+        this.editingId = null;
+        this.loadProducts();
+      },
+      error: (err: any) => {
+        this.loading = false;
+        this.message = err?.error?.message || 'Delete failed.';
+      }
+    });
+  }
+
+  startEdit(product: any): void {
+    if (!this.isManufacturer) return;
+
+    this.message = '';
+    this.editingId = Number(product?.id) || null;
+
+    this.editForm.patchValue({
+      name: product?.name ?? '',
+      description: product?.description ?? '',
+      price: Number(product?.price ?? 0),
+      stockQuantity: Number(product?.stockQuantity ?? 0)
+    });
+  }
+
+  cancelEdit(): void {
+    this.editingId = null;
+    this.editForm.reset({
+      name: '',
+      description: '',
+      price: 0,
+      stockQuantity: 0
+    });
+  }
+
+  saveEdit(original: any): void {
+    if (!this.isManufacturer) return;
+    if (!this.editingId) return;
+
+    if (this.editForm.invalid) {
+      this.editForm.markAllAsTouched();
+      return;
+    }
+
+    const userIdRaw = this.auth.getUserId();
+    const manufacturerId = userIdRaw != null ? Number(userIdRaw) : null;
+    if (!manufacturerId) {
+      this.message = 'Invalid user session.';
+      return;
+    }
+
+    this.saving = true;
+    this.message = '';
+
+    const payload = {
+      ...original,
+      ...this.editForm.value,
+      manufacturerId
+    };
+
+    // expects HttpService.updateManufacturerProduct(productId, body)
+    this.http.updateManufacturerProduct(this.editingId, payload).subscribe({
+      next: () => {
+        this.saving = false;
+        this.editingId = null;
+        this.loadProducts();
+      },
+      error: (err: any) => {
+        this.saving = false;
+        this.message = err?.error?.message || 'Update failed.';
+      }
+    });
   }
 
   // ===== UI handlers =====
@@ -206,20 +336,12 @@ export class ViewProductsComponent implements OnInit {
   onSearchChange(value: string): void {
     this.searchTerm = value || '';
     this.currentPage = 1;
-
-    // Prefer server search when term exists
-    if (this.searchTerm.trim()) {
-      this.loadProducts();
-    } else {
-      // if cleared, load base list again
-      this.loadProducts();
-    }
+    this.loadProducts();
   }
 
   changeSortKey(value: string): void {
     const key = (value as SortKey) || 'name';
 
-    // prevent selecting stockQuantity for roles that should not see it
     if (!this.canSeeStock && key === 'stockQuantity') {
       this.sortKey = 'name';
     } else {
@@ -301,7 +423,6 @@ export class ViewProductsComponent implements OnInit {
       return;
     }
 
-    // ✅ IMPORTANT: hide stock matching for non-manufacturer roles
     this.filtered = this.products.filter(p => {
       const name = String(p?.name ?? '').toLowerCase();
       const desc = String(p?.description ?? '').toLowerCase();
@@ -320,7 +441,6 @@ export class ViewProductsComponent implements OnInit {
     const key = this.sortKey;
     const dir = this.sortDir === 'asc' ? 1 : -1;
 
-    // prevent sorting by stock for non-manufacturer
     const effectiveKey: SortKey = (!this.canSeeStock && key === 'stockQuantity') ? 'name' : key;
 
     this.filtered.sort((a, b) => {
