@@ -14,12 +14,29 @@
 
         <h3>Add Inventory</h3>
         <p>Select a product and update its stock quantity</p>
+
+        <div class="header-actions">
+          <button type="button" class="refresh-btn" (click)="refreshProducts()" [disabled]="loading">
+            <i class="bi bi-arrow-clockwise"></i>
+            Refresh Products
+          </button>
+        </div>
       </div>
 
       <!-- PRODUCTS -->
       <div class="products-section">
 
         <h5 class="section-title">Select Product</h5>
+
+        <!-- Loading products -->
+        <div *ngIf="loading && products.length === 0" class="alert-info">
+          Loading products...
+        </div>
+
+        <!-- Empty products -->
+        <div *ngIf="!loading && products.length === 0 && !errorMessage" class="empty-state">
+          No products available.
+        </div>
 
         <div class="products-grid">
 
@@ -31,9 +48,6 @@
           >
             <div class="product-top">
               <h6>{{ product.name }}</h6>
-              <!-- <span class="stock-badge">
-                Stock: <strong>{{ product.stockQuantity }}</strong>
-              </span> -->
             </div>
 
             <p class="description">
@@ -49,39 +63,67 @@
 
         <h5>Inventory Details</h5>
 
+        <!-- Selected Product Info -->
         <div *ngIf="selectedProduct" class="selected-info">
           Updating stock for <strong>{{ selectedProduct.name }}</strong>
         </div>
 
+        <!-- Existing Stock Info -->
+        <div *ngIf="selectedProduct" class="stock-info">
+
+          <div *ngIf="checkingInventory" class="alert-info">
+            Checking current stock...
+          </div>
+
+          <div *ngIf="!checkingInventory && existingInventory" class="alert-neutral">
+            Current stock: <strong>{{ currentStock }}</strong>
+          </div>
+
+          <div *ngIf="!checkingInventory && !existingInventory" class="alert-neutral">
+            No inventory exists yet for this product. New inventory will be created.
+          </div>
+
+        </div>
+
         <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
 
+          <!-- Stock Quantity -->
           <div class="form-group">
-            <label>Stock Quantity</label>
+            <label>Stock Quantity to Add</label>
             <input
               type="number"
               formControlName="stockQuantity"
               placeholder="Enter quantity"
             />
+
             <small class="error-text"
-                   *ngIf="itemForm.get('stockQuantity')?.touched &&
-                          itemForm.get('stockQuantity')?.invalid">
-              Quantity must be greater than 0
+              *ngIf="itemForm.get('stockQuantity')?.touched && itemForm.get('stockQuantity')?.errors?.['required']">
+              Quantity is required
+            </small>
+
+            <small class="error-text"
+              *ngIf="itemForm.get('stockQuantity')?.touched && itemForm.get('stockQuantity')?.errors?.['min']">
+              Quantity must be at least 1
             </small>
           </div>
 
+          <!-- Success -->
           <div *ngIf="successMessage" class="alert-success">
             ✅ {{ successMessage }}
           </div>
 
+          <!-- Error -->
           <div *ngIf="errorMessage" class="alert-error">
             {{ errorMessage }}
           </div>
 
+          <!-- Submit -->
           <button
             type="submit"
             class="submit-btn"
-            [disabled]="loading || !selectedProduct">
-            {{ loading ? 'Updating…' : 'Add Inventory' }}
+            [disabled]="loading || !selectedProduct || itemForm.invalid"
+          >
+            {{ loading ? 'Updating…' : (existingInventory ? 'Update Inventory' : 'Add Inventory') }}
           </button>
 
         </form>
