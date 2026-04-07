@@ -33,13 +33,16 @@
         <!-- Logged-out hero -->
         <div class="sog-kicker" *ngIf="!isLoggedIn">
           <span class="kicker-dot"></span>
-          LOGISTICS MANAGEMENT PLATFORM
+          SUPPLY MANAGEMENT PLATFORM
+
+
+
         </div>
 
         <h1 class="sog-title" [class.compact]="isLoggedIn">
           <ng-container *ngIf="!isLoggedIn">
             WELCOME TO<br />
-            <span class="sog-accent">SUPPLY‑OF‑GOODS</span>
+            <span class="sog-accent">SMART SUPPLY PRO</span>
           </ng-container>
 
           <ng-container *ngIf="isLoggedIn">
@@ -48,9 +51,63 @@
         </h1>
 
         <p class="sog-subtitle">
-          Logistics today is complex and demanding. Our platform empowers seamless
+          Supply Management today is complex and demanding. Our platform empowers seamless
           supply‑chain operations with speed and reliability.
         </p>
+        <section class="live-supply">
+  <div class="live-header">
+    <div class="live-title">Live Supply Flow</div>
+    <div class="live-sub">Manufacture → Wholesaler → Consumer</div>
+  </div>
+
+  <div class="flow-card">
+    <div class="flow-line"></div>
+    <div class="flow-glow"></div>
+
+    <div class="stage s1">
+      <div class="icon">🏭</div>
+      <div class="label">Manufacturing</div>
+    </div>
+
+    <div class="stage s2">
+      <div class="icon">📦</div>
+      <div class="label">Packaging</div>
+    </div>
+
+    <div class="stage s3">
+      <div class="icon">🚚</div>
+      <div class="label">In Transit</div>
+    </div>
+
+    <div class="stage s4">
+      <div class="icon">📍</div>
+      <div class="label">Delivered</div>
+    </div>
+
+    <div class="package pkg-1">
+  <div class="pkg-top"></div>
+  <div class="pkg-body"></div>
+  <div class="pkg-tape"></div>
+</div>
+
+<div class="package pkg-2">
+  <div class="pkg-top"></div>
+  <div class="pkg-body"></div>
+  <div class="pkg-tape"></div>
+</div>
+
+<div class="package pkg-3">
+  <div class="pkg-top"></div>
+  <div class="pkg-body"></div>
+  <div class="pkg-tape"></div>
+</div>
+
+    <div class="spark sA"></div>
+    <div class="spark sB"></div>
+    <div class="spark sC"></div>
+  </div>
+</section>
+
 
         <!-- KPI Cards -->
         <div class="kpi-row" *ngIf="isLoggedIn">
