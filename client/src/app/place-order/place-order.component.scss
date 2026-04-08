@@ -169,6 +169,72 @@
   color: #dbeafe;
 }
 
+/* ===== PAYABLE AMOUNT BOX ===== */
+.payable-box {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  font-size: 13px;
+  font-weight: 700;
+  color: #e5e7eb;
+
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+/* Row style for breakup */
+.payable-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.payable-row .label {
+  opacity: 0.85;
+}
+
+.payable-row .value {
+  font-weight: 900;
+}
+
+/* GST rows look slightly muted */
+.payable-row.gst {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+/* Divider */
+.payable-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 6px 0;
+}
+
+/* FINAL TOTAL */
+.payable-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding-top: 6px;
+  font-size: 14px;
+  font-weight: 900;
+
+  color: #ffffff;
+}
+
+.payable-total .amount {
+  color: #38bdf8;        /* cyan-blue highlight */
+  font-size: 16px;
+}
+
 /* ALERTS */
 .alert-warning {
   background: rgba(245,158,11,0.18);

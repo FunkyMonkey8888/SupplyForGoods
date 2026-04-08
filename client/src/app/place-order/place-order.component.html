@@ -15,7 +15,6 @@
         <h3>Place Order</h3>
         <p>Select inventory and place your order</p>
 
-        <!-- NEW: quick actions -->
         <div class="header-actions">
           <button
             type="button"
@@ -33,51 +32,55 @@
 
         <div class="section-head">
           <h5 class="section-title">Available Inventory</h5>
-
-          <!-- NEW: hint badge -->
           <span class="hint-pill" *ngIf="inventories.length > 0">
-            Click an item to select
+            Select an item to continue
           </span>
         </div>
 
-        <!-- NEW: empty state -->
         <div *ngIf="inventories.length === 0 && !loading" class="alert-warning">
           You must add inventory before placing any orders.
         </div>
 
-        <!-- NEW: loading state -->
         <div *ngIf="loading" class="alert-info">
           Loading inventory...
         </div>
 
         <div class="inventory-grid" *ngIf="inventories.length > 0 && !loading">
+
           <div
             class="inventory-card"
             *ngFor="let inv of inventories"
             [class.selected]="isSelected(inv)"
             (click)="selectInventory(inv)"
             role="button"
-            tabindex="0"
-          >
-            <div class="inv-top">
-              <h6>{{ inv?.product?.name || 'Unknown Product' }}</h6>
+            tabindex="0">
 
-              <!-- stock pill turns red-ish if low -->
-              <span class="stock-pill" [class.low]="(inv?.stockQuantity || 0) <= 5">
-                Stock: {{ inv?.stockQuantity ?? 0 }}
+            <div class="inv-top">
+              <h6>{{ inv?.product?.name }}</h6>
+
+              <span
+                class="stock-pill"
+                [class.low]="(inv?.stockQuantity || 0) <= 5">
+                {{ (inv?.stockQuantity || 0) > 0 ? 'In Stock' : 'Out of Stock' }}
               </span>
+            </div>
+
+            <div
+              class="low-stock-label"
+              *ngIf="(inv?.stockQuantity || 0) > 0 && (inv?.stockQuantity || 0) <= 5">
+              ⚠️ Low stock
             </div>
 
             <p class="description">
-              {{ inv?.product?.description || 'No description' }}
+              {{ inv?.product?.description || 'No description available' }}
             </p>
 
             <div class="inv-footer">
-              <span class="price">₹{{ inv?.product?.price ?? 0 }}</span>
-              <span class="meta">
-                Product ID: {{ inv?.product?.id ?? '-' }}
+              <span class="price">
+                Unit Price: ₹{{ inv?.product?.price ?? 0 }}
               </span>
             </div>
+
           </div>
         </div>
 
@@ -88,16 +91,34 @@
 
         <div class="form-head">
           <h5>Order Details</h5>
-
-          <!-- NEW: selected badge -->
           <span class="selected-pill" *ngIf="selectedInventory">
             Selected: {{ selectedInventory?.product?.name }}
           </span>
         </div>
 
         <div *ngIf="selectedInventory" class="selected-info">
-          Ordering from <strong>{{ selectedInventory?.product?.name }}</strong><br />
-          Available stock: <strong>{{ availableStock }}</strong>
+
+          <div class="selected-row">
+            <span>Product: </span>
+            <strong>{{ selectedInventory?.product?.name }}</strong>
+          </div>
+
+          <div class="selected-row">
+            <span>Unit Price: </span>
+            <strong>₹{{ selectedInventory?.product?.price ?? 0 }}</strong>
+          </div>
+
+          <div class="selected-row">
+            <span>Available Stock: </span>
+            <strong>{{ availableStock }}</strong>
+          </div>
+
+          <div
+            class="selected-warning"
+            *ngIf="availableStock <= 5">
+            ⚠️ Limited stock available
+          </div>
+
         </div>
 
         <div *ngIf="!selectedInventory" class="alert-warning">
@@ -106,8 +127,10 @@
 
         <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
 
+          <!-- QUANTITY -->
           <div class="form-group">
             <label>Quantity</label>
+
             <input
               type="number"
               formControlName="quantity"
@@ -120,13 +143,27 @@
               Max allowed: {{ availableStock }}
             </small>
 
-            <small class="error-text"
-                   *ngIf="itemForm.get('quantity')?.touched && itemForm.get('quantity')?.invalid">
+            <small
+              class="error-text"
+              *ngIf="itemForm.get('quantity')?.touched && itemForm.get('quantity')?.invalid">
               Quantity must be at least 1
             </small>
           </div>
 
-          <!-- success / error -->
+          <!-- PAYABLE AMOUNT -->
+          <div
+            class="payable-box"
+            *ngIf="selectedInventory && itemForm.get('quantity')?.value">
+
+            <span>Total Amount to Pay</span>
+            <strong>
+              ₹{{ (selectedInventory?.product?.price ?? 0) *
+                  (itemForm.get('quantity')?.value || 0) }}
+            </strong>
+
+          </div>
+
+          <!-- FEEDBACK -->
           <div *ngIf="successMessage" class="alert-success">
             ✅ {{ successMessage }}
           </div>
@@ -135,6 +172,7 @@
             {{ errorMessage }}
           </div>
 
+          <!-- SUBMIT -->
           <button
             type="submit"
             class="submit-btn"
